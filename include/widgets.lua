@@ -259,21 +259,16 @@ watch("sp status", 1,
 
 -- Volume widget
 local volume_icon = wibox.widget.imagebox(beautiful.widget_volume)
--- local volume = lain.widget.alsa({
---     settings = function()
---         widget:set_markup(" " .. volume_now.level .. "%" .. (volume_now.status == "off" and "[M]" or "") .. " ")
--- })
+local device_bluetooth = "CC:98:8B:7F:F9:CE"
+local device_front = "front:0"
 local volume = lain.widget.pulse{
     settings = 
     function()
-        local volume_color = beautiful.fg_focus
-        if volume_now.device == "CC:98:8B:7F:F9:CE" then
-            volume_color = beautiful.fg_focus
+        if volume_now.device == device_bluetooth or volume_now.device == device_front then
+            widget:set_markup(lain.util.markup(beautiful.fg_focus, " " .. volume_now.left .. "%" .. (volume_now.muted == "yes" and " [M]" or "") .. " "))
         else
-            volume_color = beautiful.fg_urgent
+            widget:set_markup(lain.util.markup(beautiful.fg_urgent, "0%"))
         end
-
-        widget:set_markup(lain.util.markup(volume_color, " " .. volume_now.left .. "%" .. (volume_now.muted == "yes" and " [M]" or "") .. " "))
     end
 }
 local volume_widget = wibox.container.background(volume.widget)
@@ -303,7 +298,8 @@ volume.widget:buttons(awful.util.table.join(
         {}, 
         3, 
         function()
-            os.execute(string.format("pactl set-sink-volume %d 100%%", volume.device))
+            local value = volume.device == device_bluetooth and 100 or 20
+            os.execute(string.format("pactl set-sink-volume %d %d%%", volume.device, value))
             volume.update()
         end
     ),

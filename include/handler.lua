@@ -20,7 +20,7 @@ do
             { 
                 preset = naughty.config.presets.critical,
                 title = "Oops, an error happened!",
-                text = err 
+                text = tostring(err) 
             }
         )
         in_error = false
