@@ -24,8 +24,8 @@ if awesome.startup_errors then
     naughty.notify(
         {
             preset = naughty.config.presets.critical,
-            title = "Oops, there were errors during startup!",
-            text = awesome.startup_errors 
+            title = "Startup error",
+            text = awesome.startup_errors
         }
     )
 end
@@ -38,10 +38,10 @@ do
         in_error = true
 
         naughty.notify(
-            { 
+            {
                 preset = naughty.config.presets.critical,
-                title = "Oops, an error happened!",
-                text = tostring(err) 
+                title = "Unexpected error",
+                text = tostring(err)
             }
         )
         in_error = false
@@ -63,7 +63,7 @@ end
 beautiful.init(os.getenv("HOME") .. "/.config/awesome/themes/zenburn/theme.lua")
 -- }}}
 
--- {{{ Notifications theme 
+-- {{{ Notifications theme
 -- naughty.config.defaults.screen              = awful.screen.preferred
 naughty.config.presets.critical.opacity     = 0.8
 naughty.config.presets.normal.bg            = beautiful.notify_bg
@@ -137,7 +137,7 @@ function set_tags(s, tags)
         if tags[s.index] ~= nil then
             for i, settings in ipairs(tags[s.index]) do
                 awful.tag.add(
-                    settings.name, 
+                    settings.name,
                     {
                         layout = layouts.suits[settings.layout],
                         screen = s,
@@ -154,7 +154,7 @@ function set_tags(s, tags)
             if tags[i] ~= nil then
                 for j, settings in ipairs(tags[i]) do
                     awful.tag.add(
-                        settings.name, 
+                        settings.name,
                         {
                             layout = layouts.suits[settings.layout],
                             screen = s,
@@ -169,7 +169,7 @@ function set_tags(s, tags)
     end
 end
 
-local tags = 
+local tags =
 {
     TAG_TERMINAL =      1,
     TAG_VSCODE =        2,
@@ -196,14 +196,14 @@ local tags =
         "extra"
     },
 
-    [screens.SCREEN_ONE] = 
+    [screens.SCREEN_ONE] =
     {
         { name = "vscode",      layout = layouts.LAYOUT_MAX         },
         { name = "dev",         layout = layouts.LAYOUT_MAX         },
         { name = "extra",       layout = layouts.LAYOUT_FLOATING    }
     },
 
-    [screens.SCREEN_TWO] = 
+    [screens.SCREEN_TWO] =
     {
         { name = "web [unity]", layout = layouts.LAYOUT_MAX         },
         { name = "web [home]",  layout = layouts.LAYOUT_MAX         },
@@ -213,7 +213,7 @@ local tags =
         { name = "extra",       layout = layouts.LAYOUT_FLOATING    }
     },
 
-    [screens.SCREEN_THREE] = 
+    [screens.SCREEN_THREE] =
     {
         { name = "terminal",    layout = layouts.LAYOUT_CENTERWORK_HORIZONTAL   },
         { name = "sublime",     layout = layouts.LAYOUT_TILE_TOP                },
@@ -226,7 +226,7 @@ local tags =
 -- Set the terminal for applications that require it
 menubar.utils.terminal = terminal
 
-local awesome_menu = 
+local awesome_menu =
 {
     { "Hotkeys",    function() return false, hotkeys_popup.show_help end    },
     { "Lock",       "xscreensaver-command -lock"                            },
@@ -238,15 +238,15 @@ local awesome_menu =
 
 local main_menu = freedesktop.menu.build(
     {
-        before = 
-        { 
+        before =
+        {
             { "awesome", awesome_menu, beautiful.awesome_icon }
         }
     }
 )
 
 local menu = awful.widget.launcher(
-    { 
+    {
         image = beautiful.awesome_icon,
         menu =  main_menu
     }
@@ -280,8 +280,8 @@ function set_spotify_text(widget, song)
         spotify_song_size = spotify_song_text:len()
 
         widget:set_markup(
-            "<span foreground=" .. "'"..spotify_song_color .. "'" .. ">" .. 
-            spotify_song_text .. 
+            "<span foreground=" .. "'"..spotify_song_color .. "'" .. ">" ..
+            spotify_song_text ..
             "</span>"
         )
     else
@@ -299,9 +299,9 @@ function set_spotify_text(widget, song)
         end
 
         widget:set_markup(
-            "<span foreground=" .. "'"..spotify_song_color .. "'" .. ">" .. 
-            spotify_song_text:sub(spotify_song_index, spotify_song_size) .. 
-            spotify_song_text:sub(1, spotify_song_index - 1) .. 
+            "<span foreground=" .. "'"..spotify_song_color .. "'" .. ">" ..
+            spotify_song_text:sub(spotify_song_index, spotify_song_size) ..
+            spotify_song_text:sub(1, spotify_song_index - 1) ..
             "</span>"
         )
     end
@@ -321,7 +321,7 @@ function update_spotify_text(widget, song)
     if (spotify_song_index >= spotify_song_size) then
         spotify_song_index = 1
     end
-    
+
     set_spotify_text(widget, song)
 end
 
@@ -573,7 +573,7 @@ stop_icon:buttons(gears.table.join(awful.button({ }, 1, function() spotify_stop(
 play_pause_icon:connect_signal(
     "button::press",
     function(x, y, button, mods, find_widgets_result)
-        awful.spawn.easy_async("sp status", 
+        awful.spawn.easy_async("sp status",
             function(stdout, stderr, exitreason, exitcode)
                 set_play_pause_icon(play_pause_icon, stdout)
             end
@@ -583,8 +583,8 @@ play_pause_icon:connect_signal(
 
 spotify_text:buttons(awful.util.table.join(
     awful.button(
-        {}, 
-        4, 
+        {},
+        4,
         function()
             if (spotify_song_state == 1) then
                 spotify_song_index = spotify_song_index + 1
@@ -597,8 +597,8 @@ spotify_text:buttons(awful.util.table.join(
     ),
 
     awful.button(
-        {}, 
-        5, 
+        {},
+        5,
         function()
             if (spotify_song_state == 1) then
                 spotify_song_index = spotify_song_index - 1
@@ -611,17 +611,17 @@ spotify_text:buttons(awful.util.table.join(
     )
 ))
 
-watch("sp current-oneline", 1, 
-    function (widget, stdout, _, _, _) 
-        update_spotify_text(widget, stdout) 
-    end, 
+watch("sp current-oneline", 1,
+    function (widget, stdout, _, _, _)
+        update_spotify_text(widget, stdout)
+    end,
     spotify_text
 )
 
-watch("sp status", 1, 
-    function (widget, stdout, _, _, _) 
-        set_play_pause_icon(widget, stdout) 
-    end, 
+watch("sp status", 1,
+    function (widget, stdout, _, _, _)
+        set_play_pause_icon(widget, stdout)
+    end,
     play_pause_icon
 )
 
@@ -630,7 +630,7 @@ local volume_icon = wibox.widget.imagebox(beautiful.widget_volume)
 local device_bluetooth = "CC:98:8B:7F:F9:CE"
 local device_front = "front:0"
 local volume = lain.widget.pulse{
-    settings = 
+    settings =
     function()
         if volume_now.device == device_bluetooth or volume_now.device == device_front then
             widget:set_markup(lain.util.markup(beautiful.fg_focus, " " .. volume_now.left .. "%" .. (volume_now.muted == "yes" and " [M]" or "") .. " "))
@@ -644,16 +644,16 @@ volume_widget.bgimage=beautiful.widget_display
 
 volume.widget:buttons(awful.util.table.join(
     awful.button(
-        {}, 
-        1, 
+        {},
+        1,
         function()
             awful.spawn("pavucontrol")
         end
     ),
 
     awful.button(
-        {}, 
-        2, 
+        {},
+        2,
         function()
             os.execute(string.format("pactl set-sink-mute %d toggle", volume.device))
             volume.update()
@@ -661,8 +661,8 @@ volume.widget:buttons(awful.util.table.join(
     ),
 
     awful.button(
-        {}, 
-        3, 
+        {},
+        3,
         function()
             local value = volume.device == device_bluetooth and 100 or 20
             os.execute(string.format("pactl set-sink-volume %d %d%%", volume.device, value))
@@ -671,8 +671,8 @@ volume.widget:buttons(awful.util.table.join(
     ),
 
     awful.button(
-        {}, 
-        4, 
+        {},
+        4,
         function()
             os.execute(string.format("pactl set-sink-volume %d +1%%", volume.device))
             volume.update()
@@ -680,8 +680,8 @@ volume.widget:buttons(awful.util.table.join(
     ),
 
     awful.button(
-        {}, 
-        5, 
+        {},
+        5,
         function()
             os.execute(string.format("pactl set-sink-volume %d -1%%", volume.device))
             volume.update()
@@ -1457,7 +1457,7 @@ awful.rules.rules =
             titlebars_enabled = true
         }
     },
-    
+
     {
         rule =
         {
@@ -1491,38 +1491,59 @@ end)
 client.connect_signal("request::titlebars", function(c)
     -- buttons for the titlebar
     local buttons = gears.table.join(
-        awful.button({ }, 1, function()
-            client.focus = c
-            c:raise()
-            awful.mouse.client.move(c)
-        end),
-        awful.button({ }, 3, function()
-            client.focus = c
-            c:raise()
-            awful.mouse.client.resize(c)
-        end)
+        awful.button(
+            {},
+            1,
+            function()
+                client.focus = c
+                c:raise()
+                awful.mouse.client.move(c)
+            end
+        ),
+
+        awful.button(
+            {},
+            2,
+            function()
+                c:kill()
+            end
+        ),
+
+        awful.button(
+            {},
+            3,
+            function()
+                client.focus = c
+                c:raise()
+                awful.mouse.client.resize(c)
+            end
+        )
     )
 
     awful.titlebar(c) : setup {
-        { -- Left
+        {
+            -- Left
             awful.titlebar.widget.iconwidget(c),
             buttons = buttons,
             layout  = wibox.layout.fixed.horizontal
         },
-        { -- Middle
-            { -- Title
+
+        {
+            -- Middle
+            {
+                -- Title
                 align  = "center",
                 widget = awful.titlebar.widget.titlewidget(c)
             },
             buttons = buttons,
             layout  = wibox.layout.flex.horizontal
         },
-        { -- Right
-            awful.titlebar.widget.floatingbutton (c),
+
+        {
+            -- Right
+            awful.titlebar.widget.minimizebutton(c),
             awful.titlebar.widget.maximizedbutton(c),
-            awful.titlebar.widget.stickybutton   (c),
-            awful.titlebar.widget.ontopbutton    (c),
-            awful.titlebar.widget.closebutton    (c),
+            awful.titlebar.widget.closebutton(c),
             layout = wibox.layout.fixed.horizontal()
         },
         layout = wibox.layout.align.horizontal
@@ -1544,7 +1565,7 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 screen.connect_signal("property::geometry", set_wallpaper)
 
 awful.screen.connect_for_each_screen(
-    function(s) 
+    function(s)
         -- Wallpaper
         set_wallpaper(s)
 
