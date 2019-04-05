@@ -149,7 +149,6 @@ function set_tags(s, tags)
             awful.tag({ "1", "2", "3" }, s,layouts.suits[layouts.LAYOUT_FLOATING])
         end
     elseif 1 == screen:count() then
-        is_selected = false
         for _, i in ipairs({screens.SCREEN_THREE , screens.SCREEN_ONE, screens.SCREEN_TWO}) do
             if tags[i] ~= nil then
                 for j, settings in ipairs(tags[i]) do
@@ -1282,6 +1281,20 @@ awful.rules.rules =
         rule =
         {
             class = "[Pp]4v"
+        },
+        properties =
+        {
+            maximized_horizontal = true,
+            maximized_vertical = true,
+            screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
+            tag = tags.names[tags.TAG_DEV]
+        }
+    },
+
+    {
+        rule =
+        {
+            class = "[Gg]it"
         },
         properties =
         {
