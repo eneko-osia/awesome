@@ -231,8 +231,8 @@ local awesome_menu =
     { "Lock",       "xscreensaver-command -lock"                            },
     { "Restart",    awesome.restart                                         },
     { "Quit",       function() awesome.quit() end                           },
-    { "Reboot",     "shutdown -r 0"                                         },
-    { "Shutdown",   "shutdown -h 0"                                         }
+    { "Reboot",     "shutdown -r now"                                       },
+    { "Shutdown",   "shutdown -h now"                                       }
 }
 
 local main_menu = freedesktop.menu.build(
@@ -350,7 +350,9 @@ end
 -- }}}
 
 -- {{{ Auto start applications
-awful.spawn("xrandr --output HDMI-0 --pos 0x620 --output DP-2 --pos 2560x620 --primary --output DP-0.8 --rotate right --pos 5120x0")
+if screens.MAX_SCREEN == screen:count() then
+    awful.spawn("xrandr --output HDMI-0 --pos 0x620 --output DP-2 --pos 2560x620 --primary --output DP-0.8 --rotate right --pos 5120x0")
+end
 
 function startup_programs()
     awful.spawn("blueman-applet")
