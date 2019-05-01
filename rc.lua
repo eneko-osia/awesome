@@ -356,10 +356,10 @@ end
 
 function startup_programs()
     awful.spawn("blueman-applet")
-    awful.spawn("code")
-    awful.spawn("subl")
     awful.spawn("chromium-browser")
+    awful.spawn("code")
     awful.spawn("slack")
+    awful.spawn("subl")
     awful.spawn("xscreensaver -no-splash")
     awful.spawn("xterm")
     awful.spawn("xterm")
@@ -1210,7 +1210,10 @@ awful.rules.rules =
         {
             floating = true,
             titlebars_enabled = true
-        }
+        },
+        callback = function (c)
+            awful.placement.centered(c,nil)
+        end
     },
 
     {
@@ -1352,7 +1355,7 @@ awful.rules.rules =
     {
         rule =
         {
-            class = "[Cc]aja"
+            class = "[X]fe"
         },
         properties =
         {
@@ -1402,18 +1405,6 @@ awful.rules.rules =
             screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
             tag = tags.names[tags.TAG_UNITY],
             titlebars_enabled = true
-        }
-    },
-
-    {
-        rule =
-        {
-            class = "[Ee]vince"
-        },
-        properties =
-        {
-            screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
-            tag = tags.names[tags.TAG_EXTRA]
         }
     },
 
@@ -1470,18 +1461,6 @@ awful.rules.rules =
             screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
             tag = tags.names[tags.TAG_EXTRA],
             titlebars_enabled = true
-        }
-    },
-
-    {
-        rule =
-        {
-            class = "[Vv]irtual[Bb]ox"
-        },
-        properties =
-        {
-            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-            tag = tags.names[tags.TAG_EXTRA]
         }
     }
 }
