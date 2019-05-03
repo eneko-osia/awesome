@@ -352,6 +352,8 @@ end
 -- {{{ Auto start applications
 if screens.MAX_SCREEN == screen:count() then
     awful.spawn("xrandr --output HDMI-0 --pos 0x620 --output DP-2 --pos 2560x620 --primary --output DP-0.8 --rotate right --pos 5120x0")
+elseif 1 == screen:count() then
+    awful.spawn("xrandr --output eDP-1-1 --mode 1920x1080")
 end
 
 function startup_programs()
@@ -501,7 +503,7 @@ local keyboard_widget = awful.widget.keyboardlayout()
 local clock_icon = wibox.widget.imagebox(beautiful.widget_clock)
 local text_clock = wibox.widget.textclock(" %a %d %b %H:%M ")
 local clock_widget = wibox.container.background(text_clock)
-clock_widget.bgimage=beautiful.widget_display
+clock_widget.bgimage = beautiful.widget_display
 
 -- Calendar widget
 calendar({}):attach(text_clock)
@@ -515,7 +517,7 @@ local cpu = lain.widget.cpu({
         end
 })
 local cpu_widget = wibox.container.background(cpu.widget)
-cpu_widget.bgimage=beautiful.widget_display
+cpu_widget.bgimage = beautiful.widget_display
 
 -- Memory widget
 local mem_icon = wibox.widget.imagebox(beautiful.widget_mem)
@@ -526,7 +528,7 @@ local mem = lain.widget.mem({
         end
 })
 local mem_widget = wibox.container.background(mem.widget)
-mem_widget.bgimage=beautiful.widget_display
+mem_widget.bgimage = beautiful.widget_display
 
 -- Ssd widget
 local ssd_icon = wibox.widget.imagebox(beautiful.widget_ssd)
@@ -537,13 +539,42 @@ local ssd = lain.widget.fs({
     end
 })
 local ssd_widget = wibox.container.background(ssd.widget)
-ssd_widget.bgimage=beautiful.widget_display
+ssd_widget.bgimage = beautiful.widget_display
+
+-- Battery widget
+local battery_icon = wibox.widget.imagebox(beautiful.widget_battery)
+local battery = lain.widget.bat({
+    notify = "off",
+    full_notify = "off",
+    settings = function()
+        bat_perc = tonumber(bat_now.perc)
+        if bat_perc == 100 then
+            battery_icon:set_image(beautiful.widget_battery_ac)
+            widget:set_markup(" " .. bat_now.perc .. "%" .. " ")
+        elseif bat_perc > 50 then
+            battery_icon:set_image(beautiful.widget_battery)
+            widget:set_markup(" " .. bat_now.perc .. "%" .. " ")
+        elseif bat_perc > 15 then
+            battery_icon:set_image(beautiful.widget_battery_low)
+            widget:set_markup(lain.util.markup(beautiful.bg_focus, " " .. bat_now.perc .. "%" .. " "))
+        else
+            battery_icon:set_image(beautiful.widget_battery_empty)
+            widget:set_markup(lain.util.markup(beautiful.fg_urgent, " " .. bat_now.perc .. "%" .. " "))
+        end
+    end
+})
+local battery_widget = wibox.container.background(battery.widget)
+battery_widget.bgimage = beautiful.widget_display
 
 -- Network widget
 local netdl_icon = wibox.widget.imagebox(beautiful.widget_netdl)
 local netup_icon = wibox.widget.imagebox(beautiful.widget_netul)
 local netdl = wibox.widget.textbox()
+netdl.align = "center"
+netdl.forced_width = 96
 local netup = wibox.widget.textbox()
+netup.align = "center"
+netup.forced_width = 96
 local net = lain.widget.net({
     settings = function()
         netdl:set_markup(string.format(" %.1f Kb ", net_now.received))
@@ -551,9 +582,9 @@ local net = lain.widget.net({
     end
 })
 local netdl_widget = wibox.container.background(netdl)
-netdl_widget.bgimage=beautiful.widget_display
+netdl_widget.bgimage = beautiful.widget_display
 local netup_widget = wibox.container.background(netup)
-netup_widget.bgimage=beautiful.widget_display
+netup_widget.bgimage = beautiful.widget_display
 
 -- Music widget
 local next_icon = wibox.widget.imagebox(beautiful.mpd_nex)
@@ -564,7 +595,7 @@ local spotify_text = wibox.widget.textbox()
 spotify_text.align = "center"
 spotify_text.forced_width = 256
 local spotify_widget = wibox.container.background(spotify_text)
-spotify_widget.bgimage=beautiful.widget_display
+spotify_widget.bgimage = beautiful.widget_display
 
 next_icon:buttons(gears.table.join(awful.button({ }, 1, function() spotify_next() end)))
 play_pause_icon:buttons(gears.table.join(awful.button({ }, 1, function() spotify_play_pause() end)))
@@ -641,7 +672,7 @@ local volume = lain.widget.pulse{
     end
 }
 local volume_widget = wibox.container.background(volume.widget)
-volume_widget.bgimage=beautiful.widget_display
+volume_widget.bgimage = beautiful.widget_display
 
 volume.widget:buttons(awful.util.table.join(
     awful.button(
@@ -675,8 +706,10 @@ volume.widget:buttons(awful.util.table.join(
         {},
         4,
         function()
-            os.execute(string.format("pactl set-sink-volume %d +1%%", volume.device))
-            volume.update()
+            if volume.device ~= nil then
+                os.execute(string.format("pactl set-sink-volume %d +1%%", volume.device))
+                volume.update()
+            end
         end
     ),
 
@@ -684,8 +717,10 @@ volume.widget:buttons(awful.util.table.join(
         {},
         5,
         function()
-            os.execute(string.format("pactl set-sink-volume %d -1%%", volume.device))
-            volume.update()
+            if volume.device ~= nil then
+                os.execute(string.format("pactl set-sink-volume %d -1%%", volume.device))
+                volume.update()
+            end
         end
     )
 ))
@@ -817,6 +852,14 @@ function set_widgets(s)
             ssd_icon,
             widget_display_left,
             ssd_widget,
+            widget_display_right,
+            spr4px,
+            -- Separator
+            spr,
+            -- Battery widget
+            battery_icon,
+            widget_display_left,
+            battery_widget,
             widget_display_right,
             spr4px,
             -- Separator
