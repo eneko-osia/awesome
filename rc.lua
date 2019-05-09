@@ -126,14 +126,13 @@ local screens =
 {
     SCREEN_ONE =    1,
     SCREEN_TWO =    2,
-    SCREEN_THREE =  3,
-    MAX_SCREEN =    3
+    SCREEN_THREE =  3
 }
 -- }}}
 
 -- {{{ Tags definitions
 function set_tags(s, tags)
-    if screens.MAX_SCREEN == screen:count() then
+    if screens.SCREEN_THREE == screen:count() then
         if tags[s.index] ~= nil then
             for i, settings in ipairs(tags[s.index]) do
                 awful.tag.add(
@@ -148,7 +147,7 @@ function set_tags(s, tags)
         else
             awful.tag({ "1", "2", "3" }, s,layouts.suits[layouts.LAYOUT_FLOATING])
         end
-    elseif 1 == screen:count() then
+    elseif screens.SCREEN_ONE == screen:count() then
         for _, i in ipairs({screens.SCREEN_THREE , screens.SCREEN_ONE, screens.SCREEN_TWO}) do
             if tags[i] ~= nil then
                 for j, settings in ipairs(tags[i]) do
@@ -350,19 +349,23 @@ end
 -- }}}
 
 -- {{{ Auto start applications
-if screens.MAX_SCREEN == screen:count() then
+if screens.SCREEN_THREE == screen:count() then
     awful.spawn("xrandr --output HDMI-0 --pos 0x620 --output DP-2 --pos 2560x620 --primary --output DP-0.8 --rotate right --pos 5120x0")
-elseif 1 == screen:count() then
-    awful.spawn("xrandr --output eDP-1-1 --mode 1920x1080")
+elseif screens.SCREEN_ONE == screen:count() then
+    awful.spawn("xrandr --output eDP-1-1 --mode 1920x1080 --brightness 1.0")
 end
 
 function startup_programs()
+    
+    if screens.SCREEN_THREE == screen:count() then
+        awful.spawn("xscreensaver -no-splash")
+    end
+
     awful.spawn("blueman-applet")
     awful.spawn("chromium-browser")
     awful.spawn("code")
     awful.spawn("slack")
     awful.spawn("subl")
-    awful.spawn("xscreensaver -no-splash")
     awful.spawn("xterm")
     awful.spawn("xterm")
     awful.spawn("xterm")
@@ -543,6 +546,8 @@ ssd_widget.bgimage = beautiful.widget_display
 
 -- Battery widget
 local battery_icon = wibox.widget.imagebox(beautiful.widget_battery)
+local battery_notification = nil
+local battey_time = ""
 local battery = lain.widget.bat({
     notify = "off",
     full_notify = "off",
@@ -550,21 +555,36 @@ local battery = lain.widget.bat({
         bat_perc = tonumber(bat_now.perc)
         if bat_perc == 100 then
             battery_icon:set_image(beautiful.widget_battery_ac)
+            battery_time = " " .. bat_now.time .. " "
             widget:set_markup(" " .. bat_now.perc .. "%" .. " ")
         elseif bat_perc > 50 then
             battery_icon:set_image(beautiful.widget_battery)
+            battery_time = " " .. bat_now.time .. " "
             widget:set_markup(" " .. bat_now.perc .. "%" .. " ")
         elseif bat_perc > 15 then
             battery_icon:set_image(beautiful.widget_battery_low)
+            battery_time = " " .. bat_now.time .. " "
             widget:set_markup(lain.util.markup(beautiful.bg_focus, " " .. bat_now.perc .. "%" .. " "))
         else
             battery_icon:set_image(beautiful.widget_battery_empty)
+            battery_time = " " .. bat_now.time .. " "
             widget:set_markup(lain.util.markup(beautiful.fg_urgent, " " .. bat_now.perc .. "%" .. " "))
         end
     end
 })
 local battery_widget = wibox.container.background(battery.widget)
 battery_widget.bgimage = beautiful.widget_display
+battery_widget:connect_signal('mouse::enter', function()
+    battery_notification = naughty.notify(
+        {
+            title = "Battery time",
+            text = battery_time
+        }) 
+end)
+battery_widget:connect_signal('mouse::leave', function()
+    naughty.destroy(battery_notification) 
+    battery_notification = nil
+end)
 
 -- Network widget
 local netdl_icon = wibox.widget.imagebox(beautiful.widget_netdl)
@@ -727,7 +747,7 @@ volume.widget:buttons(awful.util.table.join(
 
 function set_widgets(s)
     -- Prompt box
-    s.mypromptbox =
+    s.promptbox =
         awful.widget.prompt({
             prompt = " Execute: "
         })
@@ -826,12 +846,6 @@ function set_widgets(s)
             spr,
             spr4px,
             spr,
-            -- Prompt box
-            s.mypromptbox,
-            -- Separator
-            spr,
-            spr4px,
-            spr,
             -- Cpu
             cpu_icon,
             widget_display_left,
@@ -912,6 +926,12 @@ function set_widgets(s)
         {
             -- Right widgets
             layout = wibox.layout.fixed.horizontal,
+            -- Separator
+            spr,
+            spr4px,
+            spr,
+            -- Prompt box
+            s.promptbox,
             -- Separator
             spr,
             spr4px,
@@ -1000,7 +1020,7 @@ local globalkeys = gears.table.join(
     awful.key(
         { modkey },
         "F2",
-        function () awful.screen.focused().mypromptbox:run() end,
+        function () awful.screen.focused().promptbox:run() end,
         { description = "run program", group = "launcher" }
     ),
 
@@ -1044,27 +1064,15 @@ local globalkeys = gears.table.join(
     -- Programs
 
     awful.key(
-        { modkey },
+        { modkey, "Shift" },
         "Tab",
-        function ()
-            awful.client.focus.history.previous()
-            if client.focus then
-                client.focus:raise()
-            end
-        end,
-        { description = "back program", group = "program" }
-    ),
-
-    awful.key(
-        { modkey },
-        "j",
         function () awful.client.focus.byidx( 1) end,
         { description = "previous program", group = "program" }
     ),
 
     awful.key(
         { modkey },
-        "k",
+        "Tab",
         function () awful.client.focus.byidx(-1) end,
         { description = "next program", group = "program" }
     ),
