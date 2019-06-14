@@ -362,62 +362,11 @@ function startup_programs()
     end
 
     awful.spawn("blueman-applet")
-    
-    awful.spawn("chromium-browser", {
-        screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
-        tag = tags.names[tags.TAG_WEB_UNITY]
-    })
-
-    awful.spawn("code", {
-        screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
-        tag = tags.names[tags.TAG_VSCODE]
-    })    
-
-    awful.spawn("slack", {
-        screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
-        tag = tags.names[tags.TAG_SLACK]
-    })
-
-    awful.spawn("subl", {
-        screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
-        tag = tags.names[tags.TAG_SUBLIME]
-    })
-
-    awful.spawn("xterm", {
-        screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
-        tag = tags.names[tags.TAG_WEB_UNITY]
-    })
-
-    awful.spawn("xterm", {
-        screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
-        tag = tags.names[tags.TAG_WEB_HOME]
-    })
-
-    awful.spawn("xterm", {
-        screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
-        tag = tags.names[tags.TAG_SLACK]
-    })
-
-    awful.spawn("xterm", {
-        screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-        tag = tags.names[tags.TAG_TERMINAL]
-    })
-
-    awful.spawn("xterm", {
-        screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-        tag = tags.names[tags.TAG_TERMINAL]
-    })
-
-    awful.spawn("xterm", {
-        screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-        tag = tags.names[tags.TAG_TERMINAL]
-    })
-
-    awful.spawn("xfe", {
-        screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-        tag = tags.names[tags.TAG_TERMINAL]
-    })
-end
+    awful.spawn("chromium-browser")
+    awful.spawn("code")
+    awful.spawn("slack")
+    awful.spawn("subl")
+end    
 -- }}}
 
 -- {{{ Widgets definitions
@@ -801,8 +750,129 @@ function set_widgets(s)
         })
 
     -- Layout box
-    s.mylayoutbox = awful.widget.layoutbox(s)
-    s.mylayoutbox:buttons(
+    s.layoutbox = awful.widget.layoutbox(s)
+    s.layoutbox:buttons(
+        gears.table.join(
+            awful.button(
+                { },
+                1,
+                function () awful.layout.inc( 1) end
+            ),
+
+            awful.button(
+                { },
+                3,
+                function () awful.layout.inc(-1) end
+            ),
+
+            awful.button(
+                { },
+                4,
+                function () awful.layout.inc( 1) end
+            ),
+
+            awful.button(
+                { },
+                5,
+                function () awful.layout.inc(-1) end
+            )
+        )
+    )
+
+    -- Tag list
+    s.tag_list = awful.widget.taglist(s, awful.widget.taglist.filter.all, taglist_buttons)
+
+    -- Task list
+    s.task_list = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, tasklist_buttons)
+
+    -- Wibox
+    s.top_wibox = awful.wibar({ position = "top", screen = s, height = 22, bg = beautiful.panel, fg = beautiful.fg_normal })
+    s.top_wibox:setup {
+        layout = wibox.layout.align.horizontal,
+        {
+            -- Left widgets
+            layout = wibox.layout.fixed.horizontal,
+            -- Separator
+            spr,
+            spr4px,
+            spr,
+            -- Tag list
+            s.tag_list,
+            -- Separator
+            spr,
+            spr4px,
+            spr,
+        },
+        {
+            -- Middle widget
+            layout = wibox.layout.fixed.horizontal,
+        },
+        {
+            -- Right widgets
+            layout = wibox.layout.fixed.horizontal,
+            -- Separator
+            spr,
+            spr4px,
+            spr,
+            -- Clock
+            clock_icon,
+            widget_display_left,
+            clock_widget,
+            widget_display_right,
+            spr4px,
+            -- Separator
+            spr,
+            spr4px,
+            spr,
+          -- Layout box
+            s.layoutbox,
+        },
+    }
+
+    s.bottom_wibox = awful.wibar({ position = "bottom", screen = s, height = 22, bg = beautiful.panel, fg = beautiful.fg_normal })
+    s.bottom_wibox:setup {
+        layout = wibox.layout.align.horizontal,
+        {
+            -- Left widgets
+            layout = wibox.layout.fixed.horizontal,
+            -- Menu
+            menu,
+            -- Separator
+            spr,
+            spr4px,
+        },
+        {
+            -- Middle widget
+            layout = wibox.layout.fixed.horizontal,
+            -- Task list
+            s.task_list,
+        },
+        {
+            -- Right widgets
+            layout = wibox.layout.fixed.horizontal,
+            -- Separator
+            spr,
+            spr4px,
+            spr,
+            -- Prompt box
+            s.promptbox,
+            -- Separator
+            spr,
+            spr4px,
+        },
+    }
+end
+
+function set_widgets_primary(s)
+    -- Prompt box
+    s.promptbox =
+        awful.widget.prompt({
+            prompt = " Execute: "
+        })
+
+    -- Layout box
+    s.layoutbox = awful.widget.layoutbox(s)
+    s.layoutbox:buttons(
         gears.table.join(
             awful.button(
                 { },
@@ -949,7 +1019,7 @@ function set_widgets(s)
             spr4px,
             spr,
           -- Layout box
-            s.mylayoutbox,
+            s.layoutbox,
         },
     }
 
@@ -1300,7 +1370,7 @@ awful.rules.rules =
     {
         rule_any =
         {
-            type = { "dialog" }
+            type = { "dialog", "normal" }
         },
         properties =
         {
@@ -1315,14 +1385,54 @@ awful.rules.rules =
     {
         rule =
         {
+            class = "[Cc]hromium"
+        },
+        properties =
+        {
+            floating = false,
+            screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
+            tag = tags.names[tags.TAG_WEB_UNITY],
+            titlebars_enabled = false
+        }
+    },
+
+    {
+        rule =
+        {
+            class = "[Cc]ode"
+        },
+        properties =
+        {
+            floating = false,
+            screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
+            tag = tags.names[tags.TAG_VSCODE],
+            titlebars_enabled = false
+        }
+    },
+
+    {
+        rule =
+        {
+            class = "[Ss]lack"
+        },
+        properties =
+        {
+            floating = false,
+            screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
+            tag = tags.names[tags.TAG_SLACK],
+            titlebars_enabled = false
+        }
+    },
+
+    {
+        rule =
+        {
             class = "[Ss]potify"
         },
         properties =
         {
-            floating = true,
             screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-            tag = tags.names[tags.TAG_MUSIC],
-            titlebars_enabled = true
+            tag = tags.names[tags.TAG_MUSIC]
         }
     },
 
@@ -1333,10 +1443,22 @@ awful.rules.rules =
         },
         properties =
         {
-            floating = true,
             screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-            tag = tags.names[tags.TAG_EXTRA],
-            titlebars_enabled = true
+            tag = tags.names[tags.TAG_EXTRA]
+        }
+    },
+
+    {
+        rule =
+        {
+            class = "[Ss]ublime"
+        },
+        properties =
+        {
+            floating = false,
+            screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
+            tag = tags.names[tags.TAG_SUBLIME],
+            titlebars_enabled = false
         }
     },
 
@@ -1347,10 +1469,8 @@ awful.rules.rules =
         },
         properties =
         {
-            floating = true,
             screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-            tag = tags.names[tags.TAG_UNITY],
-            titlebars_enabled = true
+            tag = tags.names[tags.TAG_UNITY]
         }
     },
 
@@ -1361,10 +1481,8 @@ awful.rules.rules =
         },
         properties =
         {
-            floating = true,
             screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-            tag = tags.names[tags.TAG_UNITY],
-            titlebars_enabled = true
+            tag = tags.names[tags.TAG_UNITY]
         }
     },
 
@@ -1375,10 +1493,20 @@ awful.rules.rules =
         },
         properties =
         {
-            floating = true,
             screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-            tag = tags.names[tags.TAG_UNITY],
-            titlebars_enabled = true
+            tag = tags.names[tags.TAG_UNITY]
+        }
+    },
+
+    {
+        rule =
+        {
+            class = "[Xx][Tt]erm"
+        },
+        properties =
+        {
+            floating = false,
+            titlebars_enabled = false
         }
     }
 }
@@ -1485,7 +1613,11 @@ awful.screen.connect_for_each_screen(
         set_tags(s, tags)
 
         -- Widgets
-        set_widgets(s)
+        if s == screen.primary then
+            set_widgets_primary(s)
+        else
+            set_widgets(s)
+        end
     end
 )
 -- }}}
