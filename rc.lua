@@ -197,25 +197,25 @@ local tags =
     [screens.SCREEN_ONE] =
     {
         { name = "vscode",      layout = layouts.LAYOUT_MAX         },
-        { name = "dev",         layout = layouts.LAYOUT_MAX         },
+        { name = "dev",         layout = layouts.LAYOUT_FLOATING    },
         { name = "extra",       layout = layouts.LAYOUT_FLOATING    }
     },
 
     [screens.SCREEN_TWO] =
     {
-        { name = "web [unity]", layout = layouts.LAYOUT_MAX         },
-        { name = "web [home]",  layout = layouts.LAYOUT_MAX         },
-        { name = "slack",       layout = layouts.LAYOUT_TILE        },
-        { name = "music",       layout = layouts.LAYOUT_MAX         },
+        { name = "terminal",    layout = layouts.LAYOUT_TILE        },
         { name = "unity",       layout = layouts.LAYOUT_FLOATING    },
+        { name = "music",       layout = layouts.LAYOUT_FLOATING    },
         { name = "extra",       layout = layouts.LAYOUT_FLOATING    }
     },
 
     [screens.SCREEN_THREE] =
     {
-        { name = "terminal",    layout = layouts.LAYOUT_CENTERWORK_HORIZONTAL   },
-        { name = "sublime",     layout = layouts.LAYOUT_TILE_TOP                },
-        { name = "extra",       layout = layouts.LAYOUT_FLOATING                }
+        { name = "sublime",     layout = layouts.LAYOUT_TILE_TOP    },
+        { name = "web [unity]", layout = layouts.LAYOUT_TILE_TOP    },
+        { name = "web [home]",  layout = layouts.LAYOUT_TILE_TOP    },
+        { name = "slack",       layout = layouts.LAYOUT_TILE_TOP    },
+        { name = "extra",       layout = layouts.LAYOUT_FLOATING    }
     }
 }
 -- }}}
@@ -350,7 +350,7 @@ end
 
 -- {{{ Auto start applications
 if screens.SCREEN_THREE == screen:count() then
-    awful.spawn("xrandr --output HDMI-0 --pos 0x620 --output DP-2 --pos 2560x620 --primary --output DP-0.8 --rotate right --pos 5120x0")
+    awful.spawn("xrandr --output DP-0.8 --rotate left --pos 0x0 --output DP-2 --pos 1440x640 --primary --output HDMI-0 --pos 4000x640")
 elseif screens.SCREEN_ONE == screen:count() then
     awful.spawn("xrandr --output eDP-1-1 --mode 1920x1080 --brightness 1.0")
 end
@@ -362,13 +362,61 @@ function startup_programs()
     end
 
     awful.spawn("blueman-applet")
-    awful.spawn("chromium-browser")
-    awful.spawn("code")
-    awful.spawn("slack")
-    awful.spawn("subl")
-    awful.spawn("xterm")
-    awful.spawn("xterm")
-    awful.spawn("xterm")
+    
+    awful.spawn("chromium-browser", {
+        screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
+        tag = tags.names[tags.TAG_WEB_UNITY]
+    })
+
+    awful.spawn("code", {
+        screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
+        tag = tags.names[tags.TAG_VSCODE]
+    })    
+
+    awful.spawn("slack", {
+        screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
+        tag = tags.names[tags.TAG_SLACK]
+    })
+
+    awful.spawn("subl", {
+        screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
+        tag = tags.names[tags.TAG_SUBLIME]
+    })
+
+    awful.spawn("xterm", {
+        screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
+        tag = tags.names[tags.TAG_WEB_UNITY]
+    })
+
+    awful.spawn("xterm", {
+        screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
+        tag = tags.names[tags.TAG_WEB_HOME]
+    })
+
+    awful.spawn("xterm", {
+        screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
+        tag = tags.names[tags.TAG_SLACK]
+    })
+
+    awful.spawn("xterm", {
+        screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
+        tag = tags.names[tags.TAG_TERMINAL]
+    })
+
+    awful.spawn("xterm", {
+        screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
+        tag = tags.names[tags.TAG_TERMINAL]
+    })
+
+    awful.spawn("xterm", {
+        screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
+        tag = tags.names[tags.TAG_TERMINAL]
+    })
+
+    awful.spawn("xfe", {
+        screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
+        tag = tags.names[tags.TAG_TERMINAL]
+    })
 end
 -- }}}
 
@@ -1147,11 +1195,8 @@ clientkeys = gears.table.join(
     awful.key(
         { modkey },
         "f",
-        function (c)
-            c.fullscreen = not c.fullscreen
-            c:raise()
-        end,
-        { description = "fullscreen", group = "program" }
+        awful.client.floating.toggle,
+        { description = "toggle floating", group = "program" }
     ),
 
     awful.key(
@@ -1270,148 +1315,26 @@ awful.rules.rules =
     {
         rule =
         {
-            class = "[Xx][Tt]erm"
-        },
-        properties =
-        {
-            screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
-            tag = tags.names[tags.TAG_TERMINAL]
-        }
-    },
-
-    {
-        rule =
-        {
-            class = "[Ss]ublime"
-        },
-        properties =
-        {
-            screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
-            tag = tags.names[tags.TAG_SUBLIME]
-        }
-    },
-
-    {
-        rule =
-        {
-            class = "[Cc]ode"
-        },
-        properties =
-        {
-            maximized_horizontal = true,
-            maximized_vertical = true,
-            screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
-            tag = tags.names[tags.TAG_VSCODE]
-        }
-    },
-
-    {
-        rule =
-        {
-            class = "[Rr]ider"
-        },
-        properties =
-        {
-            maximized_horizontal = true,
-            maximized_vertical = true,
-            screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
-            tag = tags.names[tags.TAG_VSCODE]
-        }
-    },
-
-    {
-        rule =
-        {
-            class = "[Mm]eld"
-        },
-        properties =
-        {
-            maximized_horizontal = true,
-            maximized_vertical = true,
-            screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
-            tag = tags.names[tags.TAG_DEV]
-        }
-    },
-
-    {
-        rule =
-        {
-            class = "[Pp]4v"
-        },
-        properties =
-        {
-            maximized_horizontal = true,
-            maximized_vertical = true,
-            screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
-            tag = tags.names[tags.TAG_DEV]
-        }
-    },
-
-    {
-        rule =
-        {
-            class = "[Gg]it"
-        },
-        properties =
-        {
-            maximized_horizontal = true,
-            maximized_vertical = true,
-            screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
-            tag = tags.names[tags.TAG_DEV]
-        }
-    },
-
-    {
-        rule =
-        {
-            class = "[Gg]itk"
-        },
-        properties =
-        {
-            maximized_horizontal = true,
-            maximized_vertical = true,
-            screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
-            tag = tags.names[tags.TAG_DEV]
-        }
-    },
-
-    {
-        rule =
-        {
-            class = "[Tt]hg"
-        },
-        properties =
-        {
-            maximized_horizontal = true,
-            maximized_vertical = true,
-            screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
-            tag = tags.names[tags.TAG_DEV]
-        }
-    },
-
-    {
-        rule =
-        {
-            class = "[Tt]ortoise[Hh]g"
-        },
-        properties =
-        {
-            maximized_horizontal = true,
-            maximized_vertical = true,
-            screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
-            tag = tags.names[tags.TAG_DEV]
-        }
-    },
-
-    {
-        rule =
-        {
-            class = "[X]fe"
+            class = "[Ss]potify"
         },
         properties =
         {
             floating = true,
-            screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
+            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
+            tag = tags.names[tags.TAG_MUSIC],
+            titlebars_enabled = true
+        }
+    },
+
+    {
+        rule =
+        {
+            class = "[Ss]team"
+        },
+        properties =
+        {
+            floating = true,
+            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
             tag = tags.names[tags.TAG_EXTRA],
             titlebars_enabled = true
         }
@@ -1455,62 +1378,6 @@ awful.rules.rules =
             floating = true,
             screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
             tag = tags.names[tags.TAG_UNITY],
-            titlebars_enabled = true
-        }
-    },
-
-    {
-        rule =
-        {
-            class = "[Cc]hromium"
-        },
-        properties =
-        {
-            maximized_horizontal = true,
-            maximized_vertical = true,
-            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-            tag = tags.names[tags.TAG_WEB_UNITY]
-        }
-    },
-
-    {
-        rule =
-        {
-            class = "[Ss]lack"
-        },
-        properties =
-        {
-            maximized_horizontal = true,
-            maximized_vertical = true,
-            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-            tag = tags.names[tags.TAG_SLACK]
-        }
-    },
-
-    {
-        rule =
-        {
-            class = "[Ss]potify"
-        },
-        properties =
-        {
-            maximized_horizontal = true,
-            maximized_vertical = true,
-            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-            tag = tags.names[tags.TAG_MUSIC]
-        }
-    },
-
-    {
-        rule =
-        {
-            class = "[Ss]team"
-        },
-        properties =
-        {
-            floating = true,
-            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-            tag = tags.names[tags.TAG_EXTRA],
             titlebars_enabled = true
         }
     }
