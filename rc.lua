@@ -148,7 +148,7 @@ function set_tags(s, tags)
             awful.tag({ "1", "2", "3" }, s,layouts.suits[layouts.LAYOUT_FLOATING])
         end
     elseif screens.SCREEN_ONE == screen:count() then
-        for _, i in ipairs({screens.SCREEN_THREE , screens.SCREEN_ONE, screens.SCREEN_TWO}) do
+        for _, i in ipairs({screens.SCREEN_TWO , screens.SCREEN_ONE, screens.SCREEN_THREE}) do
             if tags[i] ~= nil then
                 for j, settings in ipairs(tags[i]) do
                     awful.tag.add(
@@ -156,7 +156,7 @@ function set_tags(s, tags)
                         {
                             layout = layouts.suits[settings.layout],
                             screen = s,
-                            selected = (i == screens.SCREEN_THREE) and (j == 1)
+                            selected = (i == screens.SCREEN_TWO) and (j == 1)
                         }
                     )
                 end
@@ -201,7 +201,7 @@ local tags =
         { name = "extra",       layout = layouts.LAYOUT_FLOATING    }
     },
 
-    [screens.SCREEN_TWO] =
+    [screens.SCREEN_THREE] =
     {
         { name = "terminal",    layout = layouts.LAYOUT_TILE        },
         { name = "unity",       layout = layouts.LAYOUT_FLOATING    },
@@ -209,7 +209,7 @@ local tags =
         { name = "extra",       layout = layouts.LAYOUT_FLOATING    }
     },
 
-    [screens.SCREEN_THREE] =
+    [screens.SCREEN_TWO] =
     {
         { name = "sublime",     layout = layouts.LAYOUT_TILE_TOP    },
         { name = "web [unity]", layout = layouts.LAYOUT_TILE_TOP    },
@@ -350,7 +350,7 @@ end
 
 -- {{{ Auto start applications
 if screens.SCREEN_THREE == screen:count() then
-    awful.spawn("xrandr --output DP-0.8 --rotate left --pos 0x0 --output DP-2 --pos 1440x640 --primary --output HDMI-0 --pos 4000x640")
+    awful.spawn("xrandr --output HDMI-0 --rotate left --pos 0x0 --output DP-2 --pos 1440x640 --primary --output DP-4 --pos 4000x640")
 elseif screens.SCREEN_ONE == screen:count() then
     awful.spawn("xrandr --output eDP-1-1 --mode 1920x1080 --brightness 1.0")
 end
@@ -1390,7 +1390,7 @@ awful.rules.rules =
         properties =
         {
             floating = false,
-            screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
+            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
             tag = tags.names[tags.TAG_WEB_UNITY],
             titlebars_enabled = false
         }
@@ -1418,7 +1418,7 @@ awful.rules.rules =
         properties =
         {
             floating = false,
-            screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
+            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
             tag = tags.names[tags.TAG_SLACK],
             titlebars_enabled = false
         }
@@ -1431,7 +1431,7 @@ awful.rules.rules =
         },
         properties =
         {
-            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
+            screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
             tag = tags.names[tags.TAG_MUSIC]
         }
     },
@@ -1443,7 +1443,7 @@ awful.rules.rules =
         },
         properties =
         {
-            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
+            screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
             tag = tags.names[tags.TAG_EXTRA]
         }
     },
@@ -1456,7 +1456,7 @@ awful.rules.rules =
         properties =
         {
             floating = false,
-            screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
+            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
             tag = tags.names[tags.TAG_SUBLIME],
             titlebars_enabled = false
         }
@@ -1469,7 +1469,7 @@ awful.rules.rules =
         },
         properties =
         {
-            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
+            screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
             tag = tags.names[tags.TAG_UNITY]
         }
     },
@@ -1481,7 +1481,7 @@ awful.rules.rules =
         },
         properties =
         {
-            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
+            screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
             tag = tags.names[tags.TAG_UNITY]
         }
     },
@@ -1493,7 +1493,7 @@ awful.rules.rules =
         },
         properties =
         {
-            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
+            screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
             tag = tags.names[tags.TAG_UNITY]
         }
     },
