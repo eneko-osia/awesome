@@ -1,7 +1,11 @@
+-- {{{ LuaRocks
+pcall(require, "luarocks.loader")
+-- }}}
+
 -- {{{ Standard libraries
 local awful           = require("awful")
                         require("awful.autofocus")
-local hotkeys_popup   = require("awful.hotkeys_popup").widget
+local hotkeys_popup   = require("awful.hotkeys_popup")
                         require("awful.hotkeys_popup.keys")
 local watch           = require("awful.widget.watch")
 local beautiful       = require("beautiful")
@@ -12,6 +16,7 @@ local lain            = require("lain")
 local menubar         = require("menubar")
 local naughty         = require("naughty")
 local wibox           = require("wibox")
+-- }}}
 
 -- {{{ Variable definitions
 local altkey          = "Mod1"
@@ -125,14 +130,13 @@ awful.layout.layouts = layouts.suits
 local screens =
 {
     SCREEN_ONE =    1,
-    SCREEN_TWO =    2,
-    SCREEN_THREE =  3
+    SCREEN_TWO =    2
 }
 -- }}}
 
 -- {{{ Tags definitions
 function set_tags(s, tags)
-    if screens.SCREEN_THREE == screen:count() then
+    if screens.SCREEN_TWO == screen:count() then
         if tags[s.index] ~= nil then
             for i, settings in ipairs(tags[s.index]) do
                 awful.tag.add(
@@ -140,7 +144,7 @@ function set_tags(s, tags)
                     {
                         layout = layouts.suits[settings.layout],
                         screen = s,
-                        selected = (i == 1)
+                        selected = ((s.index == screens.SCREEN_TWO) and (i == 2)) or ((s.index == screens.SCREEN_ONE) and (i == 1))
                     }
                 )
             end
@@ -148,7 +152,7 @@ function set_tags(s, tags)
             awful.tag({ "1", "2", "3" }, s,layouts.suits[layouts.LAYOUT_FLOATING])
         end
     elseif screens.SCREEN_ONE == screen:count() then
-        for _, i in ipairs({screens.SCREEN_TWO , screens.SCREEN_ONE, screens.SCREEN_THREE}) do
+        for _, i in ipairs({screens.SCREEN_TWO , screens.SCREEN_ONE}) do
             if tags[i] ~= nil then
                 for j, settings in ipairs(tags[i]) do
                     awful.tag.add(
@@ -160,6 +164,8 @@ function set_tags(s, tags)
                         }
                     )
                 end
+            else
+                awful.tag({ "1", "2", "3" }, s,layouts.suits[layouts.LAYOUT_FLOATING])
             end
         end
     else
@@ -169,53 +175,40 @@ end
 
 local tags =
 {
-    TAG_TERMINAL =      1,
-    TAG_VSCODE =        2,
-    TAG_SUBLIME =       3,
-    TAG_DEV =           4,
-    TAG_UNITY =         5,
-    TAG_WEB_UNITY =     6,
-    TAG_WEB_HOME =      7,
-    TAG_SLACK =         8,
-    TAG_MUSIC =         9,
-    TAG_EXTRA =         10,
+    TAG_CHAT =      1,
+    TAG_DEV =       2,
+    TAG_EXTRA =     3,
+    TAG_MUSIC =     4,
+    TAG_TERMINAL =  5,
+    TAG_WEB =       6,
 
     names =
     {
-        "terminal",
-        "vscode",
-        "sublime",
+        "chat",
         "dev",
-        "unity",
-        "web [unity]",
-        "web [home]",
-        "slack",
+        "extra",
         "music",
-        "extra"
+        "terminal",
+        "web"
     },
 
     [screens.SCREEN_ONE] =
     {
-        { name = "vscode",      layout = layouts.LAYOUT_MAX         },
-        { name = "dev",         layout = layouts.LAYOUT_FLOATING    },
-        { name = "extra",       layout = layouts.LAYOUT_FLOATING    }
-    },
-
-    [screens.SCREEN_THREE] =
-    {
-        { name = "terminal",    layout = layouts.LAYOUT_TILE        },
-        { name = "unity",       layout = layouts.LAYOUT_FLOATING    },
-        { name = "music",       layout = layouts.LAYOUT_FLOATING    },
-        { name = "extra",       layout = layouts.LAYOUT_FLOATING    }
+        { name = "terminal",    layout = layouts.LAYOUT_TILE                    },
+        { name = "web",         layout = layouts.LAYOUT_TILE_TOP                },
+        { name = "dev",         layout = layouts.LAYOUT_MAX                     },
+        { name = "chat",        layout = layouts.LAYOUT_TILE_TOP                },
+        { name = "extra",       layout = layouts.LAYOUT_FLOATING                }
     },
 
     [screens.SCREEN_TWO] =
     {
-        { name = "sublime",     layout = layouts.LAYOUT_TILE_TOP    },
-        { name = "web [unity]", layout = layouts.LAYOUT_TILE_TOP    },
-        { name = "web [home]",  layout = layouts.LAYOUT_TILE_TOP    },
-        { name = "slack",       layout = layouts.LAYOUT_TILE_TOP    },
-        { name = "extra",       layout = layouts.LAYOUT_FLOATING    }
+        { name = "terminal",    layout = layouts.LAYOUT_CENTERWORK_HORIZONTAL   },
+        { name = "web",         layout = layouts.LAYOUT_TILE_TOP                },
+        { name = "dev",         layout = layouts.LAYOUT_MAX                     },
+        { name = "music",       layout = layouts.LAYOUT_TILE_TOP                },
+        { name = "chat",        layout = layouts.LAYOUT_TILE_TOP                },
+        { name = "extra",       layout = layouts.LAYOUT_FLOATING                }
     }
 }
 -- }}}
@@ -226,12 +219,12 @@ menubar.utils.terminal = terminal
 
 local awesome_menu =
 {
-    { "Hotkeys",    function() return false, hotkeys_popup.show_help end    },
-    { "Lock",       "xscreensaver-command -lock"                            },
-    { "Restart",    awesome.restart                                         },
-    { "Quit",       function() awesome.quit() end                           },
-    { "Reboot",     "shutdown -r now"                                       },
-    { "Shutdown",   "shutdown -h now"                                       }
+    { "Hotkeys",    function() hotkeys_popup.show_help(nil, awful.screen.focused()) end },
+    { "Lock",       "xscreensaver-command -lock"                                        },
+    { "Restart",    awesome.restart                                                     },
+    { "Quit",       function() awesome.quit() end                                       },
+    { "Reboot",     "shutdown -r now"                                                   },
+    { "Shutdown",   "shutdown -h now"                                                   }
 }
 
 local main_menu = freedesktop.menu.build(
@@ -348,25 +341,11 @@ function spotify_stop()
 end
 -- }}}
 
--- {{{ Auto start applications
-if screens.SCREEN_THREE == screen:count() then
-    awful.spawn("xrandr --output HDMI-0 --rotate left --pos 0x0 --output DP-2 --pos 1440x640 --primary --output DP-4 --pos 4000x640")
-elseif screens.SCREEN_ONE == screen:count() then
-    awful.spawn("xrandr --output eDP-1-1 --mode 1920x1080 --brightness 1.0")
-end
-
 function startup_programs()
-    
-    if screens.SCREEN_THREE == screen:count() then
-        awful.spawn("xscreensaver -no-splash")
-    end
-
-    awful.spawn("blueman-applet")
-    awful.spawn("chromium-browser")
-    awful.spawn("code")
+    awful.spawn("chromium")
+    awful.spawn("discord")
     awful.spawn("slack")
-    awful.spawn("subl")
-end    
+end
 -- }}}
 
 -- {{{ Widgets definitions
@@ -374,6 +353,7 @@ end
 quake = lain.util.quake(
     {
         app         = terminal,
+        extra       = "-fg white -bg black",
         followtag   = true,
         height      = 0.5,
         onlyone     = true
@@ -438,17 +418,22 @@ local tasklist_buttons = gears.table.join(
             if c == client.focus then
                 c.minimized = true
             else
-                -- Without this, the following
-                -- :isvisible() makes no sense
-                c.minimized = false
-                if not c:isvisible() and c.first_tag then
-                    c.first_tag:view_only()
-                end
-                -- This will also un-minimize
-                -- the client, if needed
-                client.focus = c
-                c:raise()
+                c:emit_signal(
+                    "request::activate",
+                    "tasklist",
+                    {
+                        raise = true
+                    }
+                )
             end
+        end
+    ),
+
+    awful.button(
+        { },
+        2,
+        function(c)
+            c:kill()
         end
     ),
 
@@ -456,15 +441,7 @@ local tasklist_buttons = gears.table.join(
         { },
         3,
         function ()
-            local instance = nil
-            return function ()
-                if instance and instance.wibox.visible then
-                    instance:hide()
-                    instance = nil
-                else
-                    instance = awful.menu.clients({ theme = { width = 250 } })
-                end
-            end
+            awful.menu.client_list({ theme = { width = 250 } })
         end
     ),
 
@@ -542,46 +519,46 @@ local ssd_widget = wibox.container.background(ssd.widget)
 ssd_widget.bgimage = beautiful.widget_display
 
 -- Battery widget
-local battery_icon = wibox.widget.imagebox(beautiful.widget_battery)
-local battery_notification = nil
-local battey_time = ""
-local battery = lain.widget.bat({
-    notify = "off",
-    full_notify = "off",
-    settings = function()
-        bat_perc = tonumber(bat_now.perc)
-        if bat_perc == 100 then
-            battery_icon:set_image(beautiful.widget_battery_ac)
-            battery_time = " " .. bat_now.time .. " "
-            widget:set_markup(" " .. bat_now.perc .. "%" .. " ")
-        elseif bat_perc > 50 then
-            battery_icon:set_image(beautiful.widget_battery)
-            battery_time = " " .. bat_now.time .. " "
-            widget:set_markup(" " .. bat_now.perc .. "%" .. " ")
-        elseif bat_perc > 15 then
-            battery_icon:set_image(beautiful.widget_battery_low)
-            battery_time = " " .. bat_now.time .. " "
-            widget:set_markup(lain.util.markup(beautiful.bg_focus, " " .. bat_now.perc .. "%" .. " "))
-        else
-            battery_icon:set_image(beautiful.widget_battery_empty)
-            battery_time = " " .. bat_now.time .. " "
-            widget:set_markup(lain.util.markup(beautiful.fg_urgent, " " .. bat_now.perc .. "%" .. " "))
-        end
-    end
-})
-local battery_widget = wibox.container.background(battery.widget)
-battery_widget.bgimage = beautiful.widget_display
-battery_widget:connect_signal('mouse::enter', function()
-    battery_notification = naughty.notify(
-        {
-            title = "Battery time",
-            text = battery_time
-        }) 
-end)
-battery_widget:connect_signal('mouse::leave', function()
-    naughty.destroy(battery_notification) 
-    battery_notification = nil
-end)
+-- local battery_icon = wibox.widget.imagebox(beautiful.widget_battery)
+-- local battery_notification = nil
+-- local battey_time = ""
+-- local battery = lain.widget.bat({
+--     notify = "off",
+--     full_notify = "off",
+--     settings = function()
+--         bat_perc = tonumber(bat_now.perc)
+--         if bat_perc == 100 then
+--             battery_icon:set_image(beautiful.widget_battery_ac)
+--             battery_time = " " .. bat_now.time .. " "
+--             widget:set_markup(" " .. bat_now.perc .. "%" .. " ")
+--         elseif bat_perc > 50 then
+--             battery_icon:set_image(beautiful.widget_battery)
+--             battery_time = " " .. bat_now.time .. " "
+--             widget:set_markup(" " .. bat_now.perc .. "%" .. " ")
+--         elseif bat_perc > 15 then
+--             battery_icon:set_image(beautiful.widget_battery_low)
+--             battery_time = " " .. bat_now.time .. " "
+--             widget:set_markup(lain.util.markup(beautiful.bg_focus, " " .. bat_now.perc .. "%" .. " "))
+--         else
+--             battery_icon:set_image(beautiful.widget_battery_empty)
+--             battery_time = " " .. bat_now.time .. " "
+--             widget:set_markup(lain.util.markup(beautiful.fg_urgent, " " .. bat_now.perc .. "%" .. " "))
+--         end
+--     end
+-- })
+-- local battery_widget = wibox.container.background(battery.widget)
+-- battery_widget.bgimage = beautiful.widget_display
+-- battery_widget:connect_signal('mouse::enter', function()
+--     battery_notification = naughty.notify(
+--         {
+--             title = "Battery time",
+--             text = battery_time
+--         })
+-- end)
+-- battery_widget:connect_signal('mouse::leave', function()
+--     naughty.destroy(battery_notification)
+--     battery_notification = nil
+-- end)
 
 -- Network widget
 local netdl_icon = wibox.widget.imagebox(beautiful.widget_netdl)
@@ -632,7 +609,7 @@ play_pause_icon:connect_signal(
 
 spotify_text:buttons(awful.util.table.join(
     awful.button(
-        {},
+        { },
         4,
         function()
             if (spotify_song_state == 1) then
@@ -646,7 +623,7 @@ spotify_text:buttons(awful.util.table.join(
     ),
 
     awful.button(
-        {},
+        { },
         5,
         function()
             if (spotify_song_state == 1) then
@@ -677,7 +654,7 @@ watch("sp status", 1,
 -- Volume widget
 local volume_icon = wibox.widget.imagebox(beautiful.widget_volume)
 local device_bluetooth = "CC:98:8B:7F:F9:CE"
-local device_front = "front:0"
+local device_front = "hdmi:0,2"
 local volume = lain.widget.pulse{
     settings =
     function()
@@ -693,7 +670,7 @@ volume_widget.bgimage = beautiful.widget_display
 
 volume.widget:buttons(awful.util.table.join(
     awful.button(
-        {},
+        { },
         1,
         function()
             awful.spawn("pavucontrol")
@@ -701,7 +678,7 @@ volume.widget:buttons(awful.util.table.join(
     ),
 
     awful.button(
-        {},
+        { },
         2,
         function()
             os.execute(string.format("pactl set-sink-mute %d toggle", volume.device))
@@ -710,7 +687,7 @@ volume.widget:buttons(awful.util.table.join(
     ),
 
     awful.button(
-        {},
+        { },
         3,
         function()
             local value = volume.device == device_bluetooth and 100 or 20
@@ -720,7 +697,7 @@ volume.widget:buttons(awful.util.table.join(
     ),
 
     awful.button(
-        {},
+        { },
         4,
         function()
             if volume.device ~= nil then
@@ -731,7 +708,7 @@ volume.widget:buttons(awful.util.table.join(
     ),
 
     awful.button(
-        {},
+        { },
         5,
         function()
             if volume.device ~= nil then
@@ -780,10 +757,18 @@ function set_widgets(s)
     )
 
     -- Tag list
-    s.tag_list = awful.widget.taglist(s, awful.widget.taglist.filter.all, taglist_buttons)
+    s.tag_list = awful.widget.taglist {
+        screen  = s,
+        filter  = awful.widget.taglist.filter.all,
+        buttons = taglist_buttons
+    }
 
     -- Task list
-    s.task_list = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, tasklist_buttons)
+    s.task_list = awful.widget.tasklist {
+        screen  = s,
+        filter  = awful.widget.tasklist.filter.currenttags,
+        buttons = tasklist_buttons
+    }
 
     -- Wibox
     s.top_wibox = awful.wibar({ position = "top", screen = s, height = 22, bg = beautiful.panel, fg = beautiful.fg_normal })
@@ -901,10 +886,18 @@ function set_widgets_primary(s)
     )
 
     -- Tag list
-    s.tag_list = awful.widget.taglist(s, awful.widget.taglist.filter.all, taglist_buttons)
+    s.tag_list = awful.widget.taglist {
+        screen  = s,
+        filter  = awful.widget.taglist.filter.all,
+        buttons = taglist_buttons
+    }
 
     -- Task list
-    s.task_list = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, tasklist_buttons)
+    s.task_list = awful.widget.tasklist {
+        screen  = s,
+        filter  = awful.widget.tasklist.filter.currenttags,
+        buttons = tasklist_buttons
+    }
 
     -- Wibox
     s.top_wibox = awful.wibar({ position = "top", screen = s, height = 22, bg = beautiful.panel, fg = beautiful.fg_normal })
@@ -989,13 +982,13 @@ function set_widgets_primary(s)
             -- Separator
             spr,
             -- Battery widget
-            battery_icon,
-            widget_display_left,
-            battery_widget,
-            widget_display_right,
-            spr4px,
-            -- Separator
-            spr,
+            -- battery_icon,
+            -- widget_display_left,
+            -- battery_widget,
+            -- widget_display_right,
+            -- spr4px,
+            -- -- Separator
+            -- spr,
             -- Network
             netdl_icon,
             widget_display_left,
@@ -1338,9 +1331,32 @@ for i = 1, 9 do
 end
 
 clientbuttons = gears.table.join(
-    awful.button({ }, 1, function (c) client.focus = c; c:raise() end),
-    awful.button({ modkey }, 1, awful.mouse.client.move),
-    awful.button({ modkey }, 3, awful.mouse.client.resize))
+    awful.button(
+        { },
+        1,
+        function (c)
+            c:emit_signal("request::activate", "mouse_click", { raise = true })
+        end
+    ),
+
+    awful.button(
+        { modkey },
+        1,
+        function (c)
+            c:emit_signal("request::activate", "mouse_click", { raise = true })
+            awful.mouse.client.move(c)
+        end
+    ),
+
+    awful.button(
+        { modkey },
+        3,
+        function (c)
+            c:emit_signal("request::activate", "mouse_click", { raise = true })
+            awful.mouse.client.resize(c)
+        end
+    )
+)
 
 -- Set keys
 root.keys(globalkeys)
@@ -1391,7 +1407,7 @@ awful.rules.rules =
         {
             floating = false,
             screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-            tag = tags.names[tags.TAG_WEB_UNITY],
+            tag = tags.names[tags.TAG_WEB],
             titlebars_enabled = false
         }
     },
@@ -1405,7 +1421,35 @@ awful.rules.rules =
         {
             floating = false,
             screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
-            tag = tags.names[tags.TAG_VSCODE],
+            tag = tags.names[tags.TAG_DEV],
+            titlebars_enabled = false
+        }
+    },
+
+    {
+        rule =
+        {
+            class = "[Dd]iscord"
+        },
+        properties =
+        {
+            floating = false,
+            screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
+            tag = tags.names[tags.TAG_CHAT],
+            titlebars_enabled = false
+        }
+    },
+
+    {
+        rule =
+        {
+            class = "[Pp]arsecd"
+        },
+        properties =
+        {
+            floating = false,
+            screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
+            tag = tags.names[tags.TAG_DEV],
             titlebars_enabled = false
         }
     },
@@ -1419,7 +1463,7 @@ awful.rules.rules =
         {
             floating = false,
             screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-            tag = tags.names[tags.TAG_SLACK],
+            tag = tags.names[tags.TAG_CHAT],
             titlebars_enabled = false
         }
     },
@@ -1431,7 +1475,7 @@ awful.rules.rules =
         },
         properties =
         {
-            screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
+            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
             tag = tags.names[tags.TAG_MUSIC]
         }
     },
@@ -1443,58 +1487,8 @@ awful.rules.rules =
         },
         properties =
         {
-            screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
+            screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
             tag = tags.names[tags.TAG_EXTRA]
-        }
-    },
-
-    {
-        rule =
-        {
-            class = "[Ss]ublime"
-        },
-        properties =
-        {
-            floating = false,
-            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-            tag = tags.names[tags.TAG_SUBLIME],
-            titlebars_enabled = false
-        }
-    },
-
-    {
-        rule =
-        {
-            class = "[Uu]nity"
-        },
-        properties =
-        {
-            screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
-            tag = tags.names[tags.TAG_UNITY]
-        }
-    },
-
-    {
-        rule =
-        {
-            class = "[Uu]nity[Hh]elper"
-        },
-        properties =
-        {
-            screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
-            tag = tags.names[tags.TAG_UNITY]
-        }
-    },
-
-    {
-        rule =
-        {
-            class = "[Uu]nity[Ss]hader[Cc]omp"
-        },
-        properties =
-        {
-            screen = screens.SCREEN_THREE <= screen.count() and screens.SCREEN_THREE or awful.screen.preferred,
-            tag = tags.names[tags.TAG_UNITY]
         }
     },
 
@@ -1519,8 +1513,8 @@ client.connect_signal("manage", function (c)
     -- i.e. put it at the end of others instead of setting it master.
     -- if not awesome.startup then awful.client.setslave(c) end
 
-    if awesome.startup and
-      not c.size_hints.user_position
+    if awesome.startup
+      and not c.size_hints.user_position
       and not c.size_hints.program_position then
         -- Prevent clients from being unreachable after screen count changes.
         awful.placement.no_offscreen(c)
@@ -1532,17 +1526,16 @@ client.connect_signal("request::titlebars", function(c)
     -- buttons for the titlebar
     local buttons = gears.table.join(
         awful.button(
-            {},
+            { },
             1,
             function()
-                client.focus = c
-                c:raise()
+                c:emit_signal("request::activate", "titlebar", { raise = true })
                 awful.mouse.client.move(c)
             end
         ),
 
         awful.button(
-            {},
+            { },
             2,
             function()
                 c:kill()
@@ -1550,11 +1543,10 @@ client.connect_signal("request::titlebars", function(c)
         ),
 
         awful.button(
-            {},
+            { },
             3,
             function()
-                client.focus = c
-                c:raise()
+                c:emit_signal("request::activate", "titlebar", { raise = true })
                 awful.mouse.client.resize(c)
             end
         )
@@ -1592,10 +1584,7 @@ end)
 
 -- Enable sloppy focus, so that focus follows mouse.
 client.connect_signal("mouse::enter", function(c)
-    if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
-        and awful.client.focus.filter(c) then
-        client.focus = c
-    end
+    c:emit_signal("request::activate", "mouse_enter", { raise = false })
 end)
 
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
