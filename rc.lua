@@ -252,16 +252,6 @@ local spotify_song_size     = 0
 local spotify_song_state    = 0
 local spotify_song_text     = "Spotify"
 
-function set_play_pause_icon(widget, state)
-    if (state:gsub("\n", "") == "Playing") then
-        spotify_song_state = 1
-        widget.image = beautiful.mpd_pause
-    else
-        spotify_song_state = 0
-        widget.image = beautiful.mpd_play
-    end
-end
-
 function set_spotify_text(widget, song)
     if string.find(song, "Error: Spotify is not running.") ~= nil then
         spotify_song = "Spotify"
@@ -298,6 +288,16 @@ function set_spotify_text(widget, song)
     end
 end
 
+function update_play_pause_icon(widget, state)
+    if (state:gsub("\n", "") == "Playing") then
+        spotify_song_state = 1
+        widget.image = beautiful.mpd_pause
+    else
+        spotify_song_state = 0
+        widget.image = beautiful.mpd_play
+    end
+end
+
 function update_spotify_text(widget, song)
     if (spotify_song_state == 1) then
         spotify_song_index = spotify_song_index + 1
@@ -329,15 +329,11 @@ function spotify_play()
 end
 
 function spotify_play_pause()
-    awful.util.spawn("sp play-pause")
+    spotify_play()
 end
 
 function spotify_previous()
     awful.util.spawn("sp prev")
-end
-
-function spotify_stop()
-    awful.util.spawn("sp stop")
 end
 -- }}}
 
@@ -593,7 +589,6 @@ netup_widget.bgimage = beautiful.widget_display
 local next_icon = wibox.widget.imagebox(beautiful.mpd_nex)
 local play_pause_icon = wibox.widget.imagebox(beautiful.mpd_play)
 local prev_icon = wibox.widget.imagebox(beautiful.mpd_prev)
-local stop_icon = wibox.widget.imagebox(beautiful.mpd_stop)
 local spotify_text = wibox.widget.textbox()
 spotify_text.align = "center"
 spotify_text.forced_width = 256
@@ -603,14 +598,13 @@ spotify_widget.bgimage = beautiful.widget_display
 next_icon:buttons(gears.table.join(awful.button({ }, 1, function() spotify_next() end)))
 play_pause_icon:buttons(gears.table.join(awful.button({ }, 1, function() spotify_play_pause() end)))
 prev_icon:buttons(gears.table.join(awful.button({ }, 1, function() spotify_previous() end)))
-stop_icon:buttons(gears.table.join(awful.button({ }, 1, function() spotify_stop() end)))
 
 play_pause_icon:connect_signal(
     "button::press",
     function(x, y, button, mods, find_widgets_result)
         awful.spawn.easy_async("sp status",
             function(stdout, stderr, exitreason, exitcode)
-                set_play_pause_icon(play_pause_icon, stdout)
+                update_play_pause_icon(play_pause_icon, stdout)
             end
         )
     end
@@ -655,7 +649,7 @@ watch("sp current-oneline", 1,
 
 watch("sp status", 1,
     function (widget, stdout, _, _, _)
-        set_play_pause_icon(widget, stdout)
+        update_play_pause_icon(widget, stdout)
     end,
     play_pause_icon
 )
@@ -935,8 +929,6 @@ function set_widgets_primary(s)
             prev_icon,
             spr,
             play_pause_icon,
-            spr,
-            stop_icon,
             spr,
             next_icon,
             -- Separator
