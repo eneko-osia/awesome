@@ -571,8 +571,17 @@ netup.align = "center"
 netup.forced_width = 96
 local net = lain.widget.net({
     settings = function()
-        netdl:set_markup(string.format(" %.1f Kb ", net_now.received))
-        netup:set_markup(string.format(" %.1f Kb ", net_now.sent))
+        if (tonumber(net_now.received) > 1024.0) then
+            netdl:set_markup(string.format(" %.1f Mb ", tonumber(net_now.received) / 1024))
+        else
+            netdl:set_markup(string.format(" %.1f Kb ", net_now.received))
+        end
+
+        if (tonumber(net_now.sent) > 1024.0) then
+            netup:set_markup(string.format(" %.1f Mb ", tonumber(net_now.sent) / 1024))
+        else
+            netup:set_markup(string.format(" %.1f Kb ", net_now.sent))
+        end
     end
 })
 local netdl_widget = wibox.container.background(netdl)
