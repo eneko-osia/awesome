@@ -341,6 +341,7 @@ function startup_programs()
     awful.spawn("chromium")
     awful.spawn("discord")
     awful.spawn("slack")
+    awful.spawn("steam")
 end
 -- }}}
 
@@ -656,17 +657,11 @@ watch("sp status", 1,
 
 -- Volume widget
 local volume_icon = wibox.widget.imagebox(beautiful.widget_volume)
-local device_bluetooth = "CC:98:8B:7F:F9:CE"
-local device_front = "hdmi:0,2"
 local volume = lain.widget.pulse{
     settings =
-    function()
-        if volume_now.device == device_bluetooth or volume_now.device == device_front then
+        function()
             widget:set_markup(lain.util.markup(beautiful.fg_focus, " " .. volume_now.left .. "%" .. (volume_now.muted == "yes" and " [M]" or "") .. " "))
-        else
-            widget:set_markup(lain.util.markup(beautiful.fg_urgent, "0%"))
         end
-    end
 }
 local volume_widget = wibox.container.background(volume.widget)
 volume_widget.bgimage = beautiful.widget_display
@@ -684,8 +679,10 @@ volume.widget:buttons(awful.util.table.join(
         { },
         2,
         function()
-            os.execute(string.format("pactl set-sink-mute %d toggle", volume.device))
-            volume.update()
+            if volume.device ~= nil then
+                os.execute(string.format("pactl set-sink-mute %d toggle", volume.device))
+                volume.update()
+            end
         end
     ),
 
@@ -693,9 +690,10 @@ volume.widget:buttons(awful.util.table.join(
         { },
         3,
         function()
-            local value = volume.device == device_bluetooth and 100 or 20
-            os.execute(string.format("pactl set-sink-volume %d %d%%", volume.device, value))
-            volume.update()
+            if volume.device ~= nil then
+                os.execute(string.format("pactl set-sink-volume %d %d%%", volume.device, 20))
+                volume.update()
+            end
         end
     ),
 
