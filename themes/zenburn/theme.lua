@@ -105,6 +105,7 @@ theme.widget_display_center = themes_path .. "zenburn/panel/widgets/display/widg
 theme.widget_display_left   = themes_path .. "zenburn/panel/widgets/display/widget_display_l.png"
 theme.widget_display_right  = themes_path .. "zenburn/panel/widgets/display/widget_display_r.png"
 theme.widget_mem            = themes_path .. "zenburn/panel/widgets/widget_mem.png"
+theme.widget_microphone     = themes_path .. "zenburn/panel/widgets/widget_microphone.png"
 theme.widget_netdl          = themes_path .. "zenburn/panel/widgets/widget_netdl.png"
 theme.widget_netul          = themes_path .. "zenburn/panel/widgets/widget_netul.png"
 theme.widget_ssd            = themes_path .. "zenburn/panel/widgets/widget_fs.png"

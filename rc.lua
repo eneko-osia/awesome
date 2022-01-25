@@ -3,19 +3,19 @@ pcall(require, "luarocks.loader")
 -- }}}
 
 -- {{{ Standard libraries
-local awful           = require("awful")
-                        require("awful.autofocus")
-local hotkeys_popup   = require("awful.hotkeys_popup")
-                        require("awful.hotkeys_popup.keys")
-local watch           = require("awful.widget.watch")
-local beautiful       = require("beautiful")
-local calendar        = require("calendar")
-local freedesktop     = require("freedesktop")
-local gears           = require("gears")
-local lain            = require("lain")
-local menubar         = require("menubar")
-local naughty         = require("naughty")
-local wibox           = require("wibox")
+local awful         = require("awful")
+                      require("awful.autofocus")
+local hotkeys_popup = require("awful.hotkeys_popup")
+                      require("awful.hotkeys_popup.keys")
+local watch         = require("awful.widget.watch")
+local beautiful     = require("beautiful")
+local calendar      = require("calendar")
+local freedesktop   = require("freedesktop")
+local gears         = require("gears")
+local lain          = require("lain")
+local menubar       = require("menubar")
+local naughty       = require("naughty")
+local wibox         = require("wibox")
 -- }}}
 
 -- {{{ Variable definitions
@@ -342,6 +342,7 @@ function startup_programs()
     awful.spawn("discord")
     awful.spawn("slack")
     awful.spawn("steam")
+    awful.spawn("zoom")
 end
 -- }}}
 
@@ -658,6 +659,7 @@ watch("sp status", 1,
 -- Volume widget
 local volume_icon = wibox.widget.imagebox(beautiful.widget_volume)
 local volume = lain.widget.pulse{
+    devicetype = "sink",
     settings =
         function()
             widget:set_markup(lain.util.markup(beautiful.fg_focus, " " .. volume_now.left .. "%" .. (volume_now.muted == "yes" and " [M]" or "") .. " "))
@@ -715,6 +717,72 @@ volume.widget:buttons(awful.util.table.join(
             if volume.device ~= nil then
                 os.execute(string.format("pactl set-sink-volume %d -1%%", volume.device))
                 volume.update()
+            end
+        end
+    )
+))
+
+-- Microphone widget
+local microphone_icon = wibox.widget.imagebox(beautiful.widget_microphone)
+local microphone = lain.widget.pulse{
+    devicetype = "source",
+    settings =
+        function()
+            widget:set_markup(lain.util.markup(beautiful.fg_focus, " " .. volume_now.left .. "%" .. (volume_now.muted == "yes" and " [M]" or "") .. " "))
+        end
+}
+local microphone_widget = wibox.container.background(microphone.widget)
+microphone_widget.bgimage = beautiful.widget_display
+
+microphone.widget:buttons(awful.util.table.join(
+    awful.button(
+        { },
+        1,
+        function()
+            awful.spawn("pavucontrol")
+        end
+    ),
+
+    awful.button(
+        { },
+        2,
+        function()
+            if microphone.device ~= nil then
+                os.execute(string.format("pactl set-source-mute %d toggle", microphone.device))
+                microphone.update()
+            end
+        end
+    ),
+
+    awful.button(
+        { },
+        3,
+        function()
+            if microphone.device ~= nil then
+                os.execute(string.format("pactl set-source-volume %d %d%%", microphone.device, 20))
+                microphone.update()
+            end
+        end
+    ),
+
+    awful.button(
+        { },
+        4,
+        function()
+            if microphone.device ~= nil then
+                os.execute(string.format("pactl set-source-volume %d +1%%", microphone.device))
+                microphone.update()
+            end
+        end
+    ),
+
+    awful.button(
+        { },
+        5,
+        function()
+            if microphone.device ~= nil then
+                os.execute(string.format("pactl set-source-volume %d -1%%", microphone.device))
+                microphone.update()
             end
         end
     )
@@ -938,6 +1006,15 @@ function set_widgets_primary(s)
             volume_icon,
             widget_display_left,
             volume_widget,
+            widget_display_right,
+            spr4px,
+            -- Separator
+            spr,
+            -- Microphone
+            spr4px,
+            microphone_icon,
+            widget_display_left,
+            microphone_widget,
             widget_display_right,
             spr4px,
             -- Separator
@@ -1419,7 +1496,7 @@ awful.rules.rules =
         properties =
         {
             floating = false,
-            screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
+            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
             tag = tags.names[tags.TAG_DEV],
             titlebars_enabled = false
         }
