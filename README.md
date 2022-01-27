@@ -3,6 +3,7 @@ My personal set up for awesome wm 4.3
 
 ## Dependencies
 freedesktop  
+imagemagick  
 xscreensaver  
 xterm  
 
