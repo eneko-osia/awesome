@@ -1,5 +1,5 @@
 # Awesome WM 
-My personal set up for awesome wm 4.2
+My personal set up for awesome wm 4.3
 
 ## Dependencies
 freedesktop  
