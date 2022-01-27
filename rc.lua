@@ -12,6 +12,7 @@ local beautiful     = require("beautiful")
 local calendar      = require("calendar")
 local freedesktop   = require("freedesktop")
 local gears         = require("gears")
+local timer         = require("gears.timer")
 local lain          = require("lain")
 local menubar       = require("menubar")
 local naughty       = require("naughty")
@@ -356,6 +357,17 @@ quake = lain.util.quake(
         height      = 0.5,
         onlyone     = true
     }
+)
+
+-- Menu bar buttons
+local menu_bar_buttons = gears.table.join(
+    awful.button(
+        { },
+        3,
+        function ()
+            awful.menu.client_list({ theme = { width = 250 } })
+        end
+    )
 )
 
 -- Tag list buttons
@@ -842,6 +854,7 @@ function set_widgets(s)
     -- Wibox
     s.top_wibox = awful.wibar({ position = "top", screen = s, height = 22, bg = beautiful.panel, fg = beautiful.fg_normal })
     s.top_wibox:setup {
+        buttons = menu_bar_buttons,
         layout = wibox.layout.align.horizontal,
         {
             -- Left widgets
@@ -885,6 +898,7 @@ function set_widgets(s)
 
     s.bottom_wibox = awful.wibar({ position = "bottom", screen = s, height = 22, bg = beautiful.panel, fg = beautiful.fg_normal })
     s.bottom_wibox:setup {
+        buttons = menu_bar_buttons,
         layout = wibox.layout.align.horizontal,
         {
             -- Left widgets
@@ -971,6 +985,7 @@ function set_widgets_primary(s)
     -- Wibox
     s.top_wibox = awful.wibar({ position = "top", screen = s, height = 22, bg = beautiful.panel, fg = beautiful.fg_normal })
     s.top_wibox:setup {
+        buttons = menu_bar_buttons,
         layout = wibox.layout.align.horizontal,
         {
             -- Left widgets
@@ -1094,6 +1109,7 @@ function set_widgets_primary(s)
 
     s.bottom_wibox = awful.wibar({ position = "bottom", screen = s, height = 22, bg = beautiful.panel, fg = beautiful.fg_normal })
     s.bottom_wibox:setup {
+        buttons = menu_bar_buttons,
         layout = wibox.layout.align.horizontal,
         {
             -- Left widgets
@@ -1599,14 +1615,22 @@ end)
 
 -- Add a titlebar if titlebars_enabled is set to true in the rules.
 client.connect_signal("request::titlebars", function(c)
+    local clicks = 0
     -- buttons for the titlebar
     local buttons = gears.table.join(
         awful.button(
             { },
             1,
             function()
-                c:emit_signal("request::activate", "titlebar", { raise = true })
-                awful.mouse.client.move(c)
+                clicks = clicks + 1
+                if clicks == 2 then
+                    c.maximized = not c.maximized
+                else
+                    c:emit_signal("request::activate", "titlebar", { raise = true })
+                    awful.mouse.client.move(c)
+                end
+
+                timer.weak_start_new(250 / 1000, function() clicks = 0 end)
             end
         ),
 
