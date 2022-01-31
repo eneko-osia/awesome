@@ -1151,7 +1151,8 @@ end
 
 -- {{{ Mouse bindings definitions
 root.buttons(gears.table.join(
-    awful.button({ }, 3, function () main_menu:toggle() end),
+    awful.button({ }, 1, function () main_menu:hide() end),
+    awful.button({ }, 3, function () main_menu:show() end),
     awful.button({ }, 4, awful.tag.viewnext),
     awful.button({ }, 5, awful.tag.viewprev)
 ))
@@ -1593,6 +1594,18 @@ awful.rules.rules =
         {
             floating = false,
             titlebars_enabled = false
+        }
+    },
+
+    {
+        rule =
+        {
+            class = "[Zz]oom"
+        },
+        properties =
+        {
+            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
+            tag = tags.names[tags.TAG_EXTRA]
         }
     }
 }
