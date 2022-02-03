@@ -575,10 +575,10 @@ local netdl_icon = wibox.widget.imagebox(beautiful.widget_netdl)
 local netup_icon = wibox.widget.imagebox(beautiful.widget_netul)
 local netdl = wibox.widget.textbox()
 netdl.align = "center"
-netdl.forced_width = 96
+netdl.forced_width = 64
 local netup = wibox.widget.textbox()
 netup.align = "center"
-netup.forced_width = 96
+netup.forced_width = 64
 local net = lain.widget.net({
     settings = function()
         if (tonumber(net_now.received) > 1024.0) then
@@ -869,6 +869,26 @@ function set_widgets(s)
             spr,
             spr4px,
             spr,
+            -- Volume
+            spr4px,
+            volume_icon,
+            widget_display_left,
+            volume_widget,
+            widget_display_right,
+            spr4px,
+            -- Separator
+            spr,
+            -- Microphone
+            spr4px,
+            microphone_icon,
+            widget_display_left,
+            microphone_widget,
+            widget_display_right,
+            spr4px,
+            -- Separator
+            spr,
+            spr4px,
+            spr,
         },
         {
             -- Middle widget
@@ -877,6 +897,50 @@ function set_widgets(s)
         {
             -- Right widgets
             layout = wibox.layout.fixed.horizontal,
+            -- Separator
+            spr,
+            spr4px,
+            spr,
+            -- Cpu
+            cpu_icon,
+            widget_display_left,
+            cpu_widget,
+            widget_display_right,
+            spr4px,
+            -- Separator
+            spr,
+            -- Memory
+            mem_icon,
+            widget_display_left,
+            mem_widget,
+            widget_display_right,
+            spr4px,
+            -- Separator
+            spr,
+            -- Ssd widget
+            ssd_icon,
+            widget_display_left,
+            ssd_widget,
+            widget_display_right,
+            spr4px,
+            -- Separator
+            spr,
+            -- Battery widget
+            -- battery_icon,
+            -- widget_display_left,
+            -- battery_widget,
+            -- widget_display_right,
+            -- spr4px,
+            -- -- Separator
+            -- spr,
+            -- Network
+            netdl_icon,
+            widget_display_left,
+            netdl_widget,
+            widget_display_center,
+            netup_widget,
+            widget_display_right,
+            netup_icon,
             -- Separator
             spr,
             spr4px,
