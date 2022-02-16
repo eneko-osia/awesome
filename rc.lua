@@ -153,7 +153,7 @@ function set_tags(s, tags)
             awful.tag({ "1", "2", "3" }, s,layouts.suits[layouts.LAYOUT_FLOATING])
         end
     elseif screens.SCREEN_ONE == screen:count() then
-        for _, i in ipairs({screens.SCREEN_TWO , screens.SCREEN_ONE}) do
+        for _, i in ipairs({screens.SCREEN_ONE}) do
             if tags[i] ~= nil then
                 for j, settings in ipairs(tags[i]) do
                     awful.tag.add(
@@ -161,7 +161,7 @@ function set_tags(s, tags)
                         {
                             layout = layouts.suits[settings.layout],
                             screen = s,
-                            selected = (i == screens.SCREEN_TWO) and (j == 1)
+                            selected = (i == screens.SCREEN_ONE) and (j == 1)
                         }
                     )
                 end
@@ -506,6 +506,16 @@ local cpu = lain.widget.cpu({
 local cpu_widget = wibox.container.background(cpu.widget)
 cpu_widget.bgimage = beautiful.widget_display
 
+cpu.widget:buttons(awful.util.table.join(
+    awful.button(
+        { },
+        1,
+        function()
+            awful.spawn(terminal .."-e htop")
+        end
+    )
+))
+
 -- Memory widget
 local mem_icon = wibox.widget.imagebox(beautiful.widget_mem)
 local mem = lain.widget.mem({
@@ -529,46 +539,46 @@ local ssd_widget = wibox.container.background(ssd.widget)
 ssd_widget.bgimage = beautiful.widget_display
 
 -- Battery widget
--- local battery_icon = wibox.widget.imagebox(beautiful.widget_battery)
--- local battery_notification = nil
--- local battey_time = ""
--- local battery = lain.widget.bat({
---     notify = "off",
---     full_notify = "off",
---     settings = function()
---         bat_perc = tonumber(bat_now.perc)
---         if bat_perc == 100 then
---             battery_icon:set_image(beautiful.widget_battery_ac)
---             battery_time = " " .. bat_now.time .. " "
---             widget:set_markup(" " .. bat_now.perc .. "%" .. " ")
---         elseif bat_perc > 50 then
---             battery_icon:set_image(beautiful.widget_battery)
---             battery_time = " " .. bat_now.time .. " "
---             widget:set_markup(" " .. bat_now.perc .. "%" .. " ")
---         elseif bat_perc > 15 then
---             battery_icon:set_image(beautiful.widget_battery_low)
---             battery_time = " " .. bat_now.time .. " "
---             widget:set_markup(lain.util.markup(beautiful.bg_focus, " " .. bat_now.perc .. "%" .. " "))
---         else
---             battery_icon:set_image(beautiful.widget_battery_empty)
---             battery_time = " " .. bat_now.time .. " "
---             widget:set_markup(lain.util.markup(beautiful.fg_urgent, " " .. bat_now.perc .. "%" .. " "))
---         end
---     end
--- })
--- local battery_widget = wibox.container.background(battery.widget)
--- battery_widget.bgimage = beautiful.widget_display
--- battery_widget:connect_signal('mouse::enter', function()
---     battery_notification = naughty.notify(
---         {
---             title = "Battery time",
---             text = battery_time
---         })
--- end)
--- battery_widget:connect_signal('mouse::leave', function()
---     naughty.destroy(battery_notification)
---     battery_notification = nil
--- end)
+local battery_icon = wibox.widget.imagebox(beautiful.widget_battery)
+local battery_notification = nil
+local battey_time = ""
+local battery = lain.widget.bat({
+    notify = "off",
+    full_notify = "off",
+    settings = function()
+        bat_perc = tonumber(bat_now.perc)
+        if bat_perc == 100 then
+            battery_icon:set_image(beautiful.widget_battery_ac)
+            battery_time = " " .. bat_now.time .. " "
+            widget:set_markup(" " .. bat_now.perc .. "%" .. " ")
+        elseif bat_perc > 50 then
+            battery_icon:set_image(beautiful.widget_battery)
+            battery_time = " " .. bat_now.time .. " "
+            widget:set_markup(" " .. bat_now.perc .. "%" .. " ")
+        elseif bat_perc > 15 then
+            battery_icon:set_image(beautiful.widget_battery_low)
+            battery_time = " " .. bat_now.time .. " "
+            widget:set_markup(lain.util.markup(beautiful.bg_focus, " " .. bat_now.perc .. "%" .. " "))
+        else
+            battery_icon:set_image(beautiful.widget_battery_empty)
+            battery_time = " " .. bat_now.time .. " "
+            widget:set_markup(lain.util.markup(beautiful.fg_urgent, " " .. bat_now.perc .. "%" .. " "))
+        end
+    end
+})
+local battery_widget = wibox.container.background(battery.widget)
+battery_widget.bgimage = beautiful.widget_display
+battery_widget:connect_signal('mouse::enter', function()
+    battery_notification = naughty.notify(
+        {
+            title = "Battery time",
+            text = battery_time
+        })
+end)
+battery_widget:connect_signal('mouse::leave', function()
+    naughty.destroy(battery_notification)
+    battery_notification = nil
+end)
 
 -- Network widget
 local netdl_icon = wibox.widget.imagebox(beautiful.widget_netdl)
@@ -926,13 +936,13 @@ function set_widgets(s)
             -- Separator
             spr,
             -- Battery widget
-            -- battery_icon,
-            -- widget_display_left,
-            -- battery_widget,
-            -- widget_display_right,
-            -- spr4px,
-            -- -- Separator
-            -- spr,
+            battery_icon,
+            widget_display_left,
+            battery_widget,
+            widget_display_right,
+            spr4px,
+            -- Separator
+            spr,
             -- Network
             netdl_icon,
             widget_display_left,
@@ -1137,13 +1147,13 @@ function set_widgets_primary(s)
             -- Separator
             spr,
             -- Battery widget
-            -- battery_icon,
-            -- widget_display_left,
-            -- battery_widget,
-            -- widget_display_right,
-            -- spr4px,
-            -- -- Separator
-            -- spr,
+            battery_icon,
+            widget_display_left,
+            battery_widget,
+            widget_display_right,
+            spr4px,
+            -- Separator
+            spr,
             -- Network
             netdl_icon,
             widget_display_left,
