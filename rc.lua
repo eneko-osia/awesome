@@ -511,7 +511,7 @@ cpu.widget:buttons(awful.util.table.join(
         { },
         1,
         function()
-            awful.spawn(terminal .."-e htop")
+            awful.spawn(terminal .." -e htop")
         end
     )
 ))
