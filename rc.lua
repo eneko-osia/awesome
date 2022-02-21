@@ -558,7 +558,7 @@ local battery = lain.widget.bat({
         elseif bat_perc > 15 then
             battery_icon:set_image(beautiful.widget_battery_low)
             battery_time = " " .. bat_now.time .. " "
-            widget:set_markup(lain.util.markup(beautiful.bg_focus, " " .. bat_now.perc .. "%" .. " "))
+            widget:set_markup(lain.util.markup(beautiful.fg_focus, " " .. bat_now.perc .. "%" .. " "))
         else
             battery_icon:set_image(beautiful.widget_battery_empty)
             battery_time = " " .. bat_now.time .. " "
