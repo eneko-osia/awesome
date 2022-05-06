@@ -715,7 +715,7 @@ volume.widget:buttons(awful.util.table.join(
         3,
         function()
             if volume.device ~= nil then
-                os.execute(string.format("pactl set-sink-volume %d %d%%", volume.device, 20))
+                os.execute(string.format("pactl set-sink-volume %d %d%%", volume.device, 100))
                 volume.update()
             end
         end
@@ -781,7 +781,7 @@ microphone.widget:buttons(awful.util.table.join(
         3,
         function()
             if microphone.device ~= nil then
-                os.execute(string.format("pactl set-source-volume %d %d%%", microphone.device, 20))
+                os.execute(string.format("pactl set-source-volume %d %d%%", microphone.device, 100))
                 microphone.update()
             end
         end
