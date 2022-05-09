@@ -864,7 +864,6 @@ function set_widgets(s)
     -- Wibox
     s.top_wibox = awful.wibar({ position = "top", screen = s, height = 22, bg = beautiful.panel, fg = beautiful.fg_normal })
     s.top_wibox:setup {
-        buttons = menu_bar_buttons,
         layout = wibox.layout.align.horizontal,
         {
             -- Left widgets
@@ -1059,7 +1058,6 @@ function set_widgets_primary(s)
     -- Wibox
     s.top_wibox = awful.wibar({ position = "top", screen = s, height = 22, bg = beautiful.panel, fg = beautiful.fg_normal })
     s.top_wibox:setup {
-        buttons = menu_bar_buttons,
         layout = wibox.layout.align.horizontal,
         {
             -- Left widgets
@@ -1563,6 +1561,18 @@ awful.rules.rules =
         callback = function (c)
             awful.placement.centered(c,nil)
         end
+    },
+
+    {
+        rule =
+        {
+            class = "[Bb]attle.net"
+        },
+        properties =
+        {
+            screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
+            tag = tags.names[tags.TAG_EXTRA]
+        }
     },
 
     {
