@@ -547,7 +547,7 @@ local battery = lain.widget.bat({
     full_notify = "off",
     settings = function()
         bat_perc = tonumber(bat_now.perc)
-        if bat_perc == 100 then
+        if bat_now.ac_status == 1 then
             battery_icon:set_image(beautiful.widget_battery_ac)
             battery_time = " " .. bat_now.time .. " "
             widget:set_markup(" " .. bat_now.perc .. "%" .. " ")
