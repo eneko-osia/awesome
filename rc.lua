@@ -1652,8 +1652,10 @@ awful.rules.rules =
         },
         properties =
         {
+            floating = false,
             screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-            tag = tags.names[tags.TAG_MUSIC]
+            tag = tags.names[tags.TAG_MUSIC],
+            titlebars_enabled = false
         }
     },
 
