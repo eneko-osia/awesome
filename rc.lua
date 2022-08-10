@@ -137,40 +137,19 @@ local screens =
 
 -- {{{ Tags definitions
 function set_tags(s, tags)
-    if screens.SCREEN_TWO == screen:count() then
-        if tags[s.index] ~= nil then
-            for i, settings in ipairs(tags[s.index]) do
-                awful.tag.add(
-                    settings.name,
-                    {
-                        layout = layouts.suits[settings.layout],
-                        screen = s,
-                        selected = ((s.index == screens.SCREEN_TWO) and (i == 2)) or ((s.index == screens.SCREEN_ONE) and (i == 1))
-                    }
-                )
-            end
-        else
-            awful.tag({ "1", "2", "3" }, s,layouts.suits[layouts.LAYOUT_FLOATING])
-        end
-    elseif screens.SCREEN_ONE == screen:count() then
-        for _, i in ipairs({screens.SCREEN_ONE}) do
-            if tags[i] ~= nil then
-                for j, settings in ipairs(tags[i]) do
-                    awful.tag.add(
-                        settings.name,
-                        {
-                            layout = layouts.suits[settings.layout],
-                            screen = s,
-                            selected = (i == screens.SCREEN_ONE) and (j == 1)
-                        }
-                    )
-                end
-            else
-                awful.tag({ "1", "2", "3" }, s,layouts.suits[layouts.LAYOUT_FLOATING])
-            end
+    if tags[s.index] ~= nil then
+        for i, settings in ipairs(tags[s.index]) do
+            awful.tag.add(
+                settings.name,
+                {
+                    layout = layouts.suits[settings.layout],
+                    screen = s,
+                    selected = ((s.index == screens.SCREEN_TWO) and (i == 2)) or ((s.index == screens.SCREEN_ONE) and (i == 1))
+                }
+            )
         end
     else
-        awful.tag({ "1", "2", "3", "4", "5", "6", "7", "8", "9" }, s,layouts.suits[layouts.LAYOUT_FLOATING])
+        awful.tag({ "main" }, s,layouts.suits[layouts.LAYOUT_FLOATING])
     end
 end
 
@@ -547,7 +526,7 @@ local battery = lain.widget.bat({
     full_notify = "off",
     settings = function()
         bat_perc = tonumber(bat_now.perc)
-        if bat_now.ac_status == 1 then
+        if bat_now.ac_status == 1 or bat_perc == 100 then
             battery_icon:set_image(beautiful.widget_battery_ac)
             battery_time = " " .. bat_now.time .. " "
             widget:set_markup(" " .. bat_now.perc .. "%" .. " ")
