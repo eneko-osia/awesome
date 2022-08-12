@@ -1,0 +1,3 @@
+#!/bin/bash
+
+liquidctl --match Corsair set fan speed $1
