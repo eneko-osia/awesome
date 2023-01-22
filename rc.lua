@@ -318,7 +318,7 @@ end
 -- }}}
 
 function startup_programs()
-    awful.spawn("chromium")
+    awful.spawn("firefox")
     awful.spawn("discord")
     awful.spawn("slack")
     awful.spawn("steam")
@@ -1557,7 +1557,7 @@ awful.rules.rules =
     {
         rule =
         {
-            class = "[Cc]hromium"
+            class = "[Ff]irefox"
         },
         properties =
         {
