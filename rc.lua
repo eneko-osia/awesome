@@ -525,19 +525,34 @@ local battery = lain.widget.bat({
     notify = "off",
     full_notify = "off",
     settings = function()
-        bat_perc = tonumber(bat_now.perc)
-        if bat_now.ac_status == 1 or bat_perc == 100 then
+        if bat_now.ac_status == "N/A" or bat_now.ac_status == 1 then
             battery_icon:set_image(beautiful.widget_battery_ac)
-            battery_time = " " .. bat_now.time .. " "
-            widget:set_markup(" " .. bat_now.perc .. "%" .. " ")
-        elseif bat_perc > 50 then
-            battery_icon:set_image(beautiful.widget_battery)
-            battery_time = " " .. bat_now.time .. " "
-            widget:set_markup(" " .. bat_now.perc .. "%" .. " ")
-        elseif bat_perc > 15 then
-            battery_icon:set_image(beautiful.widget_battery_low)
-            battery_time = " " .. bat_now.time .. " "
-            widget:set_markup(lain.util.markup(beautiful.fg_focus, " " .. bat_now.perc .. "%" .. " "))
+            if bat_now.perc ~= "N/A" then
+                battery_time = " " .. bat_now.time .. " "
+                widget:set_markup(" " .. bat_now.perc .. "%" .. " ")
+            else
+                battery_time = " " .. bat_now.time .. " "
+                widget:set_markup(" 100% ")
+            end
+        elseif bat_now.perc ~= "N/A" then
+            bat_perc_number = tonumber(bat_now.perc)
+            if bat_now.ac_status == 1 or bat_perc_number == 100 then
+                battery_icon:set_image(beautiful.widget_battery_ac)
+                battery_time = " " .. bat_now.time .. " "
+                widget:set_markup(" " .. bat_now.perc .. "%" .. " ")
+            elseif bat_perc_number > 50 then
+                battery_icon:set_image(beautiful.widget_battery)
+                battery_time = " " .. bat_now.time .. " "
+                widget:set_markup(" " .. bat_now.perc .. "%" .. " ")
+            elseif bat_perc_number > 15 then
+                battery_icon:set_image(beautiful.widget_battery_low)
+                battery_time = " " .. bat_now.time .. " "
+                widget:set_markup(lain.util.markup(beautiful.fg_focus, " " .. bat_now.perc .. "%" .. " "))
+            else
+                battery_icon:set_image(beautiful.widget_battery_empty)
+                battery_time = " " .. bat_now.time .. " "
+                widget:set_markup(lain.util.markup(beautiful.fg_urgent, " " .. bat_now.perc .. "%" .. " "))
+            end
         else
             battery_icon:set_image(beautiful.widget_battery_empty)
             battery_time = " " .. bat_now.time .. " "
@@ -1571,7 +1586,7 @@ awful.rules.rules =
     {
         rule =
         {
-            class = "[Cc]ode"
+            class = "[Vv][Ss][Cc]odium"
         },
         properties =
         {
