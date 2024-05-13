@@ -159,8 +159,10 @@ local tags =
     TAG_DEV =       2,
     TAG_EXTRA =     3,
     TAG_MUSIC =     4,
-    TAG_TERMINAL =  5,
-    TAG_WEB =       6,
+    TAG_PARSEC =    5,
+    TAG_TERMINAL =  6,
+    TAG_WEB =       7,
+    TAG_ZOOM =      8,
 
     names =
     {
@@ -168,16 +170,20 @@ local tags =
         "dev",
         "extra",
         "music",
+        "parsec",
         "terminal",
-        "web"
+        "web",
+        "zoom"
     },
 
     [screens.SCREEN_ONE] =
     {
-        { name = "terminal",    layout = layouts.LAYOUT_TILE                    },
-        { name = "web",         layout = layouts.LAYOUT_TILE_TOP                },
+        { name = "terminal",    layout = layouts.LAYOUT_TILE_LEFT               },
+        { name = "web",         layout = layouts.LAYOUT_TILE_LEFT               },
         { name = "dev",         layout = layouts.LAYOUT_MAX                     },
-        { name = "chat",        layout = layouts.LAYOUT_TILE_TOP                },
+        { name = "parsec",      layout = layouts.LAYOUT_MAX                     },
+        { name = "chat",        layout = layouts.LAYOUT_TILE_LEFT               },
+        { name = "zoom",        layout = layouts.LAYOUT_TILE_LEFT               },
         { name = "extra",       layout = layouts.LAYOUT_FLOATING                }
     },
 
@@ -188,6 +194,7 @@ local tags =
         { name = "dev",         layout = layouts.LAYOUT_MAX                     },
         { name = "music",       layout = layouts.LAYOUT_TILE_TOP                },
         { name = "chat",        layout = layouts.LAYOUT_TILE_TOP                },
+        { name = "zoom",        layout = layouts.LAYOUT_TILE_TOP                },
         { name = "extra",       layout = layouts.LAYOUT_FLOATING                }
     }
 }
@@ -1591,7 +1598,7 @@ awful.rules.rules =
         properties =
         {
             floating = false,
-            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
+            screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
             tag = tags.names[tags.TAG_DEV],
             titlebars_enabled = false
         }
@@ -1620,7 +1627,7 @@ awful.rules.rules =
         {
             floating = false,
             screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
-            tag = tags.names[tags.TAG_DEV],
+            tag = tags.names[tags.TAG_PARSEC],
             titlebars_enabled = false
         }
     },
@@ -1684,8 +1691,9 @@ awful.rules.rules =
         },
         properties =
         {
+            floating = false,
             screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-            tag = tags.names[tags.TAG_EXTRA]
+            tag = tags.names[tags.TAG_ZOOM]
         }
     }
 }
