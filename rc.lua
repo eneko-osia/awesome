@@ -325,7 +325,7 @@ end
 -- }}}
 
 function startup_programs()
-    awful.spawn("firefox")
+    awful.spawn("librewolf")
     awful.spawn("discord")
     awful.spawn("slack")
     awful.spawn("steam")
@@ -1313,14 +1313,14 @@ local globalkeys = gears.table.join(
     awful.key(
         { modkey },
         "l",
-        function () awful.tag.incmwfact( 0.05) end,
+        function () awful.tag.incmwfact(-0.05) end,
         { description = "increase width", group = "layout" }
     ),
 
     awful.key(
         { modkey },
         "h",
-        function () awful.tag.incmwfact(-0.05) end,
+        function () awful.tag.incmwfact( 0.05) end,
         { description = "decrease width", group = "layout" }
     ),
 
@@ -1579,7 +1579,7 @@ awful.rules.rules =
     {
         rule =
         {
-            class = "[Ff]irefox"
+            class = "[Ll]ibre[Ww]olf"
         },
         properties =
         {
