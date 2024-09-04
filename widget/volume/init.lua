@@ -1,26 +1,28 @@
 -- {{{ Standard libraries
-local awful     = require("awful")
-local beautiful = require("beautiful")
-local dpi       = require("beautiful.xresources").apply_dpi
-local gears     = require("gears")
-local lain      = require("lain")
-local wibox     = require("wibox")
+local awful         = require("awful")
+local beautiful     = require("beautiful")
+local beautiful_dpi = require("beautiful.xresources").apply_dpi
+local gears         = require("gears")
+local gears_timer   = require("gears.timer")
+local wibox         = require("wibox")
 -- }}}
 
 -- {{{ Factory
 local function factory(args)
     local args = args or {}
 
-    local device = args.device or nil
-    local icons = args.icons or {
-        high = nil,
-        low = nil,
-        medium = nil,
-        muted = nil
-    }
+    local device_index = -1
+    local device_type = args.device_type or "sink"
+    local icons = args.icons or
+        {
+            high = nil,
+            low = nil,
+            medium = nil,
+            muted = nil
+        }
 
-    local volume = {
-        widget = wibox.widget({
+    local volume = wibox.widget(
+        {
             {
                 {
                     {
@@ -32,7 +34,7 @@ local function factory(args)
                     {
                         {
                             align  = "center",
-                            forced_width = dpi(36),
+                            forced_width = beautiful_dpi(36),
                             text = "N/A",
                             valign = "center",
                             widget = wibox.widget.textbox
@@ -48,116 +50,157 @@ local function factory(args)
             bg = beautiful.bg_reset,
             shape = gears.shape.rectangle,
             widget = wibox.container.background
-        })
-    }
-
-    -- lain widget creation
-    local pulse = lain.widget.pulse({
-        devicetype = device,
-        settings =
-            function()
-                local icon_widget_container = widget:get_children()[1]:get_children()[1]
-                local icon_widget = icon_widget_container:get_children()[1]
-                local text_widget_container = widget:get_children()[1]:get_children()[2]:get_children()[1]
-                local text_widget = text_widget_container:get_children()[1]
-                if (icon_widget ~= nil and text_widget ~= nil) then
-                    if (volume_now.muted == "yes") then
-                        icon_widget:set_image(icons.muted)
-                        text_widget:set_markup(lain.util.markup.strike(" " .. volume_now.left .. "% "))
-                    else
-                        if (volume_now.left ~= "N/A") then
-                            local volume_number = tonumber(volume_now.left)
-                            if (volume_number > 70) then
-                                icon_widget:set_image(icons.high)
-                            elseif (volume_number > 30) then
-                                icon_widget:set_image(icons.medium)
-                            else
-                                icon_widget:set_image(icons.low)
-                            end
-                        end
-                        text_widget:set_markup(" " .. volume_now.left .. "% ")
-                    end
-                end
-            end,
-        widget = volume.widget
-    })
+        }
+    )
 
     -- methods
+    local function update()
+        awful.spawn.easy_async_with_shell(
+            string.format("pacmd list-%ss | sed -n -e '/*/,$!d' -e '/index/p' -e '/volume:/p' -e '/muted:/p'", device_type),
+            function(stdout, _, _, _)
+                device_index = tonumber(string.match(stdout, "index: (%S+)")) or nil
+                local muted = string.match(stdout, "muted: (%S+)") or "yes"
+                local vol = tonumber(string.match(stdout, ":.-(%d+)%%")) or 0
+
+                local icon_widget_container = volume:get_children()[1]:get_children()[1]
+                local icon_widget = icon_widget_container:get_children()[1]
+                local text_widget_container = volume:get_children()[1]:get_children()[2]:get_children()[1]
+                local text_widget = text_widget_container:get_children()[1]
+                if muted == "yes" then
+                    icon_widget:set_image(icons.muted)
+                    text_widget:set_markup(string.format(" <s>%d%%</s> ", vol))
+                else
+                    if vol == 0 then
+                        icon_widget:set_image(icons.muted)
+                    elseif vol > 70 then
+                        icon_widget:set_image(icons.high)
+                    elseif vol > 30 then
+                        icon_widget:set_image(icons.medium)
+                    else
+                        icon_widget:set_image(icons.low)
+                    end
+                    text_widget:set_markup(string.format(" %d%% ", vol))
+                end
+            end
+        )
+    end
+
     function volume:down()
-        if pulse.device ~= nil then
-            os.execute(string.format("pactl set-" .. device .. "-volume %d -1%%", pulse.device))
-            pulse.update()
+        if device_index ~= nil then
+            awful.spawn.easy_async(
+                string.format("pactl set-%s-volume %d -1%%", device_type, device_index),
+                function(_, _, _, _)
+                    update()
+                end
+            )
         end
     end
 
     function volume:mute()
-        if pulse.device ~= nil then
-            os.execute(string.format("pactl set-" .. device .. "-mute %d toggle", pulse.device))
-            pulse.update()
+        if device_index ~= nil then
+            awful.spawn.easy_async(
+                string.format("pactl set-%s-mute %d toggle", device_type, device_index),
+                function(_, _, _, _)
+                    update()
+                end
+            )
         end
     end
 
     function volume:set(value)
-        if pulse.device ~= nil then
-            os.execute(string.format("pactl set-" .. device .. "-volume %d %d%%", pulse.device, value))
-            pulse.update()
+        if device_index ~= nil then
+            awful.spawn.easy_async(
+                string.format("pactl set-%s-volume %d %d%%", device_type, device_index, value),
+                function(_, _, _, _)
+                    update()
+                end
+            )
         end
     end
 
     function volume:up()
-        if pulse.device ~= nil then
-            os.execute(string.format("pactl set-" .. device .. "-volume %d +1%%", pulse.device))
-            pulse.update()
+        if device_index ~= nil then
+            awful.spawn.easy_async(
+                string.format("pactl set-%s-volume %d +1%%", device_type, device_index),
+                function(_, _, _, _)
+                    update()
+                end
+            )
         end
     end
 
     -- bindings
-    volume.widget:buttons(gears.table.join(
-        awful.button(
-            {},
-            1,
-            function()
-                awful.spawn("pavucontrol")
-            end
-        ),
+    volume:buttons(
+        gears.table.join(
+            awful.button(
+                {},
+                1,
+                _,
+                function()
+                    awful.spawn("pavucontrol")
+                end
+            ),
 
-        awful.button(
-            {},
-            2,
-            function() volume:mute() end
-        ),
+            awful.button(
+                {},
+                2,
+                _,
+                function()
+                    volume:mute()
+                end
+            ),
 
-        awful.button(
-            {},
-            3,
-            function() volume:set(100) end
-        ),
+            awful.button(
+                {},
+                3,
+                _,
+                function()
+                    volume:set(100)
+                end
+            ),
 
-        awful.button(
-            {},
-            4,
-            function() volume:up() end
-        ),
+            awful.button(
+                {},
+                4,
+                _,
+                function()
+                    volume:up()
+                end
+            ),
 
-        awful.button(
-            {},
-            5,
-            function() volume:down() end
+            awful.button(
+                {},
+                5,
+                _,
+                function()
+                    volume:down()
+                end
+            )
         )
-    ))
+    )
 
     -- signals
-    volume.widget:connect_signal(
+    volume:connect_signal(
         "mouse::enter",
         function(c)
             c:set_bg(beautiful.bg_normal)
         end
     )
-    volume.widget:connect_signal(
+    volume:connect_signal(
         "mouse::leave",
         function(c)
             c:set_bg(beautiful.bg_reset)
         end
+    )
+
+    -- timers
+    gears_timer(
+        {
+            timeout = 5,
+            autostart = true,
+            call_now = true,
+            callback = update
+        }
     )
 
     return volume
