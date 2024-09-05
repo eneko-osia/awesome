@@ -115,7 +115,7 @@ local function factory(args)
             local song_widget_container = spotify:get_children()[1]
             local song_text_widget_container = song_widget_container:get_children()[1]:get_children()[2]:get_children()[1]
             local song_text_widget = song_text_widget_container:get_children()[1]
-            song_text_widget:set_markup("<span foreground='" .. color .. "'>" .. text .. "</span>")
+            song_text_widget:set_markup(string.format("<span foreground='%s'>%s</span>", color, text))
         end
 
         if string.find(text, "Spotify is not running") ~= nil then
@@ -124,7 +124,7 @@ local function factory(args)
             _set(beautiful.fg_normal, "N/A")
         else
             local color = (state == 1) and beautiful.fg_focus or beautiful.fg_normal
-            _set(color, "" .. text:sub(index, text:len()) .. text:sub(1, index - 1) .. "")
+            _set(color, string.format("%s%s", text:sub(index, text:len()), text:sub(1, index - 1)))
         end
     end
 
@@ -132,7 +132,7 @@ local function factory(args)
         awful.spawn.easy_async(
             "sp current-oneline",
             function(stdout, _, _, _)
-                local text = "   " .. stdout:sub(1, stdout:len() - 1) .. "   "
+                local text = string.format("   %s   ", stdout:sub(1, stdout:len() - 1))
                 if song_text ~= text then
                     song_index = 1
                     song_text = text
