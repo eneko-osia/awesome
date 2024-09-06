@@ -9,7 +9,7 @@ local wibox         = require("wibox")
 
 -- {{{ Factory
 local function factory(args)
-    local args = args or {}
+    args = args or {}
 
     local cpu_info = {}
     local icons = args.icons or

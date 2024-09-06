@@ -9,7 +9,7 @@ local wibox         = require("wibox")
 
 -- {{{ Factory
 local function factory(args)
-    local args = args or {}
+    args = args or {}
 
     local device_index = -1
     local device_type = args.device_type or "sink"
