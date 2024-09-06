@@ -29,7 +29,7 @@ local function factory(args)
                         id = "icon",
                         widget = wibox.widget.imagebox(icons.muted)
                     },
-                    layout = wibox.container.margin(_, 4, 4, 3, 3)
+                    layout = wibox.container.margin(_, beautiful_dpi(4), beautiful_dpi(1), beautiful_dpi(3), beautiful_dpi(3))
                 },
                 {
                     {
@@ -42,10 +42,10 @@ local function factory(args)
                             widget = wibox.widget.textbox
                         },
                         bg = beautiful.bg_focus,
-                        shape = function(cr, width, height) gears.shape.rounded_rect(cr, width, height, 2) end,
+                        shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(2)) end,
                         widget = wibox.container.background,
                     },
-                    layout = wibox.container.margin(_, _, 4, 3, 3)
+                    layout = wibox.container.margin(_, beautiful_dpi(3), beautiful_dpi(3), beautiful_dpi(3), beautiful_dpi(3))
                 },
                 layout = wibox.layout.fixed.horizontal
             },
