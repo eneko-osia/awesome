@@ -19,8 +19,8 @@ local function factory(args)
     local popup = awful.popup(
         {
             border_color = beautiful.bg_focus,
-            border_width = 2,
-            offset = { y = 2 },
+            border_width = beautiful_dpi(2),
+            offset = { y = beautiful_dpi(2) },
             ontop = true,
             shape = gears.shape.rounded_rect,
             visible = false,
@@ -37,7 +37,7 @@ local function factory(args)
                         id = "icon",
                         widget = wibox.widget.imagebox(icons.logo)
                     },
-                    layout = wibox.container.margin(_, _, 2, _, _)
+                    layout = wibox.container.margin(_, _, _, _, _)
                 },
                 {
                     {
@@ -50,10 +50,10 @@ local function factory(args)
                             widget = wibox.widget.textbox
                         },
                         bg = beautiful.bg_focus,
-                        shape = function(cr, width, height) gears.shape.rounded_rect(cr, width, height, 2) end,
+                        shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(2)) end,
                         widget = wibox.container.background,
                     },
-                    layout = wibox.container.margin(_, _, 4, 3, 3)
+                    layout = wibox.container.margin(_, beautiful_dpi(3), beautiful_dpi(3), beautiful_dpi(3), beautiful_dpi(3))
                 },
                 layout = wibox.layout.fixed.horizontal
             },
@@ -68,7 +68,7 @@ local function factory(args)
         local cpu_rows =
         {
             layout = wibox.layout.fixed.vertical,
-            spacing = 8
+            spacing = beautiful_dpi(8)
         }
         for k, v in pairs(cpu_info) do
             if k ~= 0 then
@@ -93,10 +93,10 @@ local function factory(args)
                                         widget = wibox.widget.textbox
                                     },
                                     bg = beautiful.bg_focus,
-                                    shape = function(cr, width, height) gears.shape.rounded_rect(cr, width, height, 2) end,
+                                    shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(5)) end,
                                     widget = wibox.container.background
                                 },
-                                layout = wibox.container.margin(_, _, 4, _, _)
+                                layout = wibox.container.margin(_, beautiful_dpi(3), beautiful_dpi(3), _, _)
                             },
                             {
                                 {
@@ -109,10 +109,10 @@ local function factory(args)
                                         widget = wibox.widget.textbox
                                     },
                                     bg = beautiful.bg_focus,
-                                    shape = function(cr, width, height) gears.shape.rounded_rect(cr, width, height, 2) end,
+                                    shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(5)) end,
                                     widget = wibox.container.background
                                 },
-                                layout = wibox.container.margin(_, _, 4, _, _)
+                                layout = wibox.container.margin(_, _, beautiful_dpi(3), _, _)
                             },
                             {
                                 {
@@ -121,14 +121,14 @@ local function factory(args)
                                         color = string.format("linear:0,0:150,0:0,%s:0.5,%s:1,%s", "#00FF00", "#FFFF00", "#FF0000"),
                                         forced_height = beautiful_dpi(20),
                                         forced_width = beautiful_dpi(150),
-                                        margins = 1,
+                                        margins = beautiful_dpi(1),
                                         max_value = v.total_delta,
-                                        paddings = 6,
+                                        paddings = beautiful_dpi(6),
                                         value = v.active_delta,
                                         widget = wibox.widget.progressbar
                                     },
                                     bg = beautiful.bg_focus,
-                                    shape = function(cr, width, height) gears.shape.rounded_rect(cr, width, height, 2) end,
+                                    shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(5)) end,
                                     widget = wibox.container.background
                                 },
                                 layout = wibox.container.margin(_, _, _, _, _)
@@ -150,7 +150,7 @@ local function factory(args)
                 {
                     {
                         cpu_rows,
-                        layout = wibox.container.margin(_, 10, 10, 10, 10)
+                        layout = wibox.container.margin(_, beautiful_dpi(10), beautiful_dpi(10), beautiful_dpi(10), beautiful_dpi(10))
                     },
                     layout = wibox.layout.fixed.horizontal
                 },
