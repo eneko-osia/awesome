@@ -110,7 +110,8 @@ local function factory(args)
     )
     local terminal = args.terminal or "xterm"
 
-    local memory = wibox.widget({
+    local memory = wibox.widget(
+        {
             {
                 {
                     {
