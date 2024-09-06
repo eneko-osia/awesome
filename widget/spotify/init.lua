@@ -29,6 +29,7 @@ local function factory(args)
                 {
                     {
                         {
+                            id = "song_icon",
                             widget = wibox.widget.imagebox(icons.logo)
                         },
                         layout = wibox.container.margin(_, 4, 4, 3, 3)
@@ -38,6 +39,7 @@ local function factory(args)
                             {
                                 align  = "center",
                                 forced_width = beautiful_dpi(256),
+                                id = "song_text",
                                 text = song_text,
                                 valign = "center",
                                 widget = wibox.widget.textbox
@@ -51,6 +53,7 @@ local function factory(args)
                     layout = wibox.layout.fixed.horizontal
                 },
                 bg = beautiful.bg_reset,
+                id = "song_container",
                 shape = gears.shape.rectangle,
                 widget = wibox.container.background
             },
@@ -63,11 +66,13 @@ local function factory(args)
             {
                 {
                     {
+                        id = "prev_icon",
                         widget = wibox.widget.imagebox(icons.prev)
                     },
                     layout = wibox.container.margin(_, 4, 4, 3, 3)
                 },
                 bg = beautiful.bg_reset,
+                id = "prev_icon_container",
                 shape = gears.shape.rectangle,
                 widget = wibox.container.background
             },
@@ -80,11 +85,13 @@ local function factory(args)
             {
                 {
                     {
+                        id = "play_pause_icon",
                         widget = wibox.widget.imagebox(icons.play)
                     },
                     layout = wibox.container.margin(_, 4, 4, 3, 3)
                 },
                 bg = beautiful.bg_reset,
+                id = "play_pause_icon_container",
                 shape = gears.shape.rectangle,
                 widget = wibox.container.background
             },
@@ -97,11 +104,13 @@ local function factory(args)
             {
                 {
                     {
+                        id = "next_icon",
                         widget = wibox.widget.imagebox(icons.next)
                     },
                     layout = wibox.container.margin(_, 4, 4, 3, 3)
                 },
                 bg = beautiful.bg_reset,
+                id = "next_icon_container",
                 shape = gears.shape.rectangle,
                 widget = wibox.container.background
             },
@@ -112,9 +121,7 @@ local function factory(args)
     -- methods
     local function set_song_text(state, text, index)
         local function _set(color, text)
-            local song_widget_container = spotify:get_children()[1]
-            local song_text_widget_container = song_widget_container:get_children()[1]:get_children()[2]:get_children()[1]
-            local song_text_widget = song_text_widget_container:get_children()[1]
+            local song_text_widget = spotify:get_children_by_id("song_text")[1]
             song_text_widget:set_markup(string.format("<span foreground='%s'>%s</span>", color, text))
         end
 
@@ -145,8 +152,7 @@ local function factory(args)
             "sp status",
             function(stdout, _, _, _)
                 local function _set_play_pause_icon(icon)
-                    local play_pause_icon_widget_container = spotify:get_children()[5]
-                    local play_pause_icon_widget = play_pause_icon_widget_container:get_children()[1]:get_children()[1]
+                    local play_pause_icon_widget = spotify:get_children_by_id("play_pause_icon")[1]
                     play_pause_icon_widget.image = icon
                 end
 
@@ -206,7 +212,7 @@ local function factory(args)
     end
 
     -- bindings
-    local next_icon_widget_container = spotify:get_children()[7]
+    local next_icon_widget_container = spotify:get_children_by_id("next_icon_container")[1]
     next_icon_widget_container:buttons(
         gears.table.join(
             awful.button(
@@ -220,7 +226,7 @@ local function factory(args)
         )
     )
 
-    local play_pause_icon_widget_container = spotify:get_children()[5]
+    local play_pause_icon_widget_container = spotify:get_children_by_id("play_pause_icon_container")[1]
     play_pause_icon_widget_container:buttons(
             gears.table.join(
             awful.button(
@@ -234,7 +240,7 @@ local function factory(args)
         )
     )
 
-    local prev_icon_widget_container = spotify:get_children()[3]
+    local prev_icon_widget_container = spotify:get_children_by_id("prev_icon_container")[1]
     prev_icon_widget_container:buttons(
         gears.table.join(
             awful.button(
@@ -248,9 +254,7 @@ local function factory(args)
         )
     )
 
-    local song_widget_container = spotify:get_children()[1]
-    local song_text_widget_container = song_widget_container:get_children()[1]:get_children()[2]:get_children()[1]
-    local song_text_widget = song_text_widget_container:get_children()[1]
+    local song_text_widget = spotify:get_children_by_id("song_text")[1]
     song_text_widget:buttons(
         gears.table.join(
             awful.button(
@@ -285,6 +289,7 @@ local function factory(args)
         )
     )
 
+    local song_widget_container = spotify:get_children_by_id("song_container")[1]
     song_widget_container:buttons(
         gears.table.join(
             awful.button(
