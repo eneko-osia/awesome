@@ -32,7 +32,7 @@ local function factory(args)
                             id = "song_icon",
                             widget = wibox.widget.imagebox(icons.logo)
                         },
-                        layout = wibox.container.margin(_, 4, 4, 3, 3)
+                        layout = wibox.container.margin(_, beautiful_dpi(4), beautiful_dpi(1), beautiful_dpi(3), beautiful_dpi(3))
                     },
                     {
                         {
@@ -45,10 +45,10 @@ local function factory(args)
                                 widget = wibox.widget.textbox
                             },
                             bg = beautiful.bg_focus,
-                            shape = function(cr, width, height) gears.shape.rounded_rect(cr, width, height, 2) end,
+                            shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(2)) end,
                             widget = wibox.container.background
                         },
-                        layout = wibox.container.margin(_, _, 4, 3, 3)
+                        layout = wibox.container.margin(_, beautiful_dpi(3), beautiful_dpi(3), beautiful_dpi(3), beautiful_dpi(3))
                     },
                     layout = wibox.layout.fixed.horizontal
                 },
@@ -69,7 +69,7 @@ local function factory(args)
                         id = "prev_icon",
                         widget = wibox.widget.imagebox(icons.prev)
                     },
-                    layout = wibox.container.margin(_, 4, 4, 3, 3)
+                    layout = wibox.container.margin(_, beautiful_dpi(4), beautiful_dpi(4), beautiful_dpi(3), beautiful_dpi(3))
                 },
                 bg = beautiful.bg_reset,
                 id = "prev_icon_container",
@@ -88,7 +88,7 @@ local function factory(args)
                         id = "play_pause_icon",
                         widget = wibox.widget.imagebox(icons.play)
                     },
-                    layout = wibox.container.margin(_, 4, 4, 3, 3)
+                    layout = wibox.container.margin(_, beautiful_dpi(4), beautiful_dpi(4), beautiful_dpi(3), beautiful_dpi(3))
                 },
                 bg = beautiful.bg_reset,
                 id = "play_pause_icon_container",
@@ -107,7 +107,7 @@ local function factory(args)
                         id = "next_icon",
                         widget = wibox.widget.imagebox(icons.next)
                     },
-                    layout = wibox.container.margin(_, 4, 4, 3, 3)
+                    layout = wibox.container.margin(_, beautiful_dpi(4), beautiful_dpi(4), beautiful_dpi(3), beautiful_dpi(3))
                 },
                 bg = beautiful.bg_reset,
                 id = "next_icon_container",
