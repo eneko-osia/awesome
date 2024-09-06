@@ -70,6 +70,7 @@ local function factory(args)
             layout = wibox.layout.fixed.vertical,
             spacing = beautiful_dpi(5)
         }
+
         for k, v in pairs(cpu_info) do
             if k ~= 0 then
                 local cpu_row = wibox.widget(
@@ -137,7 +138,6 @@ local function factory(args)
             end
         end
 
-        -- popup setup
         popup:setup(
             {
                 {
