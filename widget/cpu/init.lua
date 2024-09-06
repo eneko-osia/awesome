@@ -217,9 +217,9 @@ local function factory(args)
         function(c)
             c:set_bg(beautiful.bg_normal)
 
-        update_popup()
-        popup:move_next_to(mouse.current_widget_geometry)
-        popup.visible = true
+            update_popup()
+            popup:move_next_to(mouse.current_widget_geometry)
+            popup.visible = true
         end
     )
     cpu:connect_signal(
