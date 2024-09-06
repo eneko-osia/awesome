@@ -68,20 +68,13 @@ local function factory(args)
         local cpu_rows =
         {
             layout = wibox.layout.fixed.vertical,
-            spacing = beautiful_dpi(8)
+            spacing = beautiful_dpi(5)
         }
         for k, v in pairs(cpu_info) do
             if k ~= 0 then
                 local cpu_row = wibox.widget(
                     {
                         {
-                            {
-                                {
-                                    resize = false,
-                                    widget = wibox.widget.imagebox(icons.logo)
-                                },
-                                layout = wibox.container.margin(_, _, _, _, _)
-                            },
                             {
                                 {
                                     {
@@ -150,7 +143,7 @@ local function factory(args)
                 {
                     {
                         cpu_rows,
-                        layout = wibox.container.margin(_, beautiful_dpi(10), beautiful_dpi(10), beautiful_dpi(10), beautiful_dpi(10))
+                        layout = wibox.container.margin(_, beautiful_dpi(5), beautiful_dpi(5), beautiful_dpi(5), beautiful_dpi(5))
                     },
                     layout = wibox.layout.fixed.horizontal
                 },
