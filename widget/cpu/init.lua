@@ -34,6 +34,7 @@ local function factory(args)
             {
                 {
                     {
+                        id = "icon",
                         widget = wibox.widget.imagebox(icons.logo)
                     },
                     layout = wibox.container.margin(_, _, 2, _, _)
@@ -43,6 +44,7 @@ local function factory(args)
                         {
                             align  = "center",
                             forced_width = beautiful_dpi(36),
+                            id = "text",
                             text = "N/A",
                             valign = "center",
                             widget = wibox.widget.textbox
@@ -62,6 +64,108 @@ local function factory(args)
     )
 
     -- methods
+    local function update_popup()
+        local cpu_rows =
+        {
+            layout = wibox.layout.fixed.vertical,
+            spacing = 8
+        }
+        for k, v in pairs(cpu_info) do
+            if k ~= 0 then
+                local cpu_row = wibox.widget(
+                    {
+                        {
+                            {
+                                {
+                                    resize = false,
+                                    widget = wibox.widget.imagebox(icons.logo)
+                                },
+                                layout = wibox.container.margin(_, _, _, _, _)
+                            },
+                            {
+                                {
+                                    {
+                                        align  = "center",
+                                        forced_height = beautiful_dpi(20),
+                                        forced_width = beautiful_dpi(24),
+                                        text = string.format("%s", v.name),
+                                        valign = "center",
+                                        widget = wibox.widget.textbox
+                                    },
+                                    bg = beautiful.bg_focus,
+                                    shape = function(cr, width, height) gears.shape.rounded_rect(cr, width, height, 2) end,
+                                    widget = wibox.container.background
+                                },
+                                layout = wibox.container.margin(_, _, 4, _, _)
+                            },
+                            {
+                                {
+                                    {
+                                        align  = "center",
+                                        forced_height = beautiful_dpi(20),
+                                        forced_width = beautiful_dpi(36),
+                                        text = string.format("%s%%", math.ceil(math.abs((v.active_delta / v.total_delta) * 100))),
+                                        valign = "center",
+                                        widget = wibox.widget.textbox
+                                    },
+                                    bg = beautiful.bg_focus,
+                                    shape = function(cr, width, height) gears.shape.rounded_rect(cr, width, height, 2) end,
+                                    widget = wibox.container.background
+                                },
+                                layout = wibox.container.margin(_, _, 4, _, _)
+                            },
+                            {
+                                {
+                                    {
+                                        background_color = beautiful.bg_focus,
+                                        color = string.format("linear:0,0:150,0:0,%s:0.5,%s:1,%s", "#00FF00", "#FFFF00", "#FF0000"),
+                                        forced_height = beautiful_dpi(20),
+                                        forced_width = beautiful_dpi(150),
+                                        margins = 1,
+                                        max_value = v.total_delta,
+                                        paddings = 6,
+                                        value = v.active_delta,
+                                        widget = wibox.widget.progressbar
+                                    },
+                                    bg = beautiful.bg_focus,
+                                    shape = function(cr, width, height) gears.shape.rounded_rect(cr, width, height, 2) end,
+                                    widget = wibox.container.background
+                                },
+                                layout = wibox.container.margin(_, _, _, _, _)
+                            },
+                            layout = wibox.layout.fixed.horizontal
+                        },
+                        bg = beautiful.bg_reset,
+                        shape = gears.shape.rectangle,
+                        widget = wibox.container.background
+                    }
+                )
+                table.insert(cpu_rows, cpu_row)
+            end
+        end
+
+        -- popup setup
+        popup:setup(
+            {
+                {
+                    {
+                        cpu_rows,
+                        layout = wibox.container.margin(_, 10, 10, 10, 10)
+                    },
+                    layout = wibox.layout.fixed.horizontal
+                },
+                bg = beautiful.bg_reset,
+                shape = gears.shape.rectangle,
+                widget = wibox.container.background
+            }
+        )
+    end
+
+    local function update_widget()
+        local text_widget = cpu:get_children_by_id("text")[1]
+        text_widget:set_markup(string.format(" %s%% ", math.ceil(math.abs((cpu_info[0].active_delta / cpu_info[0].total_delta) * 100))))
+    end
+
     local function update()
         awful.spawn.easy_async(
             string.format("grep '^cpu.' /proc/stat"),
@@ -77,125 +181,23 @@ local function factory(args)
                             prev_active = 0,
                             prev_total = 0
                         }
-                    local total_delta = total - prev_info.prev_total
-                    local active_delta = active - prev_info.prev_active
-                    local usage = math.ceil(math.abs((active_delta / total_delta) * 100))
                     cpu_info[i] =
                         {
+                            active_delta = active - prev_info.prev_active,
                             name = name:gsub("cpu", ""),
                             prev_active = active,
                             prev_total = total,
-                            usage = usage
+                            total_delta = total - prev_info.prev_total
                         }
                     i = i + 1
                 end
+
+                if popup.visible then
+                    update_popup()
+                end
+                update_widget()
             end
         )
-
-        if cpu_info[0] then
-            -- popup definition
-            local cpu_rows =
-            {
-                layout = wibox.layout.fixed.vertical,
-                spacing = 8
-            }
-            for k, v in pairs(cpu_info) do
-                if k ~= 0 then
-                    local cpu_row = wibox.widget(
-                        {
-                            {
-                                {
-                                    {
-                                        resize = false,
-                                        widget = wibox.widget.imagebox(icons.logo)
-                                    },
-                                    layout = wibox.container.margin(_, _, _, _, _)
-                                },
-                                {
-                                    {
-                                        {
-                                            align  = "center",
-                                            forced_height = beautiful_dpi(20),
-                                            forced_width = beautiful_dpi(24),
-                                            text = string.format("%s", v.name),
-                                            valign = "center",
-                                            widget = wibox.widget.textbox
-                                        },
-                                        bg = beautiful.bg_focus,
-                                        shape = function(cr, width, height) gears.shape.rounded_rect(cr, width, height, 2) end,
-                                        widget = wibox.container.background
-                                    },
-                                    layout = wibox.container.margin(_, _, 4, _, _)
-                                },
-                                -- {
-                                --     {
-                                --         {
-                                --             align  = "center",
-                                --             forced_height = beautiful_dpi(20),
-                                --             forced_width = beautiful_dpi(36),
-                                --             text = string.format("%s%%", v.usage),
-                                --             valign = "center",
-                                --             widget = wibox.widget.textbox
-                                --         },
-                                --         bg = beautiful.bg_focus,
-                                --         shape = function(cr, width, height) gears.shape.rounded_rect(cr, width, height, 2) end,
-                                --         widget = wibox.container.background
-                                --     },
-                                --     layout = wibox.container.margin(_, _, 4, _, _)
-                                -- },
-                                {
-                                    {
-                                        {
-                                            background_color = beautiful.bg_focus,
-                                            color = string.format("linear:0,0:150,0:0,%s:0.5,%s:1,%s", "#00FF00", "#FFFF00", "#FF0000"),
-                                            forced_height = beautiful_dpi(20),
-                                            forced_width = beautiful_dpi(150),
-                                            margins = 1,
-                                            max_value = 100,
-                                            paddings = 6,
-                                            value = v.usage,
-                                            widget = wibox.widget.progressbar
-                                        },
-                                        bg = beautiful.bg_focus,
-                                        shape = function(cr, width, height) gears.shape.rounded_rect(cr, width, height, 2) end,
-                                        widget = wibox.container.background
-                                    },
-                                    layout = wibox.container.margin(_, _, _, _, _)
-                                },
-                                layout = wibox.layout.fixed.horizontal
-                            },
-                            bg = beautiful.bg_reset,
-                            shape = gears.shape.rectangle,
-                            widget = wibox.container.background
-                        }
-                    )
-                    table.insert(cpu_rows, cpu_row)
-                end
-            end
-
-            -- popup setup
-            popup:setup(
-                {
-                    {
-                        {
-                            cpu_rows,
-                            layout = wibox.container.margin(_, 10, 10, 10, 10)
-                        },
-                        layout = wibox.layout.fixed.horizontal
-                    },
-                    bg = beautiful.bg_reset,
-                    shape = gears.shape.rectangle,
-                    widget = wibox.container.background
-                }
-            )
-
-            -- widget
-            local text_widget_container = cpu:get_children()[1]:get_children()[2]:get_children()[1]
-            local text_widget = text_widget_container:get_children()[1]
-            if text_widget ~= nil then
-                text_widget:set_markup(string.format(" %s%% ", cpu_info[0].usage))
-            end
-        end
     end
 
     -- bindings
@@ -221,8 +223,10 @@ local function factory(args)
         "mouse::enter",
         function(c)
             c:set_bg(beautiful.bg_normal)
-            popup:move_next_to(mouse.current_widget_geometry)
-            popup.visible = true
+
+        update_popup()
+        popup:move_next_to(mouse.current_widget_geometry)
+        popup.visible = true
         end
     )
     cpu:connect_signal(
