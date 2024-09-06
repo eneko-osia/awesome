@@ -1,93 +1,95 @@
 -- {{{ Standard libraries
-local awful     = require("awful")
-local beautiful = require("beautiful")
-local dpi       = require("beautiful.xresources").apply_dpi
-local gears     = require("gears")
-local lain      = require("lain")
-local naughty   = require("naughty")
-local timer     = require("gears.timer")
-local watch     = require("awful.widget.watch")
-local wibox     = require("wibox")
+local awful         = require("awful")
+local beautiful     = require("beautiful")
+local beautiful_dpi = require("beautiful.xresources").apply_dpi
+local gears         = require("gears")
+local gears_timer   = require("gears.timer")
+local lain          = require("lain")
+local naughty       = require("naughty")
+local wibox         = require("wibox")
 -- }}}
 
 -- {{{ Factory
 local function factory(args)
     local args = args or {}
 
-    local icons = args.icons or {
-        netdl = nil,
-        netup = nil,
-        vpn_connected = nil,
-        vpn_diconnected = nil
-    }
+    local icons = args.icons or
+        {
+            netdl = nil,
+            netup = nil,
+            vpn_connected = nil,
+            vpn_diconnected = nil
+        }
     local notification = nil
     local notification_text = "N/A"
+    local vpn_connected = false
 
-    local network = {
-        vpn_connected = false,
-        widget = wibox.widget({
-            {
+    local network =
+        {
 
+            widget = wibox.widget({
                 {
+
                     {
                         {
-                            widget = wibox.widget.imagebox(icons.vpn_diconnected)
+                            {
+                                widget = wibox.widget.imagebox(icons.vpn_diconnected)
+                            },
+                            layout = wibox.container.margin(_, 4, 4, 3, 3)
                         },
-                        layout = wibox.container.margin(_, 4, 4, 3, 3)
-                    },
-                    bg = beautiful.bg_reset,
-                    shape = gears.shape.rectangle,
-                    widget = wibox.container.background,
-                },
-                {
-                    {
-                        widget = wibox.widget.imagebox(icons.netdl)
-                    },
-                    layout = wibox.container.margin(_, _, 2, _, _)
-                },
-                {
-                    {
-                        {
-                            align  = "center",
-                            forced_width = dpi(64),
-                            text = "N/A",
-                            valign = "center",
-                            widget = wibox.widget.textbox
-                        },
-                        bg = beautiful.bg_focus,
-                        shape = function(cr, width, height) gears.shape.rounded_rect(cr, width, height, 2) end,
+                        bg = beautiful.bg_reset,
+                        shape = gears.shape.rectangle,
                         widget = wibox.container.background,
                     },
-                    layout = wibox.container.margin(_, _, 4, 3, 3)
-                },
-                {
                     {
                         {
-                            align  = "center",
-                            forced_width = dpi(64),
-                            text = "N/A",
-                            valign = "center",
-                            widget = wibox.widget.textbox
+                            widget = wibox.widget.imagebox(icons.netdl)
                         },
-                        bg = beautiful.bg_focus,
-                        shape = function(cr, width, height) gears.shape.rounded_rect(cr, width, height, 2) end,
-                        widget = wibox.container.background,
+                        layout = wibox.container.margin(_, _, 2, _, _)
                     },
-                    layout = wibox.container.margin(_, _, 2, 3, 3)
-                },
-                {
                     {
-                        widget = wibox.widget.imagebox(icons.netup)
+                        {
+                            {
+                                align  = "center",
+                                forced_width = beautiful_dpi(64),
+                                text = "N/A",
+                                valign = "center",
+                                widget = wibox.widget.textbox
+                            },
+                            bg = beautiful.bg_focus,
+                            shape = function(cr, width, height) gears.shape.rounded_rect(cr, width, height, 2) end,
+                            widget = wibox.container.background,
+                        },
+                        layout = wibox.container.margin(_, _, 4, 3, 3)
                     },
-                    layout = wibox.container.margin(_, _, 2, _, _)
+                    {
+                        {
+                            {
+                                align  = "center",
+                                forced_width = beautiful_dpi(64),
+                                text = "N/A",
+                                valign = "center",
+                                widget = wibox.widget.textbox
+                            },
+                            bg = beautiful.bg_focus,
+                            shape = function(cr, width, height) gears.shape.rounded_rect(cr, width, height, 2) end,
+                            widget = wibox.container.background,
+                        },
+                        layout = wibox.container.margin(_, _, 2, 3, 3)
+                    },
+                    {
+                        {
+                            widget = wibox.widget.imagebox(icons.netup)
+                        },
+                        layout = wibox.container.margin(_, _, 2, _, _)
+                    },
+                    layout = wibox.layout.fixed.horizontal
                 },
-                layout = wibox.layout.fixed.horizontal
-            },
-            bg = beautiful.bg_reset,
-            shape = gears.shape.rectangle,
-            widget = wibox.container.background
-        })
-    }
+                bg = beautiful.bg_reset,
+                shape = gears.shape.rectangle,
+                widget = wibox.container.background
+            })
+        }
 
     -- lain widget creation
     local lain_network = lain.widget.net({
@@ -117,51 +119,21 @@ local function factory(args)
     })
 
     -- methods
-    function network:vpn_connect()
-        if not network.vpn_connected then
-            awful.spawn.easy_async(
-                "nordvpn c",
-                function(stdout)
-                    update_vpn_status_async()
-                end
-            )
-        end
-    end
-
-    function network:vpn_disconnect()
-        if network.vpn_connected then
-            awful.spawn.easy_async(
-                "nordvpn d",
-                function(stdout)
-                    update_vpn_status_async()
-                end
-            )
-        end
-    end
-
-    function network:vpn_toggle()
-        if network.vpn_connected then
-            network:vpn_disconnect()
-        else
-            network:vpn_connect()
-        end
-    end
-
     local function update_vpn_status_async()
         awful.spawn.easy_async(
             "nordvpn status",
             function(stdout, _, _, _)
                 local vpn_state = string.match(stdout, "Status: (%a+)")
                 if vpn_state ~= nil and vpn_state:lower() == "connected" then
-                    network.vpn_connected = true
+                    vpn_connected = true
                 else
-                    network.vpn_connected = false
+                    vpn_connected = false
                 end
 
                 local vpn_icon_widget_container = network.widget:get_children()[1]:get_children()[1]
                 local vpn_icon_widget = vpn_icon_widget_container:get_children()[1]:get_children()[1]
                 if (vpn_icon_widget ~= nil) then
-                    if network.vpn_connected then
+                    if vpn_connected then
                         vpn_icon_widget.image = icons.vpn_connected
                     else
                         vpn_icon_widget.image = icons.vpn_diconnected
@@ -174,6 +146,36 @@ local function factory(args)
                 end
             end
         )
+    end
+
+    function network:vpn_connect()
+        if not vpn_connected then
+            awful.spawn.easy_async(
+                "nordvpn c",
+                function(stdout)
+                    update_vpn_status_async()
+                end
+            )
+        end
+    end
+
+    function network:vpn_disconnect()
+        if vpn_connected then
+            awful.spawn.easy_async(
+                "nordvpn d",
+                function(stdout)
+                    update_vpn_status_async()
+                end
+            )
+        end
+    end
+
+    function network:vpn_toggle()
+        if vpn_connected then
+            network:vpn_disconnect()
+        else
+            network:vpn_connect()
+        end
     end
 
     -- bindings
@@ -213,7 +215,7 @@ local function factory(args)
     )
 
     -- timers
-    timer (
+    gears_timer(
         {
             timeout = 5,
             autostart = true,
