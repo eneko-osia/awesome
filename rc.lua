@@ -3,27 +3,26 @@ pcall(require, "luarocks.loader")
 -- }}}
 
 -- {{{ Standard libraries
-local awful         = require("awful")
-                      require("awful.autofocus")
-local dpi           = require("beautiful.xresources").apply_dpi
-local hotkeys_popup = require("awful.hotkeys_popup")
-                      require("awful.hotkeys_popup.keys")
-local battery       = require("widget.battery")
-local beautiful     = require("beautiful")
-local clock         = require("widget.clock")
-local cpu           = require("widget.cpu")
-local file_system   = require("widget.file_system")
-local gears         = require("gears")
-local lain          = require("lain")
-local memory        = require("widget.memory")
-local menu          = require("menu")
-local menubar       = require("menubar")
-local naughty       = require("naughty")
-local network       = require("widget.network")
-local spotify       = require("widget.spotify")
-local timer         = require("gears.timer")
-local volume        = require("widget.volume")
-local wibox         = require("wibox")
+local awful                 = require("awful")
+                              require("awful.autofocus")
+local awful_hotkeys_popup   = require("awful.hotkeys_popup")
+                              require("awful.hotkeys_popup.keys")
+local beautiful             = require("beautiful")
+local gears                 = require("gears")
+local gears_timer           = require("gears.timer")
+local lain                  = require("lain")
+local menu                  = require("menu")
+local menubar               = require("menubar")
+local naughty               = require("naughty")
+local wibox                 = require("wibox")
+local widget_battery        = require("widget.battery")
+local widget_clock          = require("widget.clock")
+local widget_cpu            = require("widget.cpu")
+local widget_file_system    = require("widget.file_system")
+local widget_memory         = require("widget.memory")
+local widget_network        = require("widget.network")
+local widget_spotify        = require("widget.spotify")
+local widget_volume         = require("widget.volume")
 -- }}}
 
 -- {{{ Variable definitions
@@ -221,12 +220,12 @@ menubar.utils.terminal = TERMINAL
 
 local awesome_menu =
     {
-        { "Hotkeys",    function() hotkeys_popup.show_help(nil, awful.screen.focused()) end },
-        { "Lock",       "xscreensaver-command -lock"                                        },
-        { "Restart",    awesome.restart                                                     },
-        { "Quit",       function() awesome.quit() end                                       },
-        { "Reboot",     "shutdown -r now"                                                   },
-        { "Shutdown",   "shutdown -h now"                                                   }
+        { "Hotkeys",    function() awful_hotkeys_popup.show_help(nil, awful.screen.focused()) end   },
+        { "Lock",       "xscreensaver-command -lock"                                                },
+        { "Restart",    awesome.restart                                                             },
+        { "Quit",       function() awesome.quit() end                                               },
+        { "Reboot",     "shutdown -r now"                                                           },
+        { "Shutdown",   "shutdown -h now"                                                           }
     }
 
 local main_menu_items =
@@ -389,14 +388,14 @@ local spr4px    = wibox.widget.imagebox(beautiful.spr4px)
 local keyboard_widget = awful.widget.keyboardlayout()
 
 -- Clock widget
-local clock_widget = clock({
+local clock_widget = widget_clock({
     icons = {
         logo = beautiful.widget.clock
     }
 })
 
 -- Cpu widget
-local cpu_widget = cpu({
+local cpu_widget = widget_cpu({
     icons = {
         logo = beautiful.widget.cpu
     },
@@ -404,7 +403,7 @@ local cpu_widget = cpu({
 })
 
 -- Memory widget
-local memory_widget = memory({
+local memory_widget = widget_memory({
     icons = {
         logo = beautiful.widget.mem
     },
@@ -412,14 +411,14 @@ local memory_widget = memory({
 })
 
 -- File system widget
-local file_system_widget = file_system({
+local file_system_widget = widget_file_system({
     icons = {
         logo = beautiful.widget.ssd
     }
 })
 
 -- Battery widget
-local battery_widget = battery({
+local battery_widget = widget_battery({
     icons = {
         ac = beautiful.widget.battery_ac,
         empty = beautiful.widget.battery_empty,
@@ -430,7 +429,7 @@ local battery_widget = battery({
 })
 
 -- Network widget
-local network_widget = network({
+local network_widget = widget_network({
     icons = {
         netdl = beautiful.widget.netdl,
         netup = beautiful.widget.netul,
@@ -440,7 +439,7 @@ local network_widget = network({
 })
 
 -- Spotify widget
-local spotify_widget = spotify({
+local spotify_widget = widget_spotify({
     icons = {
         logo = beautiful.mpd_spotify,
         next = beautiful.mpd_next,
@@ -451,8 +450,8 @@ local spotify_widget = spotify({
 })
 
 -- Volume widget
-local volume_widget = volume({
-    device = "sink",
+local volume_widget = widget_volume({
+    device_type = "sink",
     icons = {
         high = beautiful.widget.volume_high,
         low = beautiful.widget.volume_low,
@@ -462,8 +461,8 @@ local volume_widget = volume({
 })
 
 -- Microphone widget
-local microphone_widget = volume({
-    device = "source",
+local microphone_widget = widget_volume({
+    device_type = "source",
     icons = {
         high = beautiful.widget.microphone_high,
         low = beautiful.widget.microphone_low,
@@ -542,17 +541,17 @@ function set_widgets(s)
                 spr4px,
                 spr,
                 -- Music
-                spotify_widget.widget,
+                spotify_widget,
                 -- Separator
                 spr,
                 spr4px,
                 spr,
                 -- Volume
-                volume_widget.widget,
+                volume_widget,
                 -- Separator
                 spr,
                 -- Microphone
-                microphone_widget.widget,
+                microphone_widget,
                 -- Separator
                 spr,
                 spr4px,
@@ -570,11 +569,11 @@ function set_widgets(s)
                 spr4px,
                 spr,
                 -- Cpu
-                cpu_widget.widget,
+                cpu_widget,
                 -- Separator
                 spr,
                 -- Memory
-                memory_widget.widget,
+                memory_widget,
                 -- Separator
                 spr,
                 -- File system widget
@@ -622,11 +621,11 @@ function set_widgets(s)
                 spr4px,
                 spr,
                 -- Volume
-                volume_widget.widget,
+                volume_widget,
                 -- Separator
                 spr,
                 -- Microphone
-                microphone_widget.widget,
+                microphone_widget,
                 -- Separator
                 spr,
                 spr4px,
@@ -644,11 +643,11 @@ function set_widgets(s)
                 spr4px,
                 spr,
                 -- Cpu
-                cpu_widget.widget,
+                cpu_widget,
                 -- Separator
                 spr,
                 -- Memory
-                memory_widget.widget,
+                memory_widget,
                 -- Separator
                 spr,
                 -- File system widget
@@ -774,7 +773,7 @@ local globalkeys = gears.table.join(
     awful.key(
         { MOD_KEY, SHIFT_KEY },
         "/",
-        hotkeys_popup.show_help,
+        awful_hotkeys_popup.show_help,
         { description = "show help", group="awesome" }
     ),
 
@@ -1276,7 +1275,7 @@ client.connect_signal("request::titlebars", function(c)
                     awful.mouse.client.move(c)
                 end
 
-                timer.weak_start_new(250 / 1000, function() clicks = 0 end)
+                gears_timer.weak_start_new(250 / 1000, function() clicks = 0 end)
             end
         ),
 
