@@ -109,11 +109,6 @@ local layouts =
         LAYOUT_MAX =                    10,
         LAYOUT_MAX_FULLSCREEN =         11,
         LAYOUT_MAGNIFIER =              12,
-        LAYOUT_CENTERWORK =             13,
-        LAYOUT_CASCADE =                14,
-        LAYOUT_CASCADE_TILE =           15,
-        LAYOUT_CENTERWORK_HORIZONTAL =  16,
-        LAYOUT_TERMFAIR_CENTER =        17,
 
         suits =
             {
@@ -128,12 +123,7 @@ local layouts =
                 awful.layout.suit.spiral.dwindle,
                 awful.layout.suit.max,
                 awful.layout.suit.max.fullscreen,
-                awful.layout.suit.magnifier,
-                lain.layout.centerwork,
-                lain.layout.cascade,
-                lain.layout.cascade.tile,
-                lain.layout.centerwork.horizontal,
-                lain.layout.termfair.center
+                awful.layout.suit.magnifier
             }
     }
 
@@ -192,24 +182,24 @@ local tags =
 
         [screens.SCREEN_ONE] =
             {
-                { name = "terminal",    layout = layouts.LAYOUT_FAIR_HORIZONTAL         },
-                { name = "web",         layout = layouts.LAYOUT_TILE_LEFT               },
-                { name = "dev",         layout = layouts.LAYOUT_MAX                     },
-                { name = "parsec",      layout = layouts.LAYOUT_MAX                     },
-                { name = "chat",        layout = layouts.LAYOUT_TILE_LEFT               },
-                { name = "zoom",        layout = layouts.LAYOUT_TILE_LEFT               },
-                { name = "extra",       layout = layouts.LAYOUT_FLOATING                }
+                { name = "terminal",    layout = layouts.LAYOUT_FAIR_HORIZONTAL },
+                { name = "web",         layout = layouts.LAYOUT_TILE_LEFT       },
+                { name = "dev",         layout = layouts.LAYOUT_MAX             },
+                { name = "parsec",      layout = layouts.LAYOUT_MAX             },
+                { name = "chat",        layout = layouts.LAYOUT_TILE_LEFT       },
+                { name = "zoom",        layout = layouts.LAYOUT_TILE_LEFT       },
+                { name = "extra",       layout = layouts.LAYOUT_FLOATING        }
             },
 
         [screens.SCREEN_TWO] =
             {
-                { name = "terminal",    layout = layouts.LAYOUT_CENTERWORK_HORIZONTAL   },
-                { name = "web",         layout = layouts.LAYOUT_TILE_TOP                },
-                { name = "dev",         layout = layouts.LAYOUT_MAX                     },
-                { name = "music",       layout = layouts.LAYOUT_TILE_TOP                },
-                { name = "chat",        layout = layouts.LAYOUT_TILE_TOP                },
-                { name = "zoom",        layout = layouts.LAYOUT_TILE_TOP                },
-                { name = "extra",       layout = layouts.LAYOUT_FLOATING                }
+                { name = "terminal",    layout = layouts.LAYOUT_FAIR_HORIZONTAL },
+                { name = "web",         layout = layouts.LAYOUT_TILE_TOP        },
+                { name = "dev",         layout = layouts.LAYOUT_MAX             },
+                { name = "music",       layout = layouts.LAYOUT_TILE_TOP        },
+                { name = "chat",        layout = layouts.LAYOUT_TILE_TOP        },
+                { name = "zoom",        layout = layouts.LAYOUT_TILE_TOP        },
+                { name = "extra",       layout = layouts.LAYOUT_FLOATING        }
             }
     }
 -- }}}
@@ -389,86 +379,102 @@ local keyboard_widget = awful.widget.keyboardlayout()
 
 -- Clock widget
 local clock_widget = widget_clock({
-    icons = {
-        logo = beautiful.widget.clock
-    }
+    icons = 
+        {
+            logo = beautiful.widget.clock
+        }
 })
 
 -- Cpu widget
 local cpu_widget = widget_cpu({
-    icons = {
-        logo = beautiful.widget.cpu
-    },
+    icons = 
+        {
+            logo = beautiful.widget.cpu
+        },
     terminal = TERMINAL
 })
 
 -- Memory widget
 local memory_widget = widget_memory({
-    icons = {
-        logo = beautiful.widget.mem
-    },
+    icons = 
+        {
+            logo = beautiful.widget.mem
+        },
     terminal = TERMINAL
 })
 
 -- File system widget
 local file_system_widget = widget_file_system({
-    icons = {
-        logo = beautiful.widget.ssd
-    }
+    icons = 
+        {
+            logo = beautiful.widget.ssd
+        },
+    mounts = 
+        {
+            "/",
+            "/home",
+            "/mnt/data",
+            "/mnt/games"
+        }
 })
 
 -- Battery widget
 local battery_widget = widget_battery({
-    icons = {
-        ac = beautiful.widget.battery_ac,
-        empty = beautiful.widget.battery_empty,
-        full = beautiful.widget.battery_full,
-        logo = beautiful.widget.ssd,
-        low = beautiful.widget.battery_low
-    }
+    icons = 
+        {
+            ac = beautiful.widget.battery_ac,
+            empty = beautiful.widget.battery_empty,
+            full = beautiful.widget.battery_full,
+            logo = beautiful.widget.ssd,
+            low = beautiful.widget.battery_low
+        }
 })
 
 -- Network widget
 local network_widget = widget_network({
-    icons = {
-        netdl = beautiful.widget.netdl,
-        netup = beautiful.widget.netul,
-        vpn_connected = "/usr/share/icons/Arc/status/symbolic/network-vpn-symbolic.svg",
-        vpn_diconnected = "/usr/share/icons/Arc/status/symbolic/network-vpn-acquiring-symbolic.svg"
-    }
+    icons = 
+        {
+            netdl = beautiful.widget.netdl,
+            netup = beautiful.widget.netul,
+            vpn_connected = "/usr/share/icons/Arc/status/symbolic/network-vpn-symbolic.svg",
+            vpn_diconnected = "/usr/share/icons/Arc/status/symbolic/network-vpn-acquiring-symbolic.svg"
+        }
 })
 
 -- Spotify widget
 local spotify_widget = widget_spotify({
-    icons = {
-        logo = beautiful.mpd_spotify,
-        next = beautiful.mpd_next,
-        pause = beautiful.mpd_pause,
-        play = beautiful.mpd_play,
-        prev = beautiful.mpd_prev
-    }
+    icons = 
+        {
+            logo = beautiful.mpd_spotify,
+            next = beautiful.mpd_next,
+            pause = beautiful.mpd_pause,
+            play = beautiful.mpd_play,
+            prev = beautiful.mpd_prev
+        }
 })
 
 -- Volume widget
 local volume_widget = widget_volume({
     device_type = "sink",
-    icons = {
-        high = beautiful.widget.volume_high,
-        low = beautiful.widget.volume_low,
-        medium = beautiful.widget.volume_medium,
-        muted = beautiful.widget.volume_muted
-    }
+    icons = 
+        {
+            high = beautiful.widget.volume_high,
+            low = beautiful.widget.volume_low,
+            medium = beautiful.widget.volume_medium,
+            muted = beautiful.widget.volume_muted
+        }
 })
 
 -- Microphone widget
 local microphone_widget = widget_volume({
     device_type = "source",
-    icons = {
-        high = beautiful.widget.microphone_high,
-        low = beautiful.widget.microphone_low,
-        medium = beautiful.widget.microphone_medium,
-        muted = beautiful.widget.microphone_muted
-    }
+    icons = 
+        {
+            high = beautiful.widget.microphone_high,
+            low = beautiful.widget.microphone_low,
+            medium = beautiful.widget.microphone_medium,
+            muted = beautiful.widget.microphone_muted
+        }
 })
 
 function set_widgets(s)
@@ -577,7 +583,7 @@ function set_widgets(s)
                 -- Separator
                 spr,
                 -- File system widget
-                file_system_widget.widget,
+                file_system_widget,
                 -- Separator
                 spr,
                 -- Battery widget
@@ -595,7 +601,7 @@ function set_widgets(s)
                 -- Separator
                 spr,
                 -- Clock
-                clock_widget.widget,
+                clock_widget,
                 -- Separator
                 spr,
                 spr4px,
@@ -651,7 +657,7 @@ function set_widgets(s)
                 -- Separator
                 spr,
                 -- File system widget
-                file_system_widget.widget,
+                file_system_widget,
                 -- Separator
                 spr,
                 -- Battery widget
@@ -669,7 +675,7 @@ function set_widgets(s)
                 -- Separator
                 spr,
                 -- Clock
-                clock_widget.widget,
+                clock_widget,
                 -- Separator
                 spr,
                 spr4px,
