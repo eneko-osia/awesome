@@ -26,6 +26,7 @@ local function factory(args)
             {
                 {
                     {
+                        id = "icon",
                         widget = wibox.widget.imagebox(icons.muted)
                     },
                     layout = wibox.container.margin(_, 4, 4, 3, 3)
@@ -35,6 +36,7 @@ local function factory(args)
                         {
                             align  = "center",
                             forced_width = beautiful_dpi(36),
+                            id = "text",
                             text = "N/A",
                             valign = "center",
                             widget = wibox.widget.textbox
@@ -62,10 +64,8 @@ local function factory(args)
                 local muted = string.match(stdout, "muted: (%S+)") or "yes"
                 local vol = tonumber(string.match(stdout, ":.-(%d+)%%")) or 0
 
-                local icon_widget_container = volume:get_children()[1]:get_children()[1]
-                local icon_widget = icon_widget_container:get_children()[1]
-                local text_widget_container = volume:get_children()[1]:get_children()[2]:get_children()[1]
-                local text_widget = text_widget_container:get_children()[1]
+                local icon_widget = volume:get_children_by_id("icon")[1]
+                local text_widget = volume:get_children_by_id("text")[1]
                 if muted == "yes" then
                     icon_widget:set_image(icons.muted)
                     text_widget:set_markup(string.format(" <s>%d%%</s> ", vol))
