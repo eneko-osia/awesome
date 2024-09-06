@@ -11,29 +11,100 @@ local wibox         = require("wibox")
 local function factory(args)
     local args = args or {}
 
-    local icons = args.icons or {
-        logo = nil
-    }
-    local mem_info = { total = 0 }
+    local icons = args.icons or
+        {
+            logo = nil
+        }
+    local mem_info = {}
     local popup = awful.popup(
         {
             border_color = beautiful.bg_focus,
-            border_width = 2,
-            offset = { y = 2 },
+            border_width = beautiful_dpi(2),
+            offset = { y = beautiful_dpi(2) },
             ontop = true,
             shape = gears.shape.rounded_rect,
             visible = false,
             widget =
                 {
-                    colors =
+                    {
                         {
-                            "#FFFF00",
-                            "#00FF00",
-                            "#FF0000"
+                            {
+                                {
+                                    {
+                                        {
+                                            align  = "left",
+                                            text = "memory",
+                                            valign = "center",
+                                            widget = wibox.widget.textbox
+                                        },
+                                        layout = wibox.container.margin(_, beautiful_dpi(5), _, beautiful_dpi(5), _)
+                                    },
+                                    {
+                                        {
+                                            border_color = beautiful.bg_focus,
+                                            border_width = beautiful_dpi(2),
+                                            colors =
+                                                {
+                                                    "#FFFF00",
+                                                    "#00FF00",
+                                                    "#FF0000"
+                                                },
+                                            id = "memory",
+                                            widget = wibox.widget.piechart
+                                        },
+                                        layout = wibox.container.margin(_, _, _, _, _)
+                                    },
+                                    layout = wibox.layout.fixed.vertical
+                                },
+                                bg = beautiful.bg_focus,
+                                forced_height = beautiful_dpi(180),
+                                forced_width = beautiful_dpi(320),
+                                shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(5)) end,
+                                widget = wibox.container.background,
+                            },
+                            layout = wibox.container.margin(_, beautiful_dpi(5), beautiful_dpi(5), beautiful_dpi(5), beautiful_dpi(5))
                         },
-                    forced_height = beautiful_dpi(180),
-                    forced_width = beautiful_dpi(360),
-                    widget = wibox.widget.piechart
+                        {
+                            {
+                                {
+                                    {
+                                        {
+                                            align  = "left",
+                                            text = "swap",
+                                            valign = "center",
+                                            widget = wibox.widget.textbox
+                                        },
+                                        layout = wibox.container.margin(_, beautiful_dpi(5), _, beautiful_dpi(5), _)
+                                    },
+                                    {
+                                        {
+                                            border_color = beautiful.bg_focus,
+                                            border_width = beautiful_dpi(2),
+                                            colors =
+                                                {
+                                                    "#00FF00",
+                                                    "#FF0000"
+                                                },
+                                            id = "swap",
+                                            widget = wibox.widget.piechart
+                                        },
+                                        layout = wibox.container.margin(_, _, _, _, _)
+                                    },
+                                    layout = wibox.layout.fixed.vertical
+                                },
+                                bg = beautiful.bg_focus,
+                                forced_height = beautiful_dpi(180),
+                                forced_width = beautiful_dpi(320),
+                                shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(5)) end,
+                                widget = wibox.container.background,
+                            },
+                            layout = wibox.container.margin(_, beautiful_dpi(5), beautiful_dpi(5), _, beautiful_dpi(5))
+                        },
+                        layout = wibox.layout.fixed.vertical
+                    },
+                    bg = beautiful.bg_reset,
+                    shape = gears.shape.rectangle,
+                    widget = wibox.container.background
                 }
         }
     )
@@ -46,7 +117,7 @@ local function factory(args)
                         id = "icon",
                         widget = wibox.widget.imagebox(icons.logo)
                     },
-                    layout = wibox.container.margin(_, _, 2, _, _)
+                    layout = wibox.container.margin(_, _, _, _, _)
                 },
                 {
                     {
@@ -59,10 +130,10 @@ local function factory(args)
                             widget = wibox.widget.textbox
                         },
                         bg = beautiful.bg_focus,
-                        shape = function(cr, width, height) gears.shape.rounded_rect(cr, width, height, 2) end,
+                        shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(2)) end,
                         widget = wibox.container.background,
                     },
-                    layout = wibox.container.margin(_, _, 4, 3, 3)
+                    layout = wibox.container.margin(_, beautiful_dpi(3), beautiful_dpi(3), beautiful_dpi(3), beautiful_dpi(3))
                 },
                 layout = wibox.layout.fixed.horizontal
             },
@@ -74,19 +145,32 @@ local function factory(args)
 
     -- methods
     local function update_popup()
-        popup:get_widget().data_list =
+        local popup_widget = popup:get_widget()
+        popup_widget:get_children_by_id("memory")[1].data_list =
             {
                 {
-                    string.format("buffers %d%%", math.floor(mem_info.buffers / mem_info.total * 100)),
-                    mem_info.buffers
+                    string.format("buffers %d%%", math.floor((mem_info.buffers + mem_info.cached) / mem_info.total * 100)),
+                    mem_info.buffers + mem_info.cached
                 },
                 {
-                    string.format("free %d%%", math.floor(mem_info.free / mem_info.total * 100)),
-                    mem_info.free
+                    string.format("free %d%%", math.floor((mem_info.free + mem_info.sreclaimable) / mem_info.total * 100)),
+                    mem_info.free + mem_info.sreclaimable
                 },
                 {
                     string.format("used %d%%", math.floor(mem_info.used / mem_info.total * 100)),
                     mem_info.used
+                }
+            }
+
+        popup_widget:get_children_by_id("swap")[1].data_list =
+            {
+                {
+                    string.format("free %d%%", math.floor(mem_info.swap_free / mem_info.swap_total * 100)),
+                    mem_info.swap_free
+                },
+                {
+                    string.format("used %d%%", math.floor(mem_info.swap_used / mem_info.swap_total * 100)),
+                    mem_info.swap_used
                 }
             }
     end
@@ -104,12 +188,9 @@ local function factory(args)
                     for k, v in mem_line:gmatch("([%a]+):[%s]+([%d]+).+") do
                         if     k == "Buffers"      then mem_info.buffers        = math.floor(v / 1024 + 0.5)
                         elseif k == "Cached"       then mem_info.cached         = math.floor(v / 1024 + 0.5)
-                        -- elseif k == "MemAvailable" then mem_info.available      = math.floor(v / 1024 + 0.5)
                         elseif k == "MemFree"      then mem_info.free           = math.floor(v / 1024 + 0.5)
                         elseif k == "MemTotal"     then mem_info.total          = math.floor(v / 1024 + 0.5)
-                        -- elseif k == "Shmem"        then mem_info.shmem          = math.floor(v / 1024 + 0.5)
                         elseif k == "SReclaimable" then mem_info.sreclaimable   = math.floor(v / 1024 + 0.5)
-                        -- elseif k == "SwapCached"   then mem_info.swap_cached    = math.floor(v / 1024 + 0.5)
                         elseif k == "SwapFree"     then mem_info.swap_free      = math.floor(v / 1024 + 0.5)
                         elseif k == "SwapTotal"    then mem_info.swap_total     = math.floor(v / 1024 + 0.5)
                         end
@@ -127,7 +208,6 @@ local function factory(args)
     end
 
     -- bindings
-
     memory:buttons(gears.table.join(
         awful.button(
             {},
