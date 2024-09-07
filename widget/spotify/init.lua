@@ -22,7 +22,6 @@ local function factory(args)
     local song_index = 0
     local song_state = 0
     local song_text = "Spotify"
-
     local spotify = wibox.widget(
         {
             {
@@ -311,11 +310,26 @@ local function factory(args)
 
     -- signals
     next_icon_widget_container:connect_signal(
+        "button::press",
+        function(c)
+            c:set_bg(beautiful.bg_focus)
+        end
+    )
+
+    next_icon_widget_container:connect_signal(
+        "button::release",
+        function(c)
+            c:set_bg(beautiful.bg_normal)
+        end
+    )
+
+    next_icon_widget_container:connect_signal(
         "mouse::enter",
         function(c)
             c:set_bg(beautiful.bg_normal)
         end
     )
+
     next_icon_widget_container:connect_signal(
         "mouse::leave",
         function(c)
@@ -324,15 +338,44 @@ local function factory(args)
     )
 
     play_pause_icon_widget_container:connect_signal(
+        "button::press",
+        function(c)
+            c:set_bg(beautiful.bg_focus)
+        end
+    )
+
+    play_pause_icon_widget_container:connect_signal(
+        "button::release",
+        function(c)
+            c:set_bg(beautiful.bg_normal)
+        end
+    )
+
+    play_pause_icon_widget_container:connect_signal(
         "mouse::enter",
         function(c)
             c:set_bg(beautiful.bg_normal)
         end
     )
+
     play_pause_icon_widget_container:connect_signal(
         "mouse::leave",
         function(c)
             c:set_bg(beautiful.bg_reset)
+        end
+    )
+
+    prev_icon_widget_container:connect_signal(
+        "button::press",
+        function(c)
+            c:set_bg(beautiful.bg_focus)
+        end
+    )
+
+    prev_icon_widget_container:connect_signal(
+        "button::release",
+        function(c)
+            c:set_bg(beautiful.bg_normal)
         end
     )
 
@@ -342,10 +385,25 @@ local function factory(args)
             c:set_bg(beautiful.bg_normal)
         end
     )
+
     prev_icon_widget_container:connect_signal(
         "mouse::leave",
         function(c)
             c:set_bg(beautiful.bg_reset)
+        end
+    )
+
+    song_widget_container:connect_signal(
+        "button::press",
+        function(c)
+            c:set_bg(beautiful.bg_focus)
+        end
+    )
+
+    song_widget_container:connect_signal(
+        "button::release",
+        function(c)
+            c:set_bg(beautiful.bg_normal)
         end
     )
 
@@ -355,6 +413,7 @@ local function factory(args)
             c:set_bg(beautiful.bg_normal)
         end
     )
+
     song_widget_container:connect_signal(
         "mouse::leave",
         function(c)
