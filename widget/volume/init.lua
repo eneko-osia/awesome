@@ -11,7 +11,6 @@ local wibox         = require("wibox")
 local function factory(args)
     args = args or {}
 
-    local device_index = -1
     local device_type = args.device_type or "sink"
     local icons = args.icons or
         {
@@ -20,7 +19,7 @@ local function factory(args)
             medium = nil,
             muted = nil
         }
-
+    local info = {}
     local volume = wibox.widget(
         {
             {
@@ -56,39 +55,45 @@ local function factory(args)
     )
 
     -- methods
+    local function update_widget()
+        local icon_widget = volume:get_children_by_id("icon")[1]
+        local text_widget = volume:get_children_by_id("text")[1]
+        if info.muted == "yes" then
+            icon_widget:set_image(icons.muted)
+            text_widget:set_markup(string.format(" <s>%d%%</s> ", info.volume))
+        else
+            if info.volume == 0 then
+                icon_widget:set_image(icons.muted)
+            elseif info.volume > 70 then
+                icon_widget:set_image(icons.high)
+            elseif info.volume > 30 then
+                icon_widget:set_image(icons.medium)
+            else
+                icon_widget:set_image(icons.low)
+            end
+            text_widget:set_markup(string.format(" %d%% ", info.volume))
+        end
+    end
+
     local function update()
         awful.spawn.easy_async_with_shell(
             string.format("pacmd list-%ss | sed -n -e '/*/,$!d' -e '/index/p' -e '/volume:/p' -e '/muted:/p'", device_type),
             function(stdout, _, _, _)
-                device_index = tonumber(string.match(stdout, "index: (%S+)")) or nil
-                local muted = string.match(stdout, "muted: (%S+)") or "yes"
-                local vol = tonumber(string.match(stdout, ":.-(%d+)%%")) or 0
-
-                local icon_widget = volume:get_children_by_id("icon")[1]
-                local text_widget = volume:get_children_by_id("text")[1]
-                if muted == "yes" then
-                    icon_widget:set_image(icons.muted)
-                    text_widget:set_markup(string.format(" <s>%d%%</s> ", vol))
-                else
-                    if vol == 0 then
-                        icon_widget:set_image(icons.muted)
-                    elseif vol > 70 then
-                        icon_widget:set_image(icons.high)
-                    elseif vol > 30 then
-                        icon_widget:set_image(icons.medium)
-                    else
-                        icon_widget:set_image(icons.low)
-                    end
-                    text_widget:set_markup(string.format(" %d%% ", vol))
-                end
+                info =
+                    {
+                        index = tonumber(string.match(stdout, "index: (%S+)")) or nil,
+                        muted = string.match(stdout, "muted: (%S+)") or "yes",
+                        volume = tonumber(string.match(stdout, ":.-(%d+)%%")) or 0
+                    }
+                update_widget()
             end
         )
     end
 
     function volume:down()
-        if device_index ~= nil then
+        if info.index ~= nil then
             awful.spawn.easy_async(
-                string.format("pactl set-%s-volume %d -1%%", device_type, device_index),
+                string.format("pactl set-%s-volume %d -1%%", device_type, info.index),
                 function(_, _, _, _)
                     update()
                 end
@@ -97,9 +102,9 @@ local function factory(args)
     end
 
     function volume:mute()
-        if device_index ~= nil then
+        if info.index ~= nil then
             awful.spawn.easy_async(
-                string.format("pactl set-%s-mute %d toggle", device_type, device_index),
+                string.format("pactl set-%s-mute %d toggle", device_type, info.index),
                 function(_, _, _, _)
                     update()
                 end
@@ -108,9 +113,9 @@ local function factory(args)
     end
 
     function volume:set(value)
-        if device_index ~= nil then
+        if info.index ~= nil then
             awful.spawn.easy_async(
-                string.format("pactl set-%s-volume %d %d%%", device_type, device_index, value),
+                string.format("pactl set-%s-volume %d %d%%", device_type, info.index, value),
                 function(_, _, _, _)
                     update()
                 end
@@ -119,9 +124,9 @@ local function factory(args)
     end
 
     function volume:up()
-        if device_index ~= nil then
+        if info.index ~= nil then
             awful.spawn.easy_async(
-                string.format("pactl set-%s-volume %d +1%%", device_type, device_index),
+                string.format("pactl set-%s-volume %d +1%%", device_type, info.index),
                 function(_, _, _, _)
                     update()
                 end
@@ -181,11 +186,26 @@ local function factory(args)
 
     -- signals
     volume:connect_signal(
+        "button::press",
+        function(c)
+            c:set_bg(beautiful.bg_focus)
+        end
+    )
+
+    volume:connect_signal(
+        "button::release",
+        function(c)
+            c:set_bg(beautiful.bg_normal)
+        end
+    )
+
+    volume:connect_signal(
         "mouse::enter",
         function(c)
             c:set_bg(beautiful.bg_normal)
         end
     )
+
     volume:connect_signal(
         "mouse::leave",
         function(c)
