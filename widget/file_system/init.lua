@@ -11,11 +11,12 @@ local wibox         = require("wibox")
 local function factory(args)
     args = args or {}
 
-    local fs_info = {}
     local icons = args.icons or
-        {
-            logo = nil
-        }
+    {
+        logo = nil
+    }
+    local info = {}
+    local mount_default = args.mount_default or "/"
     local mounts = args.mounts or
         {
             "/",
@@ -32,7 +33,6 @@ local function factory(args)
             widget = {}
         }
     )
-
     local file_system = wibox.widget(
         {
             {
@@ -69,14 +69,14 @@ local function factory(args)
 
     -- methods
     local function update_popup()
-        local fs_rows =
+        local rows =
         {
             layout = wibox.layout.fixed.vertical,
             spacing = beautiful_dpi(5)
         }
 
-        for k, v in ipairs(mounts) do
-            local fs_row = wibox.widget(
+        for k, v in pairs(mounts) do
+            local row = wibox.widget(
                 {
                     {
                         {
@@ -85,7 +85,7 @@ local function factory(args)
                                     align  = "left",
                                     forced_height = beautiful_dpi(20),
                                     forced_width = beautiful_dpi(64),
-                                    text = string.format(" %s", fs_info[v].mount),
+                                    text = string.format(" %s", info[v].mount),
                                     valign = "center",
                                     widget = wibox.widget.textbox
                                 },
@@ -93,7 +93,7 @@ local function factory(args)
                                 shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(5)) end,
                                 widget = wibox.container.background
                             },
-                            layout = wibox.container.margin(_, beautiful_dpi(3), beautiful_dpi(3), _, _)
+                            layout = wibox.container.margin(_, _, _, _, _)
                         },
                         {
                             {
@@ -101,7 +101,7 @@ local function factory(args)
                                     align  = "center",
                                     forced_height = beautiful_dpi(20),
                                     forced_width = beautiful_dpi(36),
-                                    text = string.format("%d%%", fs_info[v].percentage),
+                                    text = string.format("%d%%", info[v].percentage),
                                     valign = "center",
                                     widget = wibox.widget.textbox
                                 },
@@ -109,23 +109,7 @@ local function factory(args)
                                 shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(5)) end,
                                 widget = wibox.container.background
                             },
-                            layout = wibox.container.margin(_, _, beautiful_dpi(3), _, _)
-                        },
-                        {
-                            {
-                                {
-                                    align  = "center",
-                                    forced_height = beautiful_dpi(20),
-                                    forced_width = beautiful_dpi(128),
-                                    text = string.format("%d / %d GiB", math.floor(fs_info[v].used / 1024 / 1024), math.floor(fs_info[v].size / 1024 / 1024)),
-                                    valign = "center",
-                                    widget = wibox.widget.textbox
-                                },
-                                bg = beautiful.bg_focus,
-                                shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(5)) end,
-                                widget = wibox.container.background
-                            },
-                            layout = wibox.container.margin(_, _, beautiful_dpi(3), _, _)
+                            layout = wibox.container.margin(_, beautiful_dpi(3), _, _, _)
                         },
                         {
                             {
@@ -137,14 +121,30 @@ local function factory(args)
                                     margins = beautiful_dpi(1),
                                     max_value = 100,
                                     paddings = beautiful_dpi(6),
-                                    value = fs_info[v].percentage,
+                                    value = info[v].percentage,
                                     widget = wibox.widget.progressbar
                                 },
                                 bg = beautiful.bg_focus,
                                 shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(5)) end,
                                 widget = wibox.container.background
                             },
-                            layout = wibox.container.margin(_, _, _, _, _)
+                            layout = wibox.container.margin(_, beautiful_dpi(3), _, _, _)
+                        },
+                        {
+                            {
+                                {
+                                    align  = "center",
+                                    forced_height = beautiful_dpi(20),
+                                    forced_width = beautiful_dpi(128),
+                                    text = string.format("%d / %d GiB", math.floor(info[v].used / 1024 / 1024), math.floor(info[v].size / 1024 / 1024)),
+                                    valign = "center",
+                                    widget = wibox.widget.textbox
+                                },
+                                bg = beautiful.bg_focus,
+                                shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(5)) end,
+                                widget = wibox.container.background
+                            },
+                            layout = wibox.container.margin(_, beautiful_dpi(3), _, _, _)
                         },
                         layout = wibox.layout.fixed.horizontal
                     },
@@ -153,14 +153,14 @@ local function factory(args)
                     widget = wibox.container.background
                 }
             )
-            table.insert(fs_rows, fs_row)
+            table.insert(rows, row)
         end
 
         popup:setup(
             {
                 {
                     {
-                        fs_rows,
+                        rows,
                         layout = wibox.container.margin(_, beautiful_dpi(5), beautiful_dpi(5), beautiful_dpi(5), beautiful_dpi(5))
                     },
                     layout = wibox.layout.fixed.horizontal
@@ -174,16 +174,16 @@ local function factory(args)
 
     local function update_widget()
         local text_widget = file_system:get_children_by_id("text")[1]
-        text_widget:set_markup(string.format(" %d%% ", fs_info["/home"].percentage))
+        text_widget:set_markup(string.format(" %d%% ", info[mount_default].percentage))
     end
 
     local function update()
         awful.spawn.easy_async_with_shell(
             string.format("df | tail -n +2"),
             function(stdout, _, _, _)
-                for fs_line in stdout:gmatch("[^\r\n]+") do
-                    local device, size, used, available, percentage, mount = fs_line:match('([%p%w]+)%s+([%d%w]+)%s+([%d%w]+)%s+([%d%w]+)%s+([%d]+)%%%s+([%p%w]+)')
-                    fs_info[mount] =
+                for line in stdout:gmatch("[^\r\n]+") do
+                    local device, size, used, available, percentage, mount = line:match("([%p%w]+)%s+([%d%w]+)%s+([%d%w]+)%s+([%d%w]+)%s+([%d]+)%%%s+([%p%w]+)")
+                    info[mount] =
                         {
                             available = tonumber(available),
                             device = device,
@@ -193,7 +193,6 @@ local function factory(args)
                             used = tonumber(used)
                         }
                 end
-
                 if popup.visible then
                     update_popup()
                 end
