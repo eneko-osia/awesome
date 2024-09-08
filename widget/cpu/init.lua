@@ -28,7 +28,8 @@ local function factory(args)
         }
     )
     local terminal = args.terminal or "xterm"
-    local cpu = wibox.widget(
+    local timeout = args.timeout or 2
+    local widget_cpu = wibox.widget(
         {
             {
                 {
@@ -154,7 +155,7 @@ local function factory(args)
     end
 
     local function update_widget()
-        local text_widget = cpu:get_children_by_id("text")[1]
+        local text_widget = widget_cpu:get_children_by_id("text")[1]
         text_widget:set_markup(string.format(" %s%% ", math.ceil(math.abs((info[0].active / info[0].total) * 100))))
     end
 
@@ -188,7 +189,7 @@ local function factory(args)
     end
 
     -- bindings
-    cpu:buttons(
+    widget_cpu:buttons(
         gears.table.join(
             awful.button(
                 {},
@@ -206,21 +207,21 @@ local function factory(args)
     )
 
     -- signals
-    cpu:connect_signal(
+    widget_cpu:connect_signal(
         "button::press",
         function(c)
             c:set_bg(beautiful.bg_focus)
         end
     )
 
-    cpu:connect_signal(
+    widget_cpu:connect_signal(
         "button::release",
         function(c)
             c:set_bg(beautiful.bg_normal)
         end
     )
 
-    cpu:connect_signal(
+    widget_cpu:connect_signal(
         "mouse::enter",
         function(c)
             c:set_bg(beautiful.bg_normal)
@@ -231,7 +232,7 @@ local function factory(args)
         end
     )
 
-    cpu:connect_signal(
+    widget_cpu:connect_signal(
         "mouse::leave",
         function(c)
             popup.visible = false
@@ -242,14 +243,14 @@ local function factory(args)
     -- timers
     gears_timer(
         {
-            timeout = 2,
+            timeout = timeout,
             autostart = true,
             call_now = true,
             callback = update
         }
     )
 
-    return cpu
+    return widget_cpu
 end
 -- }}}
 

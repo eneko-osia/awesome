@@ -21,9 +21,7 @@ local function factory(args)
     }
     local notification = nil
     local notification_text = "N/A"
-
-    local battery = {
-        widget = wibox.widget({
+    local widget_battery = wibox.widget({
             {
                 {
                     {
@@ -51,8 +49,8 @@ local function factory(args)
             bg = beautiful.bg_reset,
             shape = gears.shape.rectangle,
             widget = wibox.container.background
-        })
-    }
+        }
+    )
 
     -- lain widget creation
     local lain_battery = lain.widget.bat({
@@ -99,11 +97,11 @@ local function factory(args)
                 end
             end
         end,
-        widget = battery.widget
+        widget = widget_battery
     })
 
     -- signals
-    battery.widget:connect_signal(
+    widget_battery:connect_signal(
         'mouse::enter',
         function()
             naughty.destroy(notification)
@@ -114,7 +112,7 @@ local function factory(args)
                 })
         end
     )
-    battery.widget:connect_signal(
+    widget_battery:connect_signal(
         'mouse::leave',
         function()
             naughty.destroy(notification)
@@ -122,7 +120,7 @@ local function factory(args)
         end
     )
 
-    return battery
+    return widget_battery
 end
 -- }}}
 

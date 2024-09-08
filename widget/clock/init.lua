@@ -15,7 +15,7 @@ local function factory(args)
         {
             logo = nil
         }
-    local clock = wibox.widget(
+    local widget_clock = wibox.widget(
         {
             {
                 {
@@ -49,9 +49,9 @@ local function factory(args)
     )
 
     -- Calendar widget
-    calendar({}):attach(clock:get_children_by_id("text")[1])
+    calendar({}):attach(widget_clock:get_children_by_id("text")[1])
 
-    return clock
+    return widget_clock
 end
 -- }}}
 

@@ -16,39 +16,6 @@ local function factory(args)
             logo = nil
         }
     local info = {}
-    local memory = wibox.widget(
-        {
-            {
-                {
-                    {
-                        id = "icon",
-                        widget = wibox.widget.imagebox(icons.logo)
-                    },
-                    layout = wibox.container.margin(_, _, _, _, _)
-                },
-                {
-                    {
-                        {
-                            align  = "center",
-                            forced_width = beautiful_dpi(36),
-                            id = "text",
-                            text = "N/A",
-                            valign = "center",
-                            widget = wibox.widget.textbox
-                        },
-                        bg = beautiful.bg_focus,
-                        shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(2)) end,
-                        widget = wibox.container.background,
-                    },
-                    layout = wibox.container.margin(_, beautiful_dpi(3), beautiful_dpi(3), beautiful_dpi(3), beautiful_dpi(3))
-                },
-                layout = wibox.layout.fixed.horizontal
-            },
-            bg = beautiful.bg_reset,
-            shape = gears.shape.rectangle,
-            widget = wibox.container.background
-        }
-    )
     local popup = awful.popup(
         {
             border_color = beautiful.bg_focus,
@@ -142,6 +109,40 @@ local function factory(args)
         }
     )
     local terminal = args.terminal or "xterm"
+    local timeout = args.timeout or 2
+    local widget_memory = wibox.widget(
+        {
+            {
+                {
+                    {
+                        id = "icon",
+                        widget = wibox.widget.imagebox(icons.logo)
+                    },
+                    layout = wibox.container.margin(_, _, _, _, _)
+                },
+                {
+                    {
+                        {
+                            align  = "center",
+                            forced_width = beautiful_dpi(36),
+                            id = "text",
+                            text = "N/A",
+                            valign = "center",
+                            widget = wibox.widget.textbox
+                        },
+                        bg = beautiful.bg_focus,
+                        shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(2)) end,
+                        widget = wibox.container.background,
+                    },
+                    layout = wibox.container.margin(_, beautiful_dpi(3), beautiful_dpi(3), beautiful_dpi(3), beautiful_dpi(3))
+                },
+                layout = wibox.layout.fixed.horizontal
+            },
+            bg = beautiful.bg_reset,
+            shape = gears.shape.rectangle,
+            widget = wibox.container.background
+        }
+    )
 
     -- methods
     local function update_popup()
@@ -176,7 +177,7 @@ local function factory(args)
     end
 
     local function update_widget()
-        local text_widget = memory:get_children_by_id("text")[1]
+        local text_widget = widget_memory:get_children_by_id("text")[1]
         text_widget:set_markup(string.format(" %d%% ", math.floor(info.used / info.total * 100)))
     end
 
@@ -207,7 +208,7 @@ local function factory(args)
     end
 
     -- bindings
-    memory:buttons(gears.table.join(
+    widget_memory:buttons(gears.table.join(
         awful.button(
             {},
             1,
@@ -223,21 +224,21 @@ local function factory(args)
     ))
 
     -- signals
-    memory:connect_signal(
+    widget_memory:connect_signal(
         "button::press",
         function(c)
             c:set_bg(beautiful.bg_focus)
         end
     )
 
-    memory:connect_signal(
+    widget_memory:connect_signal(
         "button::release",
         function(c)
             c:set_bg(beautiful.bg_normal)
         end
     )
 
-    memory:connect_signal(
+    widget_memory:connect_signal(
         "mouse::enter",
         function(c)
             c:set_bg(beautiful.bg_normal)
@@ -248,7 +249,7 @@ local function factory(args)
         end
     )
 
-    memory:connect_signal(
+    widget_memory:connect_signal(
         "mouse::leave",
         function(c)
             popup.visible = false
@@ -258,14 +259,14 @@ local function factory(args)
     -- timers
     gears_timer(
         {
-            timeout = 2,
+            timeout = timeout,
             autostart = true,
             call_now = true,
             callback = update
         }
     )
 
-    return memory
+    return widget_memory
 end
 -- }}}
 

@@ -99,7 +99,8 @@ local function factory(args)
                 }
         }
     )
-    local vpn = wibox.widget(
+    local timeout = args.timeout or 2
+    local widget_vpn = wibox.widget(
         {
             {
                 {
@@ -135,7 +136,7 @@ local function factory(args)
     end
 
     local function update_widget()
-        local icon_widget = vpn:get_children_by_id("icon")[1]
+        local icon_widget = widget_vpn:get_children_by_id("icon")[1]
         if info.connected then
             icon_widget.image = icons.connected
         else
@@ -168,7 +169,7 @@ local function factory(args)
         )
     end
 
-    function vpn:connect()
+    function widget_vpn:connect()
         if not info.connected then
             awful.spawn.easy_async(
                 "nordvpn c",
@@ -179,7 +180,7 @@ local function factory(args)
         end
     end
 
-    function vpn:disconnect()
+    function widget_vpn:disconnect()
         if info.connected then
             awful.spawn.easy_async(
                 "nordvpn d",
@@ -190,42 +191,42 @@ local function factory(args)
         end
     end
 
-    function vpn:toggle()
+    function widget_vpn:toggle()
         if info.connected then
-            vpn:disconnect()
+            widget_vpn:disconnect()
         else
-            vpn:connect()
+            widget_vpn:connect()
         end
     end
 
     -- bindings
-    vpn:buttons(gears.table.join(
+    widget_vpn:buttons(gears.table.join(
         awful.button(
             {},
             1,
             _,
             function()
-                vpn:toggle()
+                widget_vpn:toggle()
             end
         )
     ))
 
     -- signals
-    vpn:connect_signal(
+    widget_vpn:connect_signal(
         "button::press",
         function(c)
             c:set_bg(beautiful.bg_focus)
         end
     )
 
-    vpn:connect_signal(
+    widget_vpn:connect_signal(
         "button::release",
         function(c)
             c:set_bg(beautiful.bg_normal)
         end
     )
 
-    vpn:connect_signal(
+    widget_vpn:connect_signal(
         "mouse::enter",
         function(c)
             c:set_bg(beautiful.bg_normal)
@@ -236,7 +237,7 @@ local function factory(args)
         end
     )
 
-    vpn:connect_signal(
+    widget_vpn:connect_signal(
         "mouse::leave",
         function(c)
             popup.visible = false
@@ -247,14 +248,14 @@ local function factory(args)
     -- timers
     gears_timer(
         {
-            timeout = 5,
+            timeout = timeout,
             autostart = true,
             call_now = true,
             callback = update
         }
     )
 
-    return vpn
+    return widget_vpn
 end
 -- }}}
 

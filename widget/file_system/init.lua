@@ -33,7 +33,8 @@ local function factory(args)
             widget = {}
         }
     )
-    local file_system = wibox.widget(
+    local timeout = args.timeout or 2
+    local widget_file_system = wibox.widget(
         {
             {
                 {
@@ -173,7 +174,7 @@ local function factory(args)
     end
 
     local function update_widget()
-        local text_widget = file_system:get_children_by_id("text")[1]
+        local text_widget = widget_file_system:get_children_by_id("text")[1]
         text_widget:set_markup(string.format(" %d%% ", info[mount_default].percentage))
     end
 
@@ -202,7 +203,7 @@ local function factory(args)
     end
 
     -- signals
-    file_system:connect_signal(
+    widget_file_system:connect_signal(
         "mouse::enter",
         function(c)
             c:set_bg(beautiful.bg_normal)
@@ -212,7 +213,8 @@ local function factory(args)
             popup.visible = true
         end
     )
-    file_system:connect_signal(
+
+    widget_file_system:connect_signal(
         "mouse::leave",
         function(c)
             popup.visible = false
@@ -223,14 +225,14 @@ local function factory(args)
     -- timers
     gears_timer(
         {
-            timeout = 60,
+            timeout = timeout,
             autostart = true,
             call_now = true,
             callback = update
         }
     )
 
-    return file_system
+    return widget_file_system
 end
 -- }}}
 

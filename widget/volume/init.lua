@@ -20,7 +20,8 @@ local function factory(args)
             muted = nil
         }
     local info = {}
-    local volume = wibox.widget(
+    local timeout = args.timeout or 2
+    local widget_volume = wibox.widget(
         {
             {
                 {
@@ -56,8 +57,8 @@ local function factory(args)
 
     -- methods
     local function update_widget()
-        local icon_widget = volume:get_children_by_id("icon")[1]
-        local text_widget = volume:get_children_by_id("text")[1]
+        local icon_widget = widget_volume:get_children_by_id("icon")[1]
+        local text_widget = widget_volume:get_children_by_id("text")[1]
         if info.muted == "yes" then
             icon_widget:set_image(icons.muted)
             text_widget:set_markup(string.format(" <s>%d%%</s> ", info.volume))
@@ -90,7 +91,7 @@ local function factory(args)
         )
     end
 
-    function volume:down()
+    function widget_volume:down()
         if info.index ~= nil then
             awful.spawn.easy_async(
                 string.format("pactl set-%s-volume %d -1%%", device_type, info.index),
@@ -101,7 +102,7 @@ local function factory(args)
         end
     end
 
-    function volume:mute()
+    function widget_volume:mute()
         if info.index ~= nil then
             awful.spawn.easy_async(
                 string.format("pactl set-%s-mute %d toggle", device_type, info.index),
@@ -112,7 +113,7 @@ local function factory(args)
         end
     end
 
-    function volume:set(value)
+    function widget_volume:set(value)
         if info.index ~= nil then
             awful.spawn.easy_async(
                 string.format("pactl set-%s-volume %d %d%%", device_type, info.index, value),
@@ -123,7 +124,7 @@ local function factory(args)
         end
     end
 
-    function volume:up()
+    function widget_volume:up()
         if info.index ~= nil then
             awful.spawn.easy_async(
                 string.format("pactl set-%s-volume %d +1%%", device_type, info.index),
@@ -135,7 +136,7 @@ local function factory(args)
     end
 
     -- bindings
-    volume:buttons(
+    widget_volume:buttons(
         gears.table.join(
             awful.button(
                 {},
@@ -151,7 +152,7 @@ local function factory(args)
                 2,
                 _,
                 function()
-                    volume:mute()
+                    widget_volume:mute()
                 end
             ),
 
@@ -160,7 +161,7 @@ local function factory(args)
                 3,
                 _,
                 function()
-                    volume:set(100)
+                    widget_volume:set(100)
                 end
             ),
 
@@ -169,7 +170,7 @@ local function factory(args)
                 4,
                 _,
                 function()
-                    volume:up()
+                    widget_volume:up()
                 end
             ),
 
@@ -178,35 +179,35 @@ local function factory(args)
                 5,
                 _,
                 function()
-                    volume:down()
+                    widget_volume:down()
                 end
             )
         )
     )
 
     -- signals
-    volume:connect_signal(
+    widget_volume:connect_signal(
         "button::press",
         function(c)
             c:set_bg(beautiful.bg_focus)
         end
     )
 
-    volume:connect_signal(
+    widget_volume:connect_signal(
         "button::release",
         function(c)
             c:set_bg(beautiful.bg_normal)
         end
     )
 
-    volume:connect_signal(
+    widget_volume:connect_signal(
         "mouse::enter",
         function(c)
             c:set_bg(beautiful.bg_normal)
         end
     )
 
-    volume:connect_signal(
+    widget_volume:connect_signal(
         "mouse::leave",
         function(c)
             c:set_bg(beautiful.bg_reset)
@@ -216,14 +217,14 @@ local function factory(args)
     -- timers
     gears_timer(
         {
-            timeout = 5,
+            timeout = timeout,
             autostart = true,
             call_now = true,
             callback = update
         }
     )
 
-    return volume
+    return widget_volume
 end
 -- }}}
 
