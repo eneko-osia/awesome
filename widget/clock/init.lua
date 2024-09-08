@@ -15,7 +15,6 @@ local function factory(args)
         {
             logo = nil
         }
-
     local clock = wibox.widget(
         {
             {
