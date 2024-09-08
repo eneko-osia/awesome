@@ -23,6 +23,7 @@ local widget_memory         = require("widget.memory")
 local widget_network        = require("widget.network")
 local widget_spotify        = require("widget.spotify")
 local widget_volume         = require("widget.volume")
+local widget_vpn            = require("widget.vpn")
 -- }}}
 
 -- {{{ Variable definitions
@@ -374,8 +375,17 @@ local tasklist_buttons = gears.table.join(
 local spr       = wibox.widget.imagebox(beautiful.spr)
 local spr4px    = wibox.widget.imagebox(beautiful.spr4px)
 
--- Keyboard widget
-local keyboard_widget = awful.widget.keyboardlayout()
+-- Battery widget
+local battery_widget = widget_battery({
+    icons = 
+        {
+            ac = beautiful.widget.battery_ac,
+            empty = beautiful.widget.battery_empty,
+            full = beautiful.widget.battery_full,
+            logo = beautiful.widget.ssd,
+            low = beautiful.widget.battery_low
+        }
+})
 
 -- Clock widget
 local clock_widget = widget_clock({
@@ -394,21 +404,13 @@ local cpu_widget = widget_cpu({
     terminal = TERMINAL
 })
 
--- Memory widget
-local memory_widget = widget_memory({
-    icons = 
-        {
-            logo = beautiful.widget.mem
-        },
-    terminal = TERMINAL
-})
-
 -- File system widget
 local file_system_widget = widget_file_system({
     icons = 
         {
             logo = beautiful.widget.ssd
         },
+    mount_default = "/home",
     mounts = 
         {
             "/",
@@ -418,15 +420,27 @@ local file_system_widget = widget_file_system({
         }
 })
 
--- Battery widget
-local battery_widget = widget_battery({
+-- Keyboard widget
+local keyboard_widget = awful.widget.keyboardlayout()
+
+-- Memory widget
+local memory_widget = widget_memory({
     icons = 
         {
-            ac = beautiful.widget.battery_ac,
-            empty = beautiful.widget.battery_empty,
-            full = beautiful.widget.battery_full,
-            logo = beautiful.widget.ssd,
-            low = beautiful.widget.battery_low
+            logo = beautiful.widget.mem
+        },
+    terminal = TERMINAL
+})
+
+-- Microphone widget
+local microphone_widget = widget_volume({
+    device_type = "source",
+    icons = 
+        {
+            high = beautiful.widget.microphone_high,
+            low = beautiful.widget.microphone_low,
+            medium = beautiful.widget.microphone_medium,
+            muted = beautiful.widget.microphone_muted
         }
 })
 
@@ -435,9 +449,7 @@ local network_widget = widget_network({
     icons = 
         {
             netdl = beautiful.widget.netdl,
-            netup = beautiful.widget.netul,
-            vpn_connected = "/usr/share/icons/Arc/status/symbolic/network-vpn-symbolic.svg",
-            vpn_diconnected = "/usr/share/icons/Arc/status/symbolic/network-vpn-acquiring-symbolic.svg"
+            netup = beautiful.widget.netul
         }
 })
 
@@ -465,15 +477,12 @@ local volume_widget = widget_volume({
         }
 })
 
--- Microphone widget
-local microphone_widget = widget_volume({
-    device_type = "source",
+-- Vpn widget
+local vpn_widget = widget_vpn({
     icons = 
         {
-            high = beautiful.widget.microphone_high,
-            low = beautiful.widget.microphone_low,
-            medium = beautiful.widget.microphone_medium,
-            muted = beautiful.widget.microphone_muted
+            connected = "/usr/share/icons/Arc/status/symbolic/network-vpn-symbolic.svg",
+            diconnected = "/usr/share/icons/Arc/status/symbolic/network-vpn-acquiring-symbolic.svg"
         }
 })
 
@@ -587,11 +596,17 @@ function set_widgets(s)
                 -- Separator
                 spr,
                 -- Battery widget
-                battery_widget.widget,
+                battery_widget,
                 -- Separator
                 spr,
+                spr4px,
+                spr,
                 -- Network
-                network_widget.widget,
+                network_widget,
+                -- Separator
+                spr,
+                -- Vpn
+                vpn_widget,
                 -- Separator
                 spr,
                 spr4px,
@@ -661,11 +676,17 @@ function set_widgets(s)
                 -- Separator
                 spr,
                 -- Battery widget
-                battery_widget.widget,
+                battery_widget,
                 -- Separator
                 spr,
+                spr4px,
+                spr,
                 -- Network
-                network_widget.widget,
+                network_widget,
+                -- Separator
+                spr,
+                -- Vpn
+                vpn_widget,
                 -- Separator
                 spr,
                 spr4px,
