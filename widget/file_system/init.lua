@@ -3,7 +3,6 @@ local awful         = require("awful")
 local beautiful     = require("beautiful")
 local beautiful_dpi = require("beautiful.xresources").apply_dpi
 local gears         = require("gears")
-local gears_timer   = require("gears.timer")
 local wibox         = require("wibox")
 -- }}}
 
@@ -12,16 +11,12 @@ local function factory(args)
     args = args or {}
 
     local icons = args.icons or
-    {
-        logo = nil
-    }
+        {
+            logo = nil
+        }
     local info = {}
     local mount_default = args.mount_default or "/"
-    local mounts = args.mounts or
-        {
-            "/",
-            "/home"
-        }
+    local mounts = args.mounts or { "/" }
     local popup = awful.popup(
         {
             border_color = beautiful.bg_focus,
@@ -30,11 +25,27 @@ local function factory(args)
             ontop = true,
             shape = gears.shape.rounded_rect,
             visible = false,
-            widget = {}
+            widget =
+                {
+                    {
+                        {
+                            {
+                                id = "row_container",
+                                layout = wibox.layout.fixed.vertical,
+                                spacing = beautiful_dpi(5)
+                            },
+                            layout = wibox.container.margin(_, beautiful_dpi(5), beautiful_dpi(5), beautiful_dpi(5), beautiful_dpi(5))
+                        },
+                        layout = wibox.layout.fixed.horizontal
+                    },
+                    bg = beautiful.bg_reset,
+                    shape = gears.shape.rectangle,
+                    widget = wibox.container.background
+                }
         }
     )
     local timeout = args.timeout or 2
-    local widget_file_system = wibox.widget(
+    local widget = wibox.widget(
         {
             {
                 {
@@ -69,100 +80,76 @@ local function factory(args)
     )
 
     -- methods
-    local function update_popup()
-        local rows =
-        {
-            layout = wibox.layout.fixed.vertical,
-            spacing = beautiful_dpi(5)
-        }
-
-        for k, v in pairs(mounts) do
-            local row = wibox.widget(
-                {
-                    {
-                        {
-                            {
-                                {
-                                    align  = "left",
-                                    forced_height = beautiful_dpi(20),
-                                    forced_width = beautiful_dpi(64),
-                                    text = string.format(" %s", info[v].mount),
-                                    valign = "center",
-                                    widget = wibox.widget.textbox
-                                },
-                                bg = beautiful.bg_focus,
-                                shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(5)) end,
-                                widget = wibox.container.background
-                            },
-                            layout = wibox.container.margin(_, _, _, _, _)
-                        },
-                        {
-                            {
-                                {
-                                    align  = "center",
-                                    forced_height = beautiful_dpi(20),
-                                    forced_width = beautiful_dpi(36),
-                                    text = string.format("%d%%", info[v].percentage),
-                                    valign = "center",
-                                    widget = wibox.widget.textbox
-                                },
-                                bg = beautiful.bg_focus,
-                                shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(5)) end,
-                                widget = wibox.container.background
-                            },
-                            layout = wibox.container.margin(_, beautiful_dpi(3), _, _, _)
-                        },
-                        {
-                            {
-                                {
-                                    background_color = beautiful.bg_focus,
-                                    color = string.format("linear:0,0:150,0:0,%s:0.5,%s:1,%s", "#00FF00", "#FFFF00", "#FF0000"),
-                                    forced_height = beautiful_dpi(20),
-                                    forced_width = beautiful_dpi(150),
-                                    margins = beautiful_dpi(1),
-                                    max_value = 100,
-                                    paddings = beautiful_dpi(6),
-                                    value = info[v].percentage,
-                                    widget = wibox.widget.progressbar
-                                },
-                                bg = beautiful.bg_focus,
-                                shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(5)) end,
-                                widget = wibox.container.background
-                            },
-                            layout = wibox.container.margin(_, beautiful_dpi(3), _, _, _)
-                        },
-                        {
-                            {
-                                {
-                                    align  = "center",
-                                    forced_height = beautiful_dpi(20),
-                                    forced_width = beautiful_dpi(128),
-                                    text = string.format("%d / %d GiB", math.floor(info[v].used / 1024 / 1024), math.floor(info[v].size / 1024 / 1024)),
-                                    valign = "center",
-                                    widget = wibox.widget.textbox
-                                },
-                                bg = beautiful.bg_focus,
-                                shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(5)) end,
-                                widget = wibox.container.background
-                            },
-                            layout = wibox.container.margin(_, beautiful_dpi(3), _, _, _)
-                        },
-                        layout = wibox.layout.fixed.horizontal
-                    },
-                    bg = beautiful.bg_reset,
-                    shape = gears.shape.rectangle,
-                    widget = wibox.container.background
-                }
-            )
-            table.insert(rows, row)
-        end
-
-        popup:setup(
+    local function create_popup_row(title)
+        return wibox.widget(
             {
                 {
                     {
-                        rows,
-                        layout = wibox.container.margin(_, beautiful_dpi(5), beautiful_dpi(5), beautiful_dpi(5), beautiful_dpi(5))
+                        {
+                            {
+                                align  = "left",
+                                forced_height = beautiful_dpi(20),
+                                forced_width = beautiful_dpi(128),
+                                text = string.format(" %s", title),
+                                valign = "center",
+                                widget = wibox.widget.textbox
+                            },
+                            bg = beautiful.bg_focus,
+                            shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(5)) end,
+                            widget = wibox.container.background
+                        },
+                        layout = wibox.container.margin(_, _, _, _, _)
+                    },
+                    {
+                        {
+                            {
+                                align  = "center",
+                                forced_height = beautiful_dpi(20),
+                                forced_width = beautiful_dpi(36),
+                                text = "N/A",
+                                valign = "center",
+                                widget = wibox.widget.textbox
+                            },
+                            bg = beautiful.bg_focus,
+                            shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(5)) end,
+                            widget = wibox.container.background
+                        },
+                        layout = wibox.container.margin(_, beautiful_dpi(3), _, _, _)
+                    },
+                    {
+                        {
+                            {
+                                background_color = beautiful.bg_focus,
+                                color = string.format("linear:0,0:150,0:0,%s:0.5,%s:1,%s", "#00FF00", "#FFFF00", "#FF0000"),
+                                forced_height = beautiful_dpi(20),
+                                forced_width = beautiful_dpi(150),
+                                margins = beautiful_dpi(1),
+                                max_value = 100,
+                                paddings = beautiful_dpi(6),
+                                value = 0,
+                                widget = wibox.widget.progressbar
+                            },
+                            bg = beautiful.bg_focus,
+                            shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(5)) end,
+                            widget = wibox.container.background
+                        },
+                        layout = wibox.container.margin(_, beautiful_dpi(3), _, _, _)
+                    },
+                    {
+                        {
+                            {
+                                align  = "center",
+                                forced_height = beautiful_dpi(20),
+                                forced_width = beautiful_dpi(128),
+                                text = "N/A",
+                                valign = "center",
+                                widget = wibox.widget.textbox
+                            },
+                            bg = beautiful.bg_focus,
+                            shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(5)) end,
+                            widget = wibox.container.background
+                        },
+                        layout = wibox.container.margin(_, beautiful_dpi(3), _, _, _)
                     },
                     layout = wibox.layout.fixed.horizontal
                 },
@@ -173,48 +160,134 @@ local function factory(args)
         )
     end
 
-    local function update_widget()
-        local text_widget = widget_file_system:get_children_by_id("text")[1]
-        text_widget:set_markup(string.format(" %d%% ", info[mount_default].percentage))
+    local function update_popup(fs_info)
+        local function _set_text(container, index, value)
+            local widget = container:get_children()[index]:get_children()[1]:get_children()[1]
+            widget:set_markup(value)
+        end
+
+        local function _set_value(container, index, value)
+            local widget = container:get_children()[index]:get_children()[1]:get_children()[1]
+            widget:set_value(value)
+        end
+
+        local row_container_widget = fs_info.popup.row:get_children()[1]
+        _set_text(row_container_widget, 2, string.format("%d%%", fs_info.percentage))
+        _set_value(row_container_widget, 3, fs_info.percentage)
+        _set_text(
+            row_container_widget,
+            4,
+            string.format(
+                "%3d / %3d GiB",
+                math.floor((fs_info.used / 1024.0 / 1024.0) + 0.5),
+                math.floor((fs_info.size / 1024 / 1024) + 0.5)
+            )
+        )
+    end
+
+    local function update_widget(fs_info)
+        local text_widget = widget:get_children_by_id("text")[1]
+        text_widget:set_markup(string.format(" %d%% ", fs_info.percentage))
+    end
+
+    local function remove_file_system_info(index)
+        -- remove popup row from layout
+        popup:get_widget():get_children_by_id("row_container")[1]:remove_widgets(info[index].popup.row, true)
+
+        -- remove info about the file system
+        table.remove(info, index)
     end
 
     local function update()
+
+        local function is_in_mounts(mount)
+            for _, v in pairs(mounts) do
+                if mount == v then
+                    return true
+                end
+            end
+            return false
+        end
+
+        -- check file systems in the system
         awful.spawn.easy_async_with_shell(
-            string.format("df | tail -n +2"),
+            "df -k | tail -n +2",
             function(stdout, _, _, _)
+                -- iterate all file systems
+                local i = 1
                 for line in stdout:gmatch("[^\r\n]+") do
-                    local device, size, used, available, percentage, mount = line:match("([%p%w]+)%s+([%d%w]+)%s+([%d%w]+)%s+([%d%w]+)%s+([%d]+)%%%s+([%p%w]+)")
-                    info[mount] =
-                        {
-                            available = tonumber(available),
-                            device = device,
-                            mount = mount,
-                            percentage = tonumber(percentage),
-                            size = tonumber(size),
-                            used = tonumber(used)
-                        }
+                    -- read data from command results
+                    local device, size, used, available, percentage, mount = string.match(line, "([%p%w]+)%s+([%d%w]+)%s+([%d%w]+)%s+([%d%w]+)%s+([%d]+)%%%s+([%p%w]+)")
+                    if is_in_mounts(mount) then
+                        if not info[i] then
+                            -- add new file system info since there isn't any
+                            info[i] =
+                                {
+                                    device = device,
+                                    mount = mount,
+                                    popup =
+                                        {
+                                            row = create_popup_row(mount)
+                                        }
+                                }
+
+                            -- add popup row to layout
+                            popup:get_widget():get_children_by_id("row_container")[1]:add(info[i].popup.row)
+                        end
+
+                        local fs_info = info[i]
+
+                        -- continue since it is the same file system
+                        if device == fs_info.device then
+
+                            -- update file system stats
+                            fs_info.available = tonumber(available)
+                            fs_info.percentage = tonumber(percentage)
+                            fs_info.size = tonumber(size)
+                            fs_info.used = tonumber(used)
+
+                            -- update popup
+                            if popup.visible then
+                                update_popup(fs_info)
+                            end
+
+                            -- update widget
+                            if mount == mount_default then
+                                update_widget(fs_info)
+                            end
+
+                            -- continue
+                            i = i + 1
+                        else
+                            -- remove file systems that are not in the system anymore
+                            remove_file_system_info(i)
+                        end
+                    end
                 end
-                if popup.visible then
-                    update_popup()
+
+                for j = #info, i, -1 do
+                    -- remove file system that are not in the system anymore
+                    remove_file_system_info(j)
                 end
-                update_widget()
             end
         )
     end
 
     -- signals
-    widget_file_system:connect_signal(
+    widget:connect_signal(
         "mouse::enter",
         function(c)
             c:set_bg(beautiful.bg_normal)
 
-            update_popup()
+            for _, v in pairs(info) do
+                update_popup(v)
+            end
             popup:move_next_to(mouse.current_widget_geometry)
             popup.visible = true
         end
     )
 
-    widget_file_system:connect_signal(
+    widget:connect_signal(
         "mouse::leave",
         function(c)
             popup.visible = false
@@ -223,16 +296,16 @@ local function factory(args)
     )
 
     -- timers
-    gears_timer(
+    gears.timer(
         {
-            timeout = timeout,
             autostart = true,
             call_now = true,
-            callback = update
+            callback = update,
+            timeout = timeout
         }
     )
 
-    return widget_file_system
+    return widget
 end
 -- }}}
 

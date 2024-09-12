@@ -109,7 +109,7 @@ local function factory(args)
     )
     local terminal = args.terminal or "xterm"
     local timeout = args.timeout or 2
-    local widget_memory = wibox.widget(
+    local widget = wibox.widget(
         {
             {
                 {
@@ -176,7 +176,7 @@ local function factory(args)
     end
 
     local function update_widget()
-        local text_widget = widget_memory:get_children_by_id("text")[1]
+        local text_widget = widget:get_children_by_id("text")[1]
         text_widget:set_markup(string.format(" %d%% ", math.floor(info.used / info.total * 100)))
     end
 
@@ -207,7 +207,7 @@ local function factory(args)
     end
 
     -- bindings
-    widget_memory:buttons(gears.table.join(
+    widget:buttons(gears.table.join(
         awful.button(
             {},
             1,
@@ -223,21 +223,21 @@ local function factory(args)
     ))
 
     -- signals
-    widget_memory:connect_signal(
+    widget:connect_signal(
         "button::press",
         function(c)
             c:set_bg(beautiful.bg_focus)
         end
     )
 
-    widget_memory:connect_signal(
+    widget:connect_signal(
         "button::release",
         function(c)
             c:set_bg(beautiful.bg_normal)
         end
     )
 
-    widget_memory:connect_signal(
+    widget:connect_signal(
         "mouse::enter",
         function(c)
             c:set_bg(beautiful.bg_normal)
@@ -248,7 +248,7 @@ local function factory(args)
         end
     )
 
-    widget_memory:connect_signal(
+    widget:connect_signal(
         "mouse::leave",
         function(c)
             popup.visible = false
@@ -265,7 +265,7 @@ local function factory(args)
         }
     )
 
-    return widget_memory
+    return widget
 end
 -- }}}
 

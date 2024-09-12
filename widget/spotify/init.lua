@@ -21,7 +21,7 @@ local function factory(args)
     local song_index = 0
     local song_state = 0
     local song_text = "Spotify"
-    local widget_spotify = wibox.widget(
+    local widget = wibox.widget(
         {
             {
                 {
@@ -119,7 +119,7 @@ local function factory(args)
     -- methods
     local function set_song_text(state, text, index)
         local function _set(color, text)
-            local song_text_widget = widget_spotify:get_children_by_id("song_text")[1]
+            local song_text_widget = widget:get_children_by_id("song_text")[1]
             song_text_widget:set_markup(string.format("<span foreground='%s'>%s</span>", color, text))
         end
 
@@ -152,7 +152,7 @@ local function factory(args)
             "sp status",
             function(stdout, _, _, _)
                 local function _set_play_pause_icon(icon)
-                    local play_pause_icon_widget = widget_spotify:get_children_by_id("play_pause_icon")[1]
+                    local play_pause_icon_widget = widget:get_children_by_id("play_pause_icon")[1]
                     play_pause_icon_widget.image = icon
                 end
 
@@ -171,7 +171,7 @@ local function factory(args)
         )
     end
 
-    function widget_spotify:next()
+    function widget:next()
         awful.spawn.easy_async(
             "sp next",
             function(_, _, _, _)
@@ -180,7 +180,7 @@ local function factory(args)
         )
     end
 
-    function widget_spotify:pause()
+    function widget:pause()
         awful.spawn.easy_async(
             "sp pause",
             function(_, _, _, _)
@@ -189,7 +189,7 @@ local function factory(args)
         )
     end
 
-    function widget_spotify:play()
+    function widget:play()
         awful.spawn.easy_async(
             "sp play",
             function(_, _, _, _)
@@ -198,11 +198,11 @@ local function factory(args)
         )
     end
 
-    function widget_spotify:play_pause()
+    function widget:play_pause()
         self:play()
     end
 
-    function widget_spotify:previous()
+    function widget:previous()
         awful.spawn.easy_async(
             "sp prev",
             function(_, _, _, _)
@@ -212,7 +212,7 @@ local function factory(args)
     end
 
     -- bindings
-    local next_icon_widget_container = widget_spotify:get_children_by_id("next_icon_container")[1]
+    local next_icon_widget_container = widget:get_children_by_id("next_icon_container")[1]
     next_icon_widget_container:buttons(
         gears.table.join(
             awful.button(
@@ -220,13 +220,13 @@ local function factory(args)
                 1,
                 _,
                 function()
-                    widget_spotify:next()
+                    widget:next()
                 end
             )
         )
     )
 
-    local play_pause_icon_widget_container = widget_spotify:get_children_by_id("play_pause_icon_container")[1]
+    local play_pause_icon_widget_container = widget:get_children_by_id("play_pause_icon_container")[1]
     play_pause_icon_widget_container:buttons(
             gears.table.join(
             awful.button(
@@ -234,13 +234,13 @@ local function factory(args)
                 1,
                 _,
                 function()
-                    widget_spotify:play_pause()
+                    widget:play_pause()
                 end
             )
         )
     )
 
-    local prev_icon_widget_container = widget_spotify:get_children_by_id("prev_icon_container")[1]
+    local prev_icon_widget_container = widget:get_children_by_id("prev_icon_container")[1]
     prev_icon_widget_container:buttons(
         gears.table.join(
             awful.button(
@@ -248,13 +248,13 @@ local function factory(args)
                 1,
                 _,
                 function()
-                    widget_spotify:previous()
+                    widget:previous()
                 end
             )
         )
     )
 
-    local song_text_widget = widget_spotify:get_children_by_id("song_text")[1]
+    local song_text_widget = widget:get_children_by_id("song_text")[1]
     song_text_widget:buttons(
         gears.table.join(
             awful.button(
@@ -289,7 +289,7 @@ local function factory(args)
         )
     )
 
-    local song_widget_container = widget_spotify:get_children_by_id("song_container")[1]
+    local song_widget_container = widget:get_children_by_id("song_container")[1]
     song_widget_container:buttons(
         gears.table.join(
             awful.button(
@@ -446,7 +446,7 @@ local function factory(args)
         }
     )
 
-    return widget_spotify
+    return widget
 end
 -- }}}
 

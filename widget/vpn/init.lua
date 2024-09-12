@@ -100,7 +100,7 @@ local function factory(args)
         }
     )
     local timeout = args.timeout or 2
-    local widget_vpn = wibox.widget(
+    local widget = wibox.widget(
         {
             {
                 {
@@ -123,20 +123,20 @@ local function factory(args)
             widget:set_markup(value)
         end
 
-        local rows_container_widget = popup:get_widget():get_children_by_id("row_container")[1]
-        _set_text(rows_container_widget, 1, info.country)
-        _set_text(rows_container_widget, 2, info.city)
-        _set_text(rows_container_widget, 3, info.server)
-        _set_text(rows_container_widget, 4, info.hostname)
-        _set_text(rows_container_widget, 5, info.ip)
-        _set_text(rows_container_widget, 6, info.technology)
-        _set_text(rows_container_widget, 7, info.protocol)
-        _set_text(rows_container_widget, 8, info.up_time)
-        _set_text(rows_container_widget, 9, info.transfer_time)
+        local row_container_widget = popup:get_widget():get_children_by_id("row_container")[1]
+        _set_text(row_container_widget, 1, info.country)
+        _set_text(row_container_widget, 2, info.city)
+        _set_text(row_container_widget, 3, info.server)
+        _set_text(row_container_widget, 4, info.hostname)
+        _set_text(row_container_widget, 5, info.ip)
+        _set_text(row_container_widget, 6, info.technology)
+        _set_text(row_container_widget, 7, info.protocol)
+        _set_text(row_container_widget, 8, info.up_time)
+        _set_text(row_container_widget, 9, info.transfer_time)
     end
 
     local function update_widget()
-        local icon_widget = widget_vpn:get_children_by_id("icon")[1]
+        local icon_widget = widget:get_children_by_id("icon")[1]
         if info.connected then
             icon_widget.image = icons.connected
         else
@@ -169,7 +169,7 @@ local function factory(args)
         )
     end
 
-    function widget_vpn:connect()
+    function widget:connect()
         if not info.connected then
             awful.spawn.easy_async(
                 "nordvpn c",
@@ -180,7 +180,7 @@ local function factory(args)
         end
     end
 
-    function widget_vpn:disconnect()
+    function widget:disconnect()
         if info.connected then
             awful.spawn.easy_async(
                 "nordvpn d",
@@ -191,42 +191,42 @@ local function factory(args)
         end
     end
 
-    function widget_vpn:toggle()
+    function widget:toggle()
         if info.connected then
-            widget_vpn:disconnect()
+            widget:disconnect()
         else
-            widget_vpn:connect()
+            widget:connect()
         end
     end
 
     -- bindings
-    widget_vpn:buttons(gears.table.join(
+    widget:buttons(gears.table.join(
         awful.button(
             {},
             1,
             _,
             function()
-                widget_vpn:toggle()
+                widget:toggle()
             end
         )
     ))
 
     -- signals
-    widget_vpn:connect_signal(
+    widget:connect_signal(
         "button::press",
         function(c)
             c:set_bg(beautiful.bg_focus)
         end
     )
 
-    widget_vpn:connect_signal(
+    widget:connect_signal(
         "button::release",
         function(c)
             c:set_bg(beautiful.bg_normal)
         end
     )
 
-    widget_vpn:connect_signal(
+    widget:connect_signal(
         "mouse::enter",
         function(c)
             c:set_bg(beautiful.bg_normal)
@@ -237,7 +237,7 @@ local function factory(args)
         end
     )
 
-    widget_vpn:connect_signal(
+    widget:connect_signal(
         "mouse::leave",
         function(c)
             popup.visible = false
@@ -255,7 +255,7 @@ local function factory(args)
         }
     )
 
-    return widget_vpn
+    return widget
 end
 -- }}}
 

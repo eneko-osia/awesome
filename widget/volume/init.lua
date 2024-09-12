@@ -20,7 +20,7 @@ local function factory(args)
         }
     local info = {}
     local timeout = args.timeout or 2
-    local widget_volume = wibox.widget(
+    local widget = wibox.widget(
         {
             {
                 {
@@ -58,9 +58,9 @@ local function factory(args)
 
     -- methods
     local function update_widget()
-        local icon_widget = widget_volume:get_children_by_id("icon")[1]
-        local text_widget = widget_volume:get_children_by_id("text")[1]
-        if info.muted == "yes" then
+        local icon_widget = widget:get_children_by_id("icon")[1]
+        local text_widget = widget:get_children_by_id("text")[1]
+        if info.muted then
             icon_widget:set_image(icons.muted)
             text_widget:set_markup(string.format(" <s>%d%%</s> ", info.volume))
         else
@@ -84,7 +84,7 @@ local function factory(args)
                 info =
                     {
                         index = tonumber(string.match(stdout, "index: (%S+)")) or nil,
-                        muted = string.match(stdout, "muted: (%S+)") or "yes",
+                        muted = string.match(stdout, "muted: yes") or false,
                         volume = tonumber(string.match(stdout, ":.-(%d+)%%")) or 0
                     }
                 update_widget()
@@ -92,7 +92,7 @@ local function factory(args)
         )
     end
 
-    function widget_volume:down()
+    function widget:down()
         if info.index ~= nil then
             awful.spawn.easy_async(
                 string.format("pactl set-%s-volume %d -1%%", device_type, info.index),
@@ -103,7 +103,7 @@ local function factory(args)
         end
     end
 
-    function widget_volume:mute()
+    function widget:mute()
         if info.index ~= nil then
             awful.spawn.easy_async(
                 string.format("pactl set-%s-mute %d toggle", device_type, info.index),
@@ -114,7 +114,7 @@ local function factory(args)
         end
     end
 
-    function widget_volume:set(value)
+    function widget:set(value)
         if info.index ~= nil then
             awful.spawn.easy_async(
                 string.format("pactl set-%s-volume %d %d%%", device_type, info.index, value),
@@ -125,7 +125,7 @@ local function factory(args)
         end
     end
 
-    function widget_volume:up()
+    function widget:up()
         if info.index ~= nil then
             awful.spawn.easy_async(
                 string.format("pactl set-%s-volume %d +1%%", device_type, info.index),
@@ -137,7 +137,7 @@ local function factory(args)
     end
 
     -- bindings
-    widget_volume:buttons(
+    widget:buttons(
         gears.table.join(
             awful.button(
                 {},
@@ -153,7 +153,7 @@ local function factory(args)
                 2,
                 _,
                 function()
-                    widget_volume:mute()
+                    widget:mute()
                 end
             ),
 
@@ -162,7 +162,7 @@ local function factory(args)
                 3,
                 _,
                 function()
-                    widget_volume:set(100)
+                    widget:set(100)
                 end
             ),
 
@@ -171,7 +171,7 @@ local function factory(args)
                 4,
                 _,
                 function()
-                    widget_volume:up()
+                    widget:up()
                 end
             ),
 
@@ -180,35 +180,35 @@ local function factory(args)
                 5,
                 _,
                 function()
-                    widget_volume:down()
+                    widget:down()
                 end
             )
         )
     )
 
     -- signals
-    widget_volume:connect_signal(
+    widget:connect_signal(
         "button::press",
         function(c)
             c:set_bg(beautiful.bg_focus)
         end
     )
 
-    widget_volume:connect_signal(
+    widget:connect_signal(
         "button::release",
         function(c)
             c:set_bg(beautiful.bg_normal)
         end
     )
 
-    widget_volume:connect_signal(
+    widget:connect_signal(
         "mouse::enter",
         function(c)
             c:set_bg(beautiful.bg_normal)
         end
     )
 
-    widget_volume:connect_signal(
+    widget:connect_signal(
         "mouse::leave",
         function(c)
             c:set_bg(beautiful.bg_reset)
@@ -225,7 +225,7 @@ local function factory(args)
         }
     )
 
-    return widget_volume
+    return widget
 end
 -- }}}
 
