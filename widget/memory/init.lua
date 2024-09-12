@@ -3,7 +3,6 @@ local awful         = require("awful")
 local beautiful     = require("beautiful")
 local beautiful_dpi = require("beautiful.xresources").apply_dpi
 local gears         = require("gears")
-local gears_timer   = require("gears.timer")
 local wibox         = require("wibox")
 -- }}}
 
@@ -49,7 +48,7 @@ local function factory(args)
                                                     "#00FF00",
                                                     "#FF0000"
                                                 },
-                                            id = "memory",
+                                            id = "memory_container",
                                             widget = wibox.widget.piechart
                                         },
                                         layout = wibox.container.margin(_, _, _, _, _)
@@ -85,7 +84,7 @@ local function factory(args)
                                                     "#00FF00",
                                                     "#FF0000"
                                                 },
-                                            id = "swap",
+                                            id = "swap_container",
                                             widget = wibox.widget.piechart
                                         },
                                         layout = wibox.container.margin(_, _, _, _, _)
@@ -147,7 +146,7 @@ local function factory(args)
     -- methods
     local function update_popup()
         local popup_widget = popup:get_widget()
-        popup_widget:get_children_by_id("memory")[1].data_list =
+        popup_widget:get_children_by_id("memory_container")[1].data_list =
             {
                 {
                     string.format("buffers %d%%", math.floor((info.buffers + info.cached) / info.total * 100)),
@@ -163,7 +162,7 @@ local function factory(args)
                 }
             }
 
-        popup_widget:get_children_by_id("swap")[1].data_list =
+        popup_widget:get_children_by_id("swap_container")[1].data_list =
             {
                 {
                     string.format("free %d%%", math.floor(info.swap_free / info.swap_total * 100)),
@@ -257,12 +256,12 @@ local function factory(args)
         end
     )
     -- timers
-    gears_timer(
+    gears.timer(
         {
-            timeout = timeout,
             autostart = true,
             call_now = true,
-            callback = update
+            callback = update,
+            timeout = timeout
         }
     )
 
