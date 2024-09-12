@@ -3,7 +3,6 @@ local awful         = require("awful")
 local beautiful     = require("beautiful")
 local beautiful_dpi = require("beautiful.xresources").apply_dpi
 local gears         = require("gears")
-local gears_timer   = require("gears.timer")
 local wibox         = require("wibox")
 -- }}}
 
@@ -130,15 +129,16 @@ local function factory(args)
             _set(beautiful.fg_normal, "N/A")
         else
             local color = (state == 1) and beautiful.fg_focus or beautiful.fg_normal
-            _set(color, string.format("%s%s", text:sub(index, text:len()), text:sub(1, index - 1)))
+            _set(color, string.format("%s%s", string.sub(text, index, string.len(text)), string.sub(text, 1, index - 1)))
         end
     end
 
     local function update()
+        -- update current song text
         awful.spawn.easy_async(
             "sp current-oneline",
             function(stdout, _, _, _)
-                local text = string.format("   %s   ", stdout:sub(1, stdout:len() - 1))
+                local text = string.format("   %s   ", string.sub(stdout, 1, string.len(stdout) - 1))
                 if song_text ~= text then
                     song_index = 1
                     song_text = text
@@ -147,6 +147,7 @@ local function factory(args)
             end
         )
 
+        -- update current song play state
         awful.spawn.easy_async(
             "sp status",
             function(stdout, _, _, _)
@@ -155,7 +156,7 @@ local function factory(args)
                     play_pause_icon_widget.image = icon
                 end
 
-                if stdout:gsub("\n", "") == "Playing" then
+                if string.match(stdout, "Playing") then
                     if song_state ~= 1 then
                         song_state = 1
                         _set_play_pause_icon(icons.pause)
@@ -263,7 +264,7 @@ local function factory(args)
                 function()
                     if song_state == 1 then
                         song_index = song_index + 1
-                        if song_index > song_text:len() then
+                        if song_index > string.len(song_text) then
                             song_index = 1
                         end
                         set_song_text(song_state, song_text, song_index)
@@ -279,7 +280,7 @@ local function factory(args)
                     if song_state == 1 then
                         song_index = song_index - 1
                         if song_index <= 0 then
-                            song_index = song_text:len()
+                            song_index = string.len(song_text)
                         end
                         set_song_text(song_state, song_text, song_index)
                     end
@@ -422,9 +423,8 @@ local function factory(args)
     )
 
     -- timers
-    gears_timer(
+    gears.timer(
         {
-            timeout = 1,
             autostart = true,
             call_now = true,
             callback =
@@ -432,7 +432,7 @@ local function factory(args)
                     -- update song index if playing
                     if song_state == 1 then
                         song_index = song_index + 1
-                        if song_index > song_text:len() then
+                        if song_index > string.len(song_text) then
                             song_index = 1
                         end
                     else
@@ -441,7 +441,8 @@ local function factory(args)
 
                     -- call update method
                     update()
-                end
+                end,
+            timeout = 1
         }
     )
 
