@@ -3,7 +3,6 @@ local awful         = require("awful")
 local beautiful     = require("beautiful")
 local beautiful_dpi = require("beautiful.xresources").apply_dpi
 local gears         = require("gears")
-local gears_timer   = require("gears.timer")
 local wibox         = require("wibox")
 -- }}}
 
@@ -165,7 +164,7 @@ local function factory(args)
                                 align  = "left",
                                 forced_height = beautiful_dpi(20),
                                 forced_width = beautiful_dpi(64),
-                                text = string.format(" N/A"),
+                                text = string.format(" %s", title),
                                 valign = "center",
                                 widget = wibox.widget.textbox
                             },
@@ -302,7 +301,6 @@ local function factory(args)
         end
 
         local rows_container_widget = interface_info.popup.speed_row:get_children()[1]
-        _set_text(rows_container_widget, 1, string.format(" %s", interface_info.interface))
         _set_text(rows_container_widget, 2, convert_bytes_to_bits_per_second(interface_info.received))
         _set_text(rows_container_widget, 3, convert_bytes_to_bits_per_second(interface_info.sent))
         interface_info.popup.speed_row.opacity = ((interface_info.state == STATE_UP) and 1.0 or ((interface_info.state == STATE_UNKNOWN) and 0.6 or 0.2))
@@ -333,7 +331,7 @@ local function factory(args)
                         layout = wibox.container.margin(_, beautiful_dpi(4), beautiful_dpi(4), beautiful_dpi(3), beautiful_dpi(3))
                     },
                     bg = beautiful.bg_reset,
-                    id = "icon_widget_container",
+                    id = "icon_container",
                     shape = gears.shape.rectangle,
                     widget = wibox.container.background
                 },
@@ -348,7 +346,7 @@ local function factory(args)
         )
 
         -- bindings
-        local icon_widget_container = widget:get_children_by_id("icon_widget_container")[1]
+        local icon_widget_container = widget:get_children_by_id("icon_container")[1]
         icon_widget_container:buttons(
             gears.table.join(
                 awful.button(
@@ -412,7 +410,7 @@ local function factory(args)
     end
 
     local function update_wifi_widget(interface_info)
-        local icon_widget_container = interface_info.widget:get_children_by_id("icon_widget_container")[1]
+        local icon_widget_container = interface_info.widget:get_children_by_id("icon_container")[1]
         if interface_info.state == STATE_UP then
             local icon_widget = icon_widget_container:get_children()[1]:get_children()[1]
             if interface_info.signal >= -30 then
@@ -439,11 +437,11 @@ local function factory(args)
                     string.format("iw dev %s link", interface_info.interface),
                     function(stdout, _, _, _)
                         -- get wifi connection state info
-                        for line in stdout:gmatch("[^\r\n]+") do
-                            interface_info.received_bitrate = line:match("rx bitrate: (.+/s)") or interface_info.received_bitrate
-                            interface_info.sent_bitrate = line:match("tx bitrate: (.+/s)") or interface_info.sent_bitrate
-                            interface_info.signal = tonumber(line:match("signal: (-%d+)") or interface_info.signal)
-                            interface_info.ssid = line:match("SSID: (.+)") or interface_info.ssid
+                        for line in string.gmatch(stdout, "[^\r\n]+") do
+                            interface_info.received_bitrate = string.match(line, "rx bitrate: (.+/s)") or interface_info.received_bitrate
+                            interface_info.sent_bitrate = string.match(line, "tx bitrate: (.+/s)") or interface_info.sent_bitrate
+                            interface_info.signal = tonumber(string.match(line, "signal: (-%d+)") or interface_info.signal)
+                            interface_info.ssid = string.match(line, "SSID: (.+)") or interface_info.ssid
                         end
 
                         -- create popup
@@ -527,7 +525,7 @@ local function factory(args)
 
                 -- create popup row
                 if not interface_info.popup.speed_row then
-                    interface_info.popup.speed_row = create_speed_popup_row()
+                    interface_info.popup.speed_row = create_speed_popup_row(interface_info.interface)
                     local popup_widget = popup_speed:get_widget():get_children_by_id("row_container")[1]
                     popup_widget:add(interface_info.popup.speed_row)
                 end
@@ -598,7 +596,7 @@ local function factory(args)
                             awful.spawn.easy_async(
                                 string.format("cat /sys/class/net/%s/uevent", interface),
                                 function(stdout, _, _, _)
-                                    info.interfaces[index].type = stdout:match("DEVTYPE=(%w+)") or "ethernet"
+                                    info.interfaces[index].type = string.match(stdout, "DEVTYPE=(%w+)") or "ethernet"
                                 end
                             )
                             i = i + 1
@@ -647,12 +645,12 @@ local function factory(args)
     )
 
     -- timers
-    gears_timer(
+    gears.timer(
         {
-            timeout = timeout,
             autostart = true,
             call_now = true,
-            callback = update
+            callback = update,
+            timeout = timeout
         }
     )
 
