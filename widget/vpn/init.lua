@@ -248,10 +248,10 @@ local function factory(args)
     -- timers
     gears.timer(
         {
-            timeout = timeout,
             autostart = true,
             call_now = true,
-            callback = update
+            callback = update,
+            timeout = timeout
         }
     )
 
