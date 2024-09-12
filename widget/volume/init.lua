@@ -3,7 +3,6 @@ local awful         = require("awful")
 local beautiful     = require("beautiful")
 local beautiful_dpi = require("beautiful.xresources").apply_dpi
 local gears         = require("gears")
-local gears_timer   = require("gears.timer")
 local wibox         = require("wibox")
 -- }}}
 
@@ -29,6 +28,7 @@ local function factory(args)
                         id = "icon",
                         widget = wibox.widget.imagebox(icons.muted)
                     },
+                    id = "icon_container",
                     layout = wibox.container.margin(_, beautiful_dpi(4), beautiful_dpi(1), beautiful_dpi(3), beautiful_dpi(3))
                 },
                 {
@@ -42,6 +42,7 @@ local function factory(args)
                             widget = wibox.widget.textbox
                         },
                         bg = beautiful.bg_focus,
+                        id = "text_container",
                         shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(2)) end,
                         widget = wibox.container.background,
                     },
@@ -215,7 +216,7 @@ local function factory(args)
     )
 
     -- timers
-    gears_timer(
+    gears.timer(
         {
             timeout = timeout,
             autostart = true,
