@@ -3,7 +3,6 @@ local awful         = require("awful")
 local beautiful     = require("beautiful")
 local beautiful_dpi = require("beautiful.xresources").apply_dpi
 local gears         = require("gears")
-local gears_timer   = require("gears.timer")
 local wibox         = require("wibox")
 -- }}}
 
@@ -86,6 +85,7 @@ local function factory(args)
                                 create_popup_row("protocol"),
                                 create_popup_row("uptime"),
                                 create_popup_row("transfer"),
+                                id = "row_container",
                                 layout = wibox.layout.fixed.vertical,
                                 spacing = beautiful_dpi(5)
                             },
@@ -110,6 +110,7 @@ local function factory(args)
                 layout = wibox.container.margin(_, beautiful_dpi(4), beautiful_dpi(4), beautiful_dpi(3), beautiful_dpi(3))
             },
             bg = beautiful.bg_reset,
+            id = "icon_container",
             shape = gears.shape.rectangle,
             widget = wibox.container.background
         }
@@ -122,8 +123,7 @@ local function factory(args)
             widget:set_markup(value)
         end
 
-        local popup_widget = popup:get_widget()
-        local rows_container_widget = popup_widget:get_children()[1]:get_children()[1]:get_children()[1]
+        local rows_container_widget = popup:get_widget():get_children_by_id("row_container")[1]
         _set_text(rows_container_widget, 1, info.country)
         _set_text(rows_container_widget, 2, info.city)
         _set_text(rows_container_widget, 3, info.server)
@@ -150,16 +150,16 @@ local function factory(args)
             function(stdout, _, _, _)
                 info =
                 {
-                    city = string.match(stdout, "City: ([%g%s]+)") or "N/A",
-                    connected = (string.match(stdout, "Status: (%a+)") == "Connected"),
-                    country = string.match(stdout, "Country: ([%g%s]+)") or "N/A",
-                    hostname = string.match(stdout, "Hostname: ([%g%s]+)") or "N/A",
-                    ip = string.match(stdout, "IP: ([%g%s]+)") or "N/A",
-                    protocol = string.match(stdout, "Current protocol: ([%g%s]+)") or "N/A",
-                    server = string.match(stdout, "Server: ([%g%s]+)") or "N/A",
-                    technology = string.match(stdout, "Current technology: ([%g%s]+)") or "N/A",
-                    transfer_time = string.match(stdout, "Transfer: ([%g%s]+)") or "N/A",
-                    up_time = string.match(stdout, "Uptime: ([%g%s]+)") or "N/A"
+                    connected = string.match(stdout, "Status: Connected"),
+                    city = string.match(stdout, "City: (.+)") or "N/A",
+                    country = string.match(stdout, "Country: (.+)") or "N/A",
+                    hostname = string.match(stdout, "Hostname: (.+)") or "N/A",
+                    ip = string.match(stdout, "IP: (.+)") or "N/A",
+                    protocol = string.match(stdout, "Current protocol: (.+)") or "N/A",
+                    server = string.match(stdout, "Server: (.+)") or "N/A",
+                    technology = string.match(stdout, "Current technology: (.+)") or "N/A",
+                    transfer_time = string.match(stdout, "Transfer: (.+)") or "N/A",
+                    up_time = string.match(stdout, "Uptime: (.+)") or "N/A"
                 }
                 if popup.visible then
                     update_popup()
@@ -246,7 +246,7 @@ local function factory(args)
     )
 
     -- timers
-    gears_timer(
+    gears.timer(
         {
             timeout = timeout,
             autostart = true,
