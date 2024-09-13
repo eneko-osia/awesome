@@ -22,7 +22,7 @@ local function factory(args)
             netdl = nil,
             netup = nil,
             wifi = nil,
-            wifi_excelent = nil,
+            wifi_excellent = nil,
             wifi_very_good = nil,
             wifi_good = nil,
             wifi_weak = nil,
@@ -414,7 +414,7 @@ local function factory(args)
         if net_info.state == STATE_UP then
             local icon_widget = icon_widget_container:get_children()[1]:get_children()[1]
             if net_info.signal >= -30 then
-                icon_widget:set_image(icons.wifi_excelent)
+                icon_widget:set_image(icons.wifi_excellent)
             elseif net_info.signal >= -67 then
                 icon_widget:set_image(icons.wifi_very_good)
             elseif net_info.signal >= -70 then
