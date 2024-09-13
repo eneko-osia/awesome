@@ -58,7 +58,7 @@ local function factory(args)
     )
     local terminal = args.terminal or "xterm"
     local timeout = args.timeout or 2
-    local widget_network = wibox.widget(
+    local widget = wibox.widget(
         {
             {
                 {
@@ -163,7 +163,7 @@ local function factory(args)
                             {
                                 align  = "left",
                                 forced_height = beautiful_dpi(20),
-                                forced_width = beautiful_dpi(64),
+                                forced_width = beautiful_dpi(128),
                                 text = string.format(" %s", title),
                                 valign = "center",
                                 widget = wibox.widget.textbox
@@ -294,33 +294,33 @@ local function factory(args)
         )
     end
 
-    local function update_speed_popup(interface_info)
+    local function update_speed_popup(net_info)
         local function _set_text(container, index, value)
             local widget = container:get_children()[index]:get_children()[1]:get_children()[1]
             widget:set_markup(value)
         end
 
-        local rows_container_widget = interface_info.popup.speed_row:get_children()[1]
-        _set_text(rows_container_widget, 2, convert_bytes_to_bits_per_second(interface_info.received))
-        _set_text(rows_container_widget, 3, convert_bytes_to_bits_per_second(interface_info.sent))
-        interface_info.popup.speed_row.opacity = ((interface_info.state == STATE_UP) and 1.0 or ((interface_info.state == STATE_UNKNOWN) and 0.6 or 0.2))
+        local rows_container_widget = net_info.popup.speed_row:get_children()[1]
+        _set_text(rows_container_widget, 2, convert_bytes_to_bits_per_second(net_info.received))
+        _set_text(rows_container_widget, 3, convert_bytes_to_bits_per_second(net_info.sent))
+        net_info.popup.speed_row.opacity = ((net_info.state == STATE_UP) and 1.0 or ((net_info.state == STATE_UNKNOWN) and 0.6 or 0.2))
     end
 
-    local function update_wifi_popup(interface_info)
+    local function update_wifi_popup(net_info)
         local function _set_text(container, index, value)
             local widget = container:get_children()[index]:get_children()[1]:get_children()[2]:get_children()[1]:get_children()[1]
             widget:set_markup(value)
         end
 
-        local popup_widget = interface_info.popup.info:get_widget()
+        local popup_widget = net_info.popup.wifi:get_widget()
         local rows_container_widget = popup_widget:get_children_by_id("row_container")[1]
-        _set_text(rows_container_widget, 1, string.format(" %s", interface_info.interface))
-        _set_text(rows_container_widget, 2, interface_info.ssid)
-        _set_text(rows_container_widget, 3, interface_info.received_bitrate)
-        _set_text(rows_container_widget, 4, interface_info.sent_bitrate)
+        _set_text(rows_container_widget, 1, string.format(" %s", net_info.interface))
+        _set_text(rows_container_widget, 2, net_info.ssid)
+        _set_text(rows_container_widget, 3, net_info.received_bitrate)
+        _set_text(rows_container_widget, 4, net_info.sent_bitrate)
     end
 
-    local function create_wifi_widget(interface_info)
+    local function create_wifi_widget(net_info)
         local widget = wibox.widget(
             {
                 {
@@ -384,16 +384,16 @@ local function factory(args)
             function(c)
                 c:set_bg(beautiful.bg_normal)
 
-                update_wifi_popup(interface_info)
-                interface_info.popup.info:move_next_to(mouse.current_widget_geometry)
-                interface_info.popup.info.visible = true
+                update_wifi_popup(net_info)
+                net_info.popup.wifi:move_next_to(mouse.current_widget_geometry)
+                net_info.popup.wifi.visible = true
             end
         )
 
         icon_widget_container:connect_signal(
             "mouse::leave",
             function(c)
-                interface_info.popup.info.visible = false
+                net_info.popup.wifi.visible = false
                 c:set_bg(beautiful.bg_reset)
             end
         )
@@ -402,79 +402,81 @@ local function factory(args)
     end
 
     local function update_speed_widget()
-        local netdl_text_widget = widget_network:get_children_by_id("text_netdl")[1]
+        local netdl_text_widget = widget:get_children_by_id("text_netdl")[1]
         netdl_text_widget:set_markup(convert_bytes_to_bits_per_second(info.received))
 
-        local netup_text_widget = widget_network:get_children_by_id("text_netup")[1]
+        local netup_text_widget = widget:get_children_by_id("text_netup")[1]
         netup_text_widget:set_markup(convert_bytes_to_bits_per_second(info.sent))
     end
 
-    local function update_wifi_widget(interface_info)
-        local icon_widget_container = interface_info.widget:get_children_by_id("icon_container")[1]
-        if interface_info.state == STATE_UP then
+    local function update_wifi_widget(net_info)
+        local icon_widget_container = net_info.widget:get_children_by_id("icon_container")[1]
+        if net_info.state == STATE_UP then
             local icon_widget = icon_widget_container:get_children()[1]:get_children()[1]
-            if interface_info.signal >= -30 then
+            if net_info.signal >= -30 then
                 icon_widget:set_image(icons.wifi_excelent)
-            elseif interface_info.signal >= -67 then
+            elseif net_info.signal >= -67 then
                 icon_widget:set_image(icons.wifi_very_good)
-            elseif interface_info.signal >= -70 then
+            elseif net_info.signal >= -70 then
                 icon_widget:set_image(icons.wifi_good)
-            elseif interface_info.signal >= -80 then
+            elseif net_info.signal >= -80 then
                 icon_widget:set_image(icons.wifi_weak)
             else
                 icon_widget:set_image(icons.wifi_none)
             end
-            interface_info.widget.visible = true
+            net_info.widget.visible = true
         else
-            interface_info.widget.visible = false
+            net_info.widget.visible = false
         end
     end
 
-    local function update_connection_info(interface_info)
-        if interface_info.type == "wlan" then
-            if interface_info.state == STATE_UP then
+    local function remove_connection_info(index)
+        local net_info = info.interfaces[index]
+        -- remove widget
+        if net_info.widget then
+            widget:remove_widgets(net_info.widget, true)
+        end
+        -- remove speed row
+        if net_info.popup.speed_row then
+            popup_speed:get_widget():get_children_by_id("row_container")[1]:remove_widgets(net_info.popup.speed_row, true)
+        end
+        -- remove info about the interface since it is different
+        table.remove(info.interfaces, index)
+    end
+
+    local function update_connection_info(net_info)
+        if net_info.type == "wlan" then
+            if net_info.state == STATE_UP then
                 awful.spawn.easy_async(
-                    string.format("iw dev %s link", interface_info.interface),
+                    string.format("iw dev %s link", net_info.interface),
                     function(stdout, _, _, _)
                         -- get wifi connection state info
                         for line in string.gmatch(stdout, "[^\r\n]+") do
-                            interface_info.received_bitrate = string.match(line, "rx bitrate: (.+/s)") or interface_info.received_bitrate
-                            interface_info.sent_bitrate = string.match(line, "tx bitrate: (.+/s)") or interface_info.sent_bitrate
-                            interface_info.signal = tonumber(string.match(line, "signal: (-%d+)") or interface_info.signal)
-                            interface_info.ssid = string.match(line, "SSID: (.+)") or interface_info.ssid
-                        end
-
-                        -- create popup
-                        if not interface_info.popup.info then
-                            interface_info.popup.info = create_wifi_popup()
-                        end
-
-                        -- create widget
-                        if not interface_info.widget then
-                            interface_info.widget = create_wifi_widget(interface_info)
-                            local connection_container_widget = widget_network:get_children_by_id("connection_container")[1]:get_children()[1]
-                            connection_container_widget:add(interface_info.widget)
+                            net_info.received_bitrate = string.match(line, "rx bitrate: (.+/s)") or net_info.received_bitrate
+                            net_info.sent_bitrate = string.match(line, "tx bitrate: (.+/s)") or net_info.sent_bitrate
+                            net_info.signal = tonumber(string.match(line, "signal: (-%d+)") or net_info.signal)
+                            net_info.ssid = string.match(line, "SSID: (.+)") or net_info.ssid
                         end
 
                         -- update popup
-                        if interface_info.popup.info.visible then
-                            update_wifi_popup(interface_info)
+                        if net_info.popup.wifi.visible then
+                            update_wifi_popup(net_info)
                         end
 
                         -- update widget
-                        update_wifi_widget(interface_info)
+                        update_wifi_widget(net_info)
                     end
                 )
             else
                 -- update widget
-                if interface_info.widget then
-                    update_wifi_widget(interface_info)
+                if net_info.widget then
+                    update_wifi_widget(net_info)
                 end
             end
         end
     end
 
-    local function update_connection_state_n_stats(interface_info)
+    local function update_connection_state_n_stats(net_info)
         -- check interface state
         awful.spawn.easy_async(
             string.format("cat \
@@ -482,10 +484,10 @@ local function factory(args)
                 /sys/class/net/%s/operstate \
                 /sys/class/net/%s/statistics/rx_bytes \
                 /sys/class/net/%s/statistics/tx_bytes",
-                interface_info.interface,
-                interface_info.interface,
-                interface_info.interface,
-                interface_info.interface),
+                net_info.interface,
+                net_info.interface,
+                net_info.interface,
+                net_info.interface),
             function(stdout, _, _, _)
                 local carrier = 0
                 local received = 0
@@ -499,14 +501,14 @@ local function factory(args)
                         carrier = v
                     elseif i == 1 then
                         if carrier == 0 then
-                            interface_info.state = STATE_DOWN
+                            net_info.state = STATE_DOWN
                         else
                             if v == "up" then
-                                interface_info.state = STATE_UP
+                                net_info.state = STATE_UP
                             elseif v == "down" then
-                                interface_info.state = STATE_DOWN
+                                net_info.state = STATE_DOWN
                             else
-                                interface_info.state = STATE_UNKNOWN
+                                net_info.state = STATE_UNKNOWN
                             end
                         end
                     elseif i == 2 then
@@ -518,25 +520,18 @@ local function factory(args)
                 end
 
                 -- calculate received and sent values
-                interface_info.received = (received - (interface_info.prev_received or 0)) / timeout
-                interface_info.sent = (sent - (interface_info.prev_sent or 0)) / timeout
-                interface_info.prev_received = received
-                interface_info.prev_sent = sent
-
-                -- create popup row
-                if not interface_info.popup.speed_row then
-                    interface_info.popup.speed_row = create_speed_popup_row(interface_info.interface)
-                    local popup_widget = popup_speed:get_widget():get_children_by_id("row_container")[1]
-                    popup_widget:add(interface_info.popup.speed_row)
-                end
+                net_info.received = (received - (net_info.prev_received or 0)) / timeout
+                net_info.sent = (sent - (net_info.prev_sent or 0)) / timeout
+                net_info.prev_received = received
+                net_info.prev_sent = sent
 
                 -- update popup
-                if interface_info.popup.speed_row.visible then
-                    update_speed_popup(interface_info)
+                if net_info.popup.speed_row.visible then
+                    update_speed_popup(net_info)
                 end
 
                 -- calculate total received and sent
-                if interface_info.state == STATE_UP then
+                if net_info.state == STATE_UP then
                     local total_received = 0
                     local total_sent = 0
                     for _, v in pairs(info.interfaces) do
@@ -564,72 +559,77 @@ local function factory(args)
                 local i = 1
                 for interface in stdout:gmatch("[^\r\n]+") do
                     if interface ~= "lo" then
-                        -- if there is already info about the interface
-                        if info.interfaces[i] then
-                            local interface_info = info.interfaces[i]
-                            -- continue since it is the same interface
-                            if interface == interface_info.interface then
-                                -- check interface state and stats
-                                update_connection_state_n_stats(interface_info)
-
-                                -- check interface connection info
-                                update_connection_info(interface_info)
-
-                                -- check interface connection speed
-                                i = i + 1
-                            else
-                                -- remove info about the interface since it is different
-                                table.remove(info.interfaces, i)
-                            end
-                        else
+                        if not info.interfaces[i] then
                             -- add new interface info since there isn't any
                             info.interfaces[i] =
                                 {
                                     interface = interface,
+                                    popup =
+                                        {
+                                            speed_row = create_speed_popup_row(interface)
+                                        },
                                     received = 0,
-                                    popup = {},
                                     sent = 0,
                                     state = STATE_DOWN
                                 }
-                            -- request interface type for the interface
-                            local index = i
+                            local net_info = info.interfaces[i]
+
+                            -- add popup row to layout
+                            popup_speed:get_widget():get_children_by_id("row_container")[1]:add(net_info.popup.speed_row)
+
+                            -- request interface type
                             awful.spawn.easy_async(
                                 string.format("cat /sys/class/net/%s/uevent", interface),
                                 function(stdout, _, _, _)
-                                    info.interfaces[index].type = string.match(stdout, "DEVTYPE=(%w+)") or "ethernet"
+                                    net_info.type = string.match(stdout, "DEVTYPE=(%w+)") or "ethernet"
+                                    if net_info.type == "wlan" then
+                                        -- create wifi popup
+                                        net_info.popup.wifi = create_wifi_popup()
+
+                                        -- create wifi widget
+                                        net_info.widget = create_wifi_widget(net_info)
+                                        local connection_container_widget = widget:get_children_by_id("connection_container")[1]:get_children()[1]
+                                        connection_container_widget:add(net_info.widget)
+                                    end
                                 end
                             )
+                        end
+
+                        local net_info = info.interfaces[i]
+
+                        -- continue since it is the same interface
+                        if interface == net_info.interface then
+                            -- check interface state and stats
+                            update_connection_state_n_stats(net_info)
+
+                            -- check interface connection info
+                            update_connection_info(net_info)
+
+                            -- continue
                             i = i + 1
+                        else
+                            -- remove interfaces that are not in the system anymore
+                            remove_connection_info(i)
                         end
                     end
                 end
 
-                -- remove interfaces that are not in the system anymore
                 for j = #info.interfaces, i, -1 do
-                    -- remove widget
-                    if info.interfaces[j].widget then
-                        widget_network:remove_widgets(info.interfaces[j].widget, true)
-                    end
-                    -- remove speed row
-                    if info.interfaces[j].popup.speed_row then
-                        popup_speed:get_widget():get_children_by_id("row_container")[1]:remove_widgets(info.interfaces[j].popup.speed_row, true)
-                    end
-                    table.remove(info.interfaces, j)
+                    -- remove interfaces that are not in the system anymore
+                    remove_connection_info(j)
                 end
             end
         )
     end
 
-    local speed_container_widget = widget_network:get_children_by_id("speed_container")[1]
+    local speed_container_widget = widget:get_children_by_id("speed_container")[1]
     speed_container_widget:connect_signal(
         "mouse::enter",
         function(c)
             c:set_bg(beautiful.bg_normal)
 
             for _, v in pairs(info.interfaces) do
-                if v.popup.speed_row then
-                    update_speed_popup(v)
-                end
+                update_speed_popup(v)
             end
             popup_speed:move_next_to(mouse.current_widget_geometry)
             popup_speed.visible = true
@@ -654,7 +654,7 @@ local function factory(args)
         }
     )
 
-    return widget_network
+    return widget
 end
 -- }}}
 
