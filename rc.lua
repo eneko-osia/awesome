@@ -9,7 +9,6 @@ local awful_hotkeys_popup   = require("awful.hotkeys_popup")
                               require("awful.hotkeys_popup.keys")
 local beautiful             = require("beautiful")
 local gears                 = require("gears")
-local gears_timer           = require("gears.timer")
 local lain                  = require("lain")
 local menu                  = require("menu")
 local menubar               = require("menubar")
@@ -239,7 +238,6 @@ local launcher_menu = awful.widget.launcher(
 function startup_programs()
     awful.spawn("discord")
     awful.spawn("librewolf")
-    awful.spawn("nm-applet")
     awful.spawn("slack")
     awful.spawn("steam")
     awful.spawn("zoom")
@@ -253,8 +251,7 @@ quake = lain.util.quake(
         app         = TERMINAL,
         extra       = "-fg white -bg black",
         followtag   = true,
-        height      = 0.5,
-        onlyone     = true
+        height      = 0.5
     }
 )
 
@@ -376,147 +373,184 @@ local spr       = wibox.widget.imagebox(beautiful.spr)
 local spr4px    = wibox.widget.imagebox(beautiful.spr4px)
 
 -- Battery widget
-local battery_widget = widget_battery({
-    icons = 
-        {
-            ac = beautiful.widget.battery_ac,
-            empty = beautiful.widget.battery_empty,
-            full = beautiful.widget.battery_full,
-            logo = beautiful.widget.ssd,
-            low = beautiful.widget.battery_low
-        }
-})
+local battery_widget = widget_battery(
+    {
+        icons =
+            {
+                ac = beautiful.widget.battery_ac,
+                empty = beautiful.widget.battery_empty,
+                full = beautiful.widget.battery_full,
+                logo = beautiful.widget.ssd,
+                low = beautiful.widget.battery_low
+            }
+    }
+)
 
 -- Clock widget
-local clock_widget = widget_clock({
-    icons = 
-        {
-            logo = beautiful.widget.clock
-        }
-})
+local clock_widget = widget_clock(
+    {
+        icons =
+            {
+                logo = beautiful.widget.clock
+            }
+    }
+)
 
 -- Cpu widget
-local cpu_widget = widget_cpu({
-    icons = 
-        {
-            logo = beautiful.widget.cpu
-        },
-    terminal = TERMINAL
-})
+local cpu_widget = widget_cpu(
+    {
+        icons =
+            {
+                logo = beautiful.widget.cpu
+            },
+        terminal = TERMINAL,
+        timeout = 2
+    }
+)
 
 -- File system widget
-local file_system_widget = widget_file_system({
-    icons = 
-        {
-            logo = beautiful.widget.ssd
-        },
-    mount_default = "/home",
-    mounts = 
-        {
-            "/",
-            "/home",
-            "/mnt/data",
-            "/mnt/games"
-        }
-})
+local file_system_widget = widget_file_system(
+    {
+        icons =
+            {
+                logo = beautiful.widget.ssd
+            },
+        mount_default = "/home",
+        mounts =
+            {
+                "/",
+                "/home",
+                "/mnt/data",
+                "/mnt/games",
+                "/mnt/usb"
+            },
+        timeout = 30
+    }
+)
 
 -- Keyboard widget
 local keyboard_widget = awful.widget.keyboardlayout()
 
 -- Memory widget
-local memory_widget = widget_memory({
-    icons = 
-        {
-            logo = beautiful.widget.mem
-        },
-    terminal = TERMINAL
-})
+local memory_widget = widget_memory(
+    {
+        icons =
+            {
+                logo = beautiful.widget.mem
+            },
+        terminal = TERMINAL,
+        timeout = 2
+    }
+)
 
 -- Microphone widget
-local microphone_widget = widget_volume({
-    device_type = "source",
-    icons = 
-        {
-            high = beautiful.widget.microphone_high,
-            low = beautiful.widget.microphone_low,
-            medium = beautiful.widget.microphone_medium,
-            muted = beautiful.widget.microphone_muted
-        }
-})
+local microphone_widget = widget_volume(
+    {
+        device_type = "source",
+        icons =
+            {
+                high = beautiful.widget.microphone_high,
+                low = beautiful.widget.microphone_low,
+                medium = beautiful.widget.microphone_medium,
+                muted = beautiful.widget.microphone_muted
+            },
+        timeout = 2
+    }
+)
 
 -- Network widget
-local network_widget = widget_network({
-    icons = 
-        {
-            netdl = beautiful.widget.netdl,
-            netup = beautiful.widget.netul
-        }
-})
+local network_widget = widget_network(
+    {
+        icons =
+            {
+                eth = beautiful.widget.eth,
+                netdl = beautiful.widget.netdl,
+                netup = beautiful.widget.netul,
+                wifi = beautiful.widget.wifi,
+                wifi_excellent = beautiful.widget.wifi_excellent,
+                wifi_very_good = beautiful.widget.wifi_very_good,
+                wifi_good = beautiful.widget.wifi_good,
+                wifi_weak = beautiful.widget.wifi_weak,
+                wifi_none = beautiful.widget.wifi_none
+            },
+        timeout = 2
+    }
+)
 
 -- Spotify widget
-local spotify_widget = widget_spotify({
-    icons = 
-        {
-            logo = beautiful.mpd_spotify,
-            next = beautiful.mpd_next,
-            pause = beautiful.mpd_pause,
-            play = beautiful.mpd_play,
-            prev = beautiful.mpd_prev
-        }
-})
+local spotify_widget = widget_spotify(
+    {
+        icons =
+            {
+                logo = beautiful.mpd_spotify,
+                next = beautiful.mpd_next,
+                pause = beautiful.mpd_pause,
+                play = beautiful.mpd_play,
+                prev = beautiful.mpd_prev
+            }
+    }
+)
 
 -- Volume widget
-local volume_widget = widget_volume({
-    device_type = "sink",
-    icons = 
-        {
-            high = beautiful.widget.volume_high,
-            low = beautiful.widget.volume_low,
-            medium = beautiful.widget.volume_medium,
-            muted = beautiful.widget.volume_muted
-        }
-})
+local volume_widget = widget_volume(
+    {
+        device_type = "sink",
+        icons =
+            {
+                high = beautiful.widget.volume_high,
+                low = beautiful.widget.volume_low,
+                medium = beautiful.widget.volume_medium,
+                muted = beautiful.widget.volume_muted
+            },
+        timeout = 2
+    }
+)
 
 -- Vpn widget
-local vpn_widget = widget_vpn({
-    icons = 
-        {
-            connected = "/usr/share/icons/Arc/status/symbolic/network-vpn-symbolic.svg",
-            diconnected = "/usr/share/icons/Arc/status/symbolic/network-vpn-acquiring-symbolic.svg"
-        }
-})
+local vpn_widget = widget_vpn(
+    {
+        icons =
+            {
+                connected = beautiful.widget.vpn_connected,
+                diconnected = beautiful.widget.vpn_disconnected
+            },
+        timeout = 2
+    }
+)
 
 function set_widgets(s)
     -- Prompt box
     s.promptbox =
-        awful.widget.prompt({
-            prompt = " Execute: "
-        })
+        awful.widget.prompt(
+            {
+                prompt = " Execute: "
+            }
+        )
 
     -- Layout box
     s.layoutbox = awful.widget.layoutbox(s)
     s.layoutbox:buttons(
         gears.table.join(
             awful.button(
-                { },
+                {},
                 MOUSE_LEFT_BUTTON,
                 function () awful.layout.inc( 1) end
             ),
 
             awful.button(
-                { },
+                {},
                 MOUSE_RIGHT_BUTTON,
                 function () awful.layout.inc(-1) end
             ),
 
             awful.button(
-                { },
+                {},
                 MOUSE_UP_BUTTON,
                 function () awful.layout.inc( 1) end
             ),
 
             awful.button(
-                { },
+                {},
                 MOUSE_DOWN_BUTTON,
                 function () awful.layout.inc(-1) end
             )
@@ -524,272 +558,286 @@ function set_widgets(s)
     )
 
     -- Tag list
-    s.tag_list = awful.widget.taglist {
-        screen  = s,
-        filter  = awful.widget.taglist.filter.all,
-        buttons = taglist_buttons
-    }
+    s.tag_list = awful.widget.taglist(
+        {
+            screen  = s,
+            filter  = awful.widget.taglist.filter.all,
+            buttons = taglist_buttons
+        }
+    )
 
     -- Task list
-    s.task_list = awful.widget.tasklist {
-        screen  = s,
-        filter  = awful.widget.tasklist.filter.currenttags,
-        buttons = tasklist_buttons
-    }
+    s.task_list = awful.widget.tasklist(
+        {
+            screen  = s,
+            filter  = awful.widget.tasklist.filter.currenttags,
+            buttons = tasklist_buttons
+        }
+    )
 
     -- Wibox
     s.top_wibox = awful.wibar({ position = "top", screen = s, height = 22, bg = beautiful.panel, fg = beautiful.fg_normal })
-    if (s == screen.primary) then
-        s.top_wibox:setup {
-            layout = wibox.layout.align.horizontal,
+    if s == screen.primary then
+        s.top_wibox:setup(
             {
-                -- Left widgets
-                layout = wibox.layout.fixed.horizontal,
-                -- Separator
-                spr,
-                spr4px,
-                spr,
-                -- Tag list
-                s.tag_list,
-                -- Separator
-                spr,
-                spr4px,
-                spr,
-                -- Music
-                spotify_widget,
-                -- Separator
-                spr,
-                spr4px,
-                spr,
-                -- Volume
-                volume_widget,
-                -- Separator
-                spr,
-                -- Microphone
-                microphone_widget,
-                -- Separator
-                spr,
-                spr4px,
-                spr,
-            },
-            {
-                -- Middle widget
-                layout = wibox.layout.fixed.horizontal,
-            },
-            {
-                -- Right widgets
-                layout = wibox.layout.fixed.horizontal,
-                -- Separator
-                spr,
-                spr4px,
-                spr,
-                -- Cpu
-                cpu_widget,
-                -- Separator
-                spr,
-                -- Memory
-                memory_widget,
-                -- Separator
-                spr,
-                -- File system widget
-                file_system_widget,
-                -- Separator
-                spr,
-                -- Battery widget
-                battery_widget,
-                -- Separator
-                spr,
-                spr4px,
-                spr,
-                -- Network
-                network_widget,
-                -- Separator
-                spr,
-                -- Vpn
-                vpn_widget,
-                -- Separator
-                spr,
-                spr4px,
-                spr,
-                -- Keyboard
-                keyboard_widget,
-                -- Separator
-                spr,
-                -- Clock
-                clock_widget,
-                -- Separator
-                spr,
-                spr4px,
-                spr,
-            -- Layout box
-                s.layoutbox,
-            },
-        }
+                layout = wibox.layout.align.horizontal,
+                {
+                    -- Left widgets
+                    layout = wibox.layout.fixed.horizontal,
+                    -- Separator
+                    spr,
+                    spr4px,
+                    spr,
+                    -- Tag list
+                    s.tag_list,
+                    -- Separator
+                    spr,
+                    spr4px,
+                    spr,
+                    -- Music
+                    spotify_widget,
+                    -- Separator
+                    spr,
+                    spr4px,
+                    spr,
+                    -- Volume
+                    volume_widget,
+                    -- Separator
+                    spr,
+                    -- Microphone
+                    microphone_widget,
+                    -- Separator
+                    spr,
+                    spr4px,
+                    spr
+                },
+                {
+                    -- Middle widget
+                    layout = wibox.layout.fixed.horizontal
+                },
+                {
+                    -- Right widgets
+                    layout = wibox.layout.fixed.horizontal,
+                    -- Separator
+                    spr,
+                    spr4px,
+                    spr,
+                    -- Cpu
+                    cpu_widget,
+                    -- Separator
+                    spr,
+                    -- Memory
+                    memory_widget,
+                    -- Separator
+                    spr,
+                    -- File system widget
+                    file_system_widget,
+                    -- Separator
+                    -- spr,
+                    -- Battery widget
+                    -- battery_widget,
+                    -- Separator
+                    spr,
+                    spr4px,
+                    spr,
+                    -- Network
+                    network_widget,
+                    -- Separator
+                    spr,
+                    -- Vpn
+                    vpn_widget,
+                    -- Separator
+                    spr,
+                    spr4px,
+                    spr,
+                    -- Keyboard
+                    keyboard_widget,
+                    -- Separator
+                    spr,
+                    -- Clock
+                    clock_widget,
+                    -- Separator
+                    spr,
+                    spr4px,
+                    spr,
+                    -- Layout box
+                    s.layoutbox
+                }
+            }
+        )
     else
-        s.top_wibox:setup {
-            layout = wibox.layout.align.horizontal,
+        s.top_wibox:setup(
             {
-                -- Left widgets
-                layout = wibox.layout.fixed.horizontal,
-                -- Separator
-                spr,
-                spr4px,
-                spr,
-                -- Tag list
-                s.tag_list,
-                -- Separator
-                spr,
-                spr4px,
-                spr,
-                -- Volume
-                volume_widget,
-                -- Separator
-                spr,
-                -- Microphone
-                microphone_widget,
-                -- Separator
-                spr,
-                spr4px,
-                spr,
-            },
-            {
-                -- Middle widget
-                layout = wibox.layout.fixed.horizontal,
-            },
-            {
-                -- Right widgets
-                layout = wibox.layout.fixed.horizontal,
-                -- Separator
-                spr,
-                spr4px,
-                spr,
-                -- Cpu
-                cpu_widget,
-                -- Separator
-                spr,
-                -- Memory
-                memory_widget,
-                -- Separator
-                spr,
-                -- File system widget
-                file_system_widget,
-                -- Separator
-                spr,
-                -- Battery widget
-                battery_widget,
-                -- Separator
-                spr,
-                spr4px,
-                spr,
-                -- Network
-                network_widget,
-                -- Separator
-                spr,
-                -- Vpn
-                vpn_widget,
-                -- Separator
-                spr,
-                spr4px,
-                spr,
-                -- Keyboard
-                keyboard_widget,
-                -- Separator
-                spr,
-                -- Clock
-                clock_widget,
-                -- Separator
-                spr,
-                spr4px,
-                spr,
-              -- Layout box
-                s.layoutbox,
-            },
-        }
+                layout = wibox.layout.align.horizontal,
+                {
+                    -- Left widgets
+                    layout = wibox.layout.fixed.horizontal,
+                    -- Separator
+                    spr,
+                    spr4px,
+                    spr,
+                    -- Tag list
+                    s.tag_list,
+                    -- Separator
+                    spr,
+                    spr4px,
+                    spr,
+                    -- Volume
+                    volume_widget,
+                    -- Separator
+                    spr,
+                    -- Microphone
+                    microphone_widget,
+                    -- Separator
+                    spr,
+                    spr4px,
+                    spr
+                },
+                {
+                    -- Middle widget
+                    layout = wibox.layout.fixed.horizontal
+                },
+                {
+                    -- Right widgets
+                    layout = wibox.layout.fixed.horizontal,
+                    -- Separator
+                    spr,
+                    spr4px,
+                    spr,
+                    -- Cpu
+                    cpu_widget,
+                    -- Separator
+                    spr,
+                    -- Memory
+                    memory_widget,
+                    -- Separator
+                    spr,
+                    -- File system widget
+                    file_system_widget,
+                    -- Separator
+                    -- spr,
+                    -- Battery widget
+                    -- battery_widget,
+                    -- Separator
+                    spr,
+                    spr4px,
+                    spr,
+                    -- Network
+                    network_widget,
+                    -- Separator
+                    spr,
+                    -- Vpn
+                    vpn_widget,
+                    -- Separator
+                    spr,
+                    spr4px,
+                    spr,
+                    -- Keyboard
+                    keyboard_widget,
+                    -- Separator
+                    spr,
+                    -- Clock
+                    clock_widget,
+                    -- Separator
+                    spr,
+                    spr4px,
+                    spr,
+                    -- Layout box
+                    s.layoutbox
+                }
+            }
+        )
     end
 
     -- Bottom box
     s.bottom_wibox = awful.wibar({ position = "bottom", screen = s, height = 22, bg = beautiful.panel, fg = beautiful.fg_normal })
-    if (s == screen.primary) then
-        s.bottom_wibox:setup {
-            buttons = menu_bar_buttons,
-            layout = wibox.layout.align.horizontal,
+    if s == screen.primary then
+        s.bottom_wibox:setup(
             {
-                -- Left widgets
-                layout = wibox.layout.fixed.horizontal,
-                -- Launcher menu
-                launcher_menu,
-                -- Separator
-                spr,
-                spr4px,
-            },
-            {
-                -- Middle widget
-                layout = wibox.layout.fixed.horizontal,
-                -- Task list
-                s.task_list,
-            },
-            {
-                -- Right widgets
-                layout = wibox.layout.fixed.horizontal,
-                -- Separator
-                spr,
-                spr4px,
-                spr,
-                -- Prompt box
-                s.promptbox,
-                -- Separator
-                spr,
-                spr4px,
-                spr,
-                -- System tray
-                wibox.widget.systray(),
-                -- Separator
-                spr,
-                spr4px,
-            },
-        }
+                buttons = menu_bar_buttons,
+                layout = wibox.layout.align.horizontal,
+                {
+                    -- Left widgets
+                    layout = wibox.layout.fixed.horizontal,
+                    -- Launcher menu
+                    launcher_menu,
+                    -- Separator
+                    spr,
+                    spr4px
+                },
+                {
+                    -- Middle widget
+                    layout = wibox.layout.fixed.horizontal,
+                    -- Task list
+                    s.task_list
+                },
+                {
+                    -- Right widgets
+                    layout = wibox.layout.fixed.horizontal,
+                    -- Separator
+                    spr,
+                    spr4px,
+                    spr,
+                    -- Prompt box
+                    s.promptbox,
+                    -- Separator
+                    spr,
+                    spr4px,
+                    spr,
+                    -- System tray
+                    wibox.widget.systray(),
+                    -- Separator
+                    spr,
+                    spr4px
+                }
+            }
+        )
     else
-        s.bottom_wibox:setup {
-            buttons = menu_bar_buttons,
-            layout = wibox.layout.align.horizontal,
+        s.bottom_wibox:setup(
             {
-                -- Left widgets
-                layout = wibox.layout.fixed.horizontal,
-                -- Launcher menu
-                launcher_menu,
-                -- Separator
-                spr,
-                spr4px,
-            },
-            {
-                -- Middle widget
-                layout = wibox.layout.fixed.horizontal,
-                -- Task list
-                s.task_list,
-            },
-            {
-                -- Right widgets
-                layout = wibox.layout.fixed.horizontal,
-                -- Separator
-                spr,
-                spr4px,
-                spr,
-                -- Prompt box
-                s.promptbox,
-                -- Separator
-                spr,
-                spr4px,
-            },
-        }
+                buttons = menu_bar_buttons,
+                layout = wibox.layout.align.horizontal,
+                {
+                    -- Left widgets
+                    layout = wibox.layout.fixed.horizontal,
+                    -- Launcher menu
+                    launcher_menu,
+                    -- Separator
+                    spr,
+                    spr4px
+                },
+                {
+                    -- Middle widget
+                    layout = wibox.layout.fixed.horizontal,
+                    -- Task list
+                    s.task_list
+                },
+                {
+                    -- Right widgets
+                    layout = wibox.layout.fixed.horizontal,
+                    -- Separator
+                    spr,
+                    spr4px,
+                    spr,
+                    -- Prompt box
+                    s.promptbox,
+                    -- Separator
+                    spr,
+                    spr4px
+                }
+            }
+        )
     end
 end
 -- }}}
 
 -- {{{ Mouse bindings definitions
-root.buttons(gears.table.join(
-    awful.button({ }, MOUSE_LEFT_BUTTON, function () main_menu:hide() end),
-    awful.button({ }, MOUSE_RIGHT_BUTTON, function () main_menu:show() end)
-))
+root.buttons(
+    gears.table.join(
+        awful.button({}, MOUSE_LEFT_BUTTON, function () main_menu:hide() end),
+        awful.button({}, MOUSE_RIGHT_BUTTON, function () main_menu:show() end)
+    )
+)
 -- }}}
 
 -- {{{ Key bindings definitions
@@ -1009,7 +1057,7 @@ end
 
 clientbuttons = gears.table.join(
     awful.button(
-        { },
+        {},
         MOUSE_LEFT_BUTTON,
         function (c)
             c:emit_signal("request::activate", "mouse_click", { raise = true })
@@ -1088,282 +1136,305 @@ root.keys(globalkeys)
 
 -- {{{ Rules definitions
 awful.rules.rules =
-{
     {
-        rule =
         {
+            rule =
+                {
 
+                },
+            properties =
+                {
+                    border_color    = beautiful.border_normal,
+                    border_width    = beautiful.border_width,
+                    focus           = awful.client.focus.filter,
+                    raise           = true,
+                    buttons         = clientbuttons,
+                    keys            = clientkeys,
+                    screen          = awful.screen.preferred,
+                    placement       = awful.placement.no_overlap+awful.placement.no_offscreen
+                }
         },
-        properties =
-        {
-            border_color    = beautiful.border_normal,
-            border_width    = beautiful.border_width,
-            focus           = awful.client.focus.filter,
-            raise           = true,
-            buttons         = clientbuttons,
-            keys            = clientkeys,
-            screen          = awful.screen.preferred,
-            placement       = awful.placement.no_overlap+awful.placement.no_offscreen
-        }
-    },
 
-    {
-        rule_any =
         {
-            type = { "dialog", "normal" }
+            rule_any =
+                {
+                    type = { "dialog", "normal" }
+                },
+            properties =
+                {
+                    floating = true,
+                    titlebars_enabled = true
+                },
+            callback = function (c)
+                awful.placement.centered(c,nil)
+            end
         },
-        properties =
-        {
-            floating = true,
-            titlebars_enabled = true
-        },
-        callback = function (c)
-            awful.placement.centered(c,nil)
-        end
-    },
 
-    {
-        rule =
         {
-            class = "[Bb]attle.net"
+            rule =
+                {
+                    class = "[Bb]attle.net"
+                },
+            properties =
+                {
+                    screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
+                    tag = tags.names[tags.TAG_EXTRA]
+                }
         },
-        properties =
-        {
-            screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
-            tag = tags.names[tags.TAG_EXTRA]
-        }
-    },
 
-    {
-        rule =
         {
-            class = "[Ll]ibre[Ww]olf"
+            rule =
+                {
+                    class = "[Ll]ibre[Ww]olf"
+                },
+            properties =
+                {
+                    floating = false,
+                    screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
+                    tag = tags.names[tags.TAG_WEB],
+                    titlebars_enabled = false
+                }
         },
-        properties =
-        {
-            floating = false,
-            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-            tag = tags.names[tags.TAG_WEB],
-            titlebars_enabled = false
-        }
-    },
 
-    {
-        rule =
         {
-            class = "[Vv][Ss][Cc]odium"
+            rule =
+                {
+                    class = "[Vv][Ss][Cc]odium"
+                },
+            properties =
+                {
+                    floating = false,
+                    screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
+                    tag = tags.names[tags.TAG_DEV],
+                    titlebars_enabled = false
+                }
         },
-        properties =
-        {
-            floating = false,
-            screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
-            tag = tags.names[tags.TAG_DEV],
-            titlebars_enabled = false
-        }
-    },
 
-    {
-        rule =
         {
-            class = "[Dd]iscord"
+            rule =
+                {
+                    class = "[Dd]iscord"
+                },
+            properties =
+                {
+                    floating = false,
+                    screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
+                    tag = tags.names[tags.TAG_CHAT],
+                    titlebars_enabled = false
+                }
         },
-        properties =
-        {
-            floating = false,
-            screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
-            tag = tags.names[tags.TAG_CHAT],
-            titlebars_enabled = false
-        }
-    },
 
-    {
-        rule =
         {
-            class = "[Pp]arsecd"
+            rule =
+                {
+                    class = "[Pp]arsecd"
+                },
+            properties =
+                {
+                    floating = false,
+                    screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
+                    tag = tags.names[tags.TAG_PARSEC],
+                    titlebars_enabled = false
+                }
         },
-        properties =
-        {
-            floating = false,
-            screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
-            tag = tags.names[tags.TAG_PARSEC],
-            titlebars_enabled = false
-        }
-    },
 
-    {
-        rule =
         {
-            class = "[Ss]lack"
+            rule =
+                {
+                    class = "[Ss]lack"
+                },
+            properties =
+                {
+                    floating = false,
+                    screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
+                    tag = tags.names[tags.TAG_CHAT],
+                    titlebars_enabled = false
+                }
         },
-        properties =
-        {
-            floating = false,
-            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-            tag = tags.names[tags.TAG_CHAT],
-            titlebars_enabled = false
-        }
-    },
 
-    {
-        rule =
         {
-            class = "[Ss]potify"
+            rule =
+                {
+                    class = "[Ss]potify"
+                },
+            properties =
+                {
+                    floating = false,
+                    screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
+                    tag = tags.names[tags.TAG_MUSIC],
+                    titlebars_enabled = false
+                }
         },
-        properties =
-        {
-            floating = false,
-            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-            tag = tags.names[tags.TAG_MUSIC],
-            titlebars_enabled = false
-        }
-    },
 
-    {
-        rule =
         {
-            class = "[Ss]team"
+            rule =
+                {
+                    class = "[Ss]team"
+                },
+            properties =
+                {
+                    screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
+                    tag = tags.names[tags.TAG_EXTRA]
+                }
         },
-        properties =
-        {
-            screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
-            tag = tags.names[tags.TAG_EXTRA]
-        }
-    },
 
-    {
-        rule =
         {
-            class = "[Xx][Tt]erm"
+            rule =
+                {
+                    class = "[Xx][Tt]erm"
+                },
+            properties =
+                {
+                    floating = false,
+                    titlebars_enabled = false
+                }
         },
-        properties =
-        {
-            floating = false,
-            titlebars_enabled = false
-        }
-    },
 
-    {
-        rule =
         {
-            class = "[Zz]oom"
+            rule =
+                {
+                    class = "[Zz]oom"
+                },
+            properties =
+                {
+                    floating = false,
+                    screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
+                    tag = tags.names[tags.TAG_ZOOM]
+                }
         },
-        properties =
-        {
-            floating = false,
-            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-            tag = tags.names[tags.TAG_ZOOM]
-        }
-    },
 
-    {
-        rule =
         {
-            class = "[Zz]oom[Ww]ebview[Hh]ost"
-        },
-        properties =
-        {
-            floating = false,
-            screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-            tag = tags.names[tags.TAG_ZOOM]
+            rule =
+                {
+                    class = "[Zz]oom[Ww]ebview[Hh]ost"
+                },
+            properties =
+                {
+                    floating = false,
+                    screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
+                    tag = tags.names[tags.TAG_ZOOM]
+                }
         }
     }
-}
 -- }}}
 
 -- {{{ Signals definitions
 -- Signal function to execute when a new client appears.
-client.connect_signal("manage", function (c)
-    -- Set the windows at the slave,
-    -- i.e. put it at the end of others instead of setting it master.
-    -- if not awesome.startup then awful.client.setslave(c) end
+client.connect_signal(
+    "manage",
+    function (c)
+        -- Set the windows at the slave,
+        -- i.e. put it at the end of others instead of setting it master.
+        -- if not awesome.startup then awful.client.setslave(c) end
 
-    if awesome.startup
-      and not c.size_hints.user_position
-      and not c.size_hints.program_position then
-        -- Prevent clients from being unreachable after screen count changes.
-        awful.placement.no_offscreen(c)
+        if awesome.startup
+        and not c.size_hints.user_position
+        and not c.size_hints.program_position then
+            -- Prevent clients from being unreachable after screen count changes.
+            awful.placement.no_offscreen(c)
+        end
     end
-end)
+)
 
 -- Add a titlebar if titlebars_enabled is set to true in the rules.
-client.connect_signal("request::titlebars", function(c)
-    local clicks = 0
-    -- buttons for the titlebar
-    local buttons = gears.table.join(
-        awful.button(
-            { },
-            MOUSE_LEFT_BUTTON,
-            function()
-                clicks = clicks + 1
-                if clicks == 2 then
-                    c.maximized = not c.maximized
-                else
-                    c:emit_signal("request::activate", "titlebar", { raise = true })
-                    awful.mouse.client.move(c)
+client.connect_signal(
+    "request::titlebars",
+    function(c)
+        local clicks = 0
+        -- buttons for the titlebar
+        local buttons = gears.table.join(
+            awful.button(
+                {},
+                MOUSE_LEFT_BUTTON,
+                function()
+                    clicks = clicks + 1
+                    if clicks == 2 then
+                        c.maximized = not c.maximized
+                    else
+                        c:emit_signal("request::activate", "titlebar", { raise = true })
+                        awful.mouse.client.move(c)
+                    end
+
+                    gears.timer.weak_start_new(250 / 1000, function() clicks = 0 end)
                 end
+            ),
 
-                gears_timer.weak_start_new(250 / 1000, function() clicks = 0 end)
-            end
-        ),
+            awful.button(
+                {},
+                MOUSE_MIDDLE_BUTTON,
+                function()
+                    c:kill()
+                end
+            ),
 
-        awful.button(
-            { },
-            MOUSE_MIDDLE_BUTTON,
-            function()
-                c:kill()
-            end
-        ),
-
-        awful.button(
-            { },
-            MOUSE_RIGHT_BUTTON,
-            function()
-                c:emit_signal("request::activate", "titlebar", { raise = true })
-                awful.mouse.client.resize(c)
-            end
+            awful.button(
+                {},
+                MOUSE_RIGHT_BUTTON,
+                function()
+                    c:emit_signal("request::activate", "titlebar", { raise = true })
+                    awful.mouse.client.resize(c)
+                end
+            )
         )
-    )
 
-    awful.titlebar(c) : setup {
-        {
-            -- Left
-            awful.titlebar.widget.iconwidget(c),
-            buttons = buttons,
-            layout  = wibox.layout.fixed.horizontal
-        },
-
-        {
-            -- Middle
+        awful.titlebar(c):setup(
             {
-                -- Title
-                align  = "center",
-                widget = awful.titlebar.widget.titlewidget(c)
-            },
-            buttons = buttons,
-            layout  = wibox.layout.flex.horizontal
-        },
-
-        {
-            -- Right
-            awful.titlebar.widget.minimizebutton(c),
-            awful.titlebar.widget.maximizedbutton(c),
-            awful.titlebar.widget.closebutton(c),
-            layout = wibox.layout.fixed.horizontal()
-        },
-        layout = wibox.layout.align.horizontal
-    }
-end)
+                {
+                    -- Left
+                    awful.titlebar.widget.iconwidget(c),
+                    buttons = buttons,
+                    layout  = wibox.layout.fixed.horizontal
+                },
+                {
+                    -- Middle
+                    {
+                        -- Title
+                        align  = "center",
+                        widget = awful.titlebar.widget.titlewidget(c)
+                    },
+                    buttons = buttons,
+                    layout  = wibox.layout.flex.horizontal
+                },
+                {
+                    -- Right
+                    awful.titlebar.widget.minimizebutton(c),
+                    awful.titlebar.widget.maximizedbutton(c),
+                    awful.titlebar.widget.closebutton(c),
+                    layout = wibox.layout.fixed.horizontal()
+                },
+                layout = wibox.layout.align.horizontal
+            }
+        )
+    end
+)
 
 -- Enable sloppy focus, so that focus follows mouse.
-client.connect_signal("mouse::enter", function(c)
-    c:emit_signal("request::activate", "mouse_enter", { raise = false })
-end)
+client.connect_signal(
+    "mouse::enter",
+    function(c)
+        c:emit_signal("request::activate", "mouse_enter", { raise = false })
+    end
+)
 
-client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
-client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
+client.connect_signal(
+    "focus",
+    function(c)
+        c.border_color = beautiful.border_focus
+    end
+)
+
+client.connect_signal(
+    "unfocus",
+    function(c)
+        c.border_color = beautiful.border_normal
+    end
+)
 
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
-screen.connect_signal("property::geometry", set_wallpaper)
+screen.connect_signal(
+    "property::geometry",
+    set_wallpaper
+)
 
 awful.screen.connect_for_each_screen(
     function(s)
