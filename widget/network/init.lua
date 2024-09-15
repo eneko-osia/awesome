@@ -640,6 +640,7 @@ local function factory(args)
         )
     end
 
+    -- signals
     local speed_container_widget = widget:get_children_by_id("speed_container")[1]
     speed_container_widget:connect_signal(
         "mouse::enter",
