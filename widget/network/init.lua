@@ -559,6 +559,13 @@ local function factory(args)
                 local i = 1
                 for interface in stdout:gmatch("[^\r\n]+") do
                     if interface ~= "lo" then
+                        if info.interfaces[i] then
+                            -- remove interfaces since it is not the same interface
+                            if interface ~= info.interfaces[i].interface then
+                                remove_connection_info(i)
+                            end
+                        end
+
                         if not info.interfaces[i] then
                             -- add new interface info since there isn't any
                             info.interfaces[i] =
@@ -597,20 +604,14 @@ local function factory(args)
 
                         local net_info = info.interfaces[i]
 
-                        -- continue since it is the same interface
-                        if interface == net_info.interface then
-                            -- check interface state and stats
-                            update_connection_state_n_stats(net_info)
+                        -- check interface state and stats
+                        update_connection_state_n_stats(net_info)
 
-                            -- check interface connection info
-                            update_connection_info(net_info)
+                        -- check interface connection info
+                        update_connection_info(net_info)
 
-                            -- continue
-                            i = i + 1
-                        else
-                            -- remove interfaces that are not in the system anymore
-                            remove_connection_info(i)
-                        end
+                        -- continue
+                        i = i + 1
                     end
                 end
 
