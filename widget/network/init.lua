@@ -276,6 +276,7 @@ local function factory(args)
                                 {
                                     create_wifi_popup_row("interface"),
                                     create_wifi_popup_row("ssid"),
+                                    create_wifi_popup_row("ip"),
                                     create_wifi_popup_row("received bitrate"),
                                     create_wifi_popup_row("sent bitrate"),
                                     id = "row_container",
@@ -316,8 +317,9 @@ local function factory(args)
         local rows_container_widget = popup_widget:get_children_by_id("row_container")[1]
         _set_text(rows_container_widget, 1, string.format(" %s", net_info.interface))
         _set_text(rows_container_widget, 2, net_info.ssid)
-        _set_text(rows_container_widget, 3, net_info.received_bitrate)
-        _set_text(rows_container_widget, 4, net_info.sent_bitrate)
+        _set_text(rows_container_widget, 3, net_info.ip)
+        _set_text(rows_container_widget, 4, net_info.received_bitrate)
+        _set_text(rows_container_widget, 5, net_info.sent_bitrate)
     end
 
     local function create_wifi_widget(net_info)
@@ -445,8 +447,21 @@ local function factory(args)
     end
 
     local function update_connection_info(net_info)
-        if net_info.type == "wlan" then
-            if net_info.state == STATE_UP then
+        if net_info.state == STATE_UP then
+            awful.spawn.easy_async(
+                string.format("ip address show %s", net_info.interface),
+                function(stdout, _, _, _)
+                    -- get ip info
+                    net_info.ip = string.match(stdout, "inet (%d+%.%d+%.%d+%.%d+)") or "N/A"
+
+                    -- update popup
+                    if net_info.popup.wifi.visible then
+                        update_wifi_popup(net_info)
+                    end
+                end
+            )
+
+            if net_info.type == "wlan" then
                 awful.spawn.easy_async(
                     string.format("iw dev %s link", net_info.interface),
                     function(stdout, _, _, _)
@@ -467,7 +482,9 @@ local function factory(args)
                         update_wifi_widget(net_info)
                     end
                 )
-            else
+            end
+        else
+            if net_info.type == "wlan" then
                 -- update widget
                 if net_info.widget then
                     update_wifi_widget(net_info)
