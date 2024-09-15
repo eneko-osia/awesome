@@ -2,6 +2,3 @@
     path = lain
     url = https://github.com/lcpz/lain.git
 
-[submodule "calendar"]
-    path = calendar
-    url = https://github.com/deficient/calendar
