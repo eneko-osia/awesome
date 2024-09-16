@@ -6,15 +6,6 @@ local gears         = require("gears")
 local wibox         = require("wibox")
 -- }}}
 
-local function debug(message)
-    local naughty = require("naughty")
-    naughty.notify(
-        {
-            text = tostring(message)
-        }
-    )
-end
-
 -- {{{ Calendar functions
 local styles =
     {
@@ -66,6 +57,56 @@ local styles =
             }
     }
 
+local function is_holiday(date)
+    local bank_holidays =
+        {
+            { day = 12, month = 10, year = 2024 },
+            { day = 1,  month = 11, year = 2024 },
+            { day = 6,  month = 12, year = 2024 },
+            { day = 25, month = 12, year = 2024 },
+
+            { day = 1,  month = 1,  year = 2025 },
+            { day = 6,  month = 1,  year = 2025 },
+            { day = 17, month = 4,  year = 2025 },
+            { day = 18, month = 4,  year = 2025 },
+            { day = 21, month = 4,  year = 2025 },
+            { day = 1,  month = 5,  year = 2025 },
+            { day = 25, month = 7,  year = 2025 },
+            { day = 31, month = 7,  year = 2025 },
+            { day = 15, month = 8,  year = 2025 },
+            { day = 1,  month = 11, year = 2025 },
+            { day = 6,  month = 12, year = 2025 },
+            { day = 8,  month = 12, year = 2025 },
+            { day = 25, month = 12, year = 2025 }
+        }
+
+    local holidays =
+        {
+            { day = 26, month = 12, year = 2024 },
+            { day = 27, month = 12, year = 2024 },
+            { day = 28, month = 12, year = 2024 },
+            { day = 29, month = 12, year = 2024 },
+            { day = 30, month = 12, year = 2024 },
+            { day = 31, month = 12, year = 2024 }
+        }
+
+    local function _is_holiday(holidays, date)
+        for _, v in pairs(holidays) do
+            if v.day == date.day and v.month == date.month and v.year == date.year then
+                return true
+            end
+        end
+    end
+
+    if _is_holiday(bank_holidays, date) then
+        return true
+    end
+    if _is_holiday(holidays, date) then
+        return true
+    end
+    return false
+end
+
 local function decorate_cell(widget, flag, date)
     if flag == "focus" then
         local today = os.date('*t')
@@ -76,7 +117,7 @@ local function decorate_cell(widget, flag, date)
 
     local d = { year = date.year, month = (date.month or 1), day = (date.day or 1) }
     local weekday = tonumber(os.date('%w', os.time(d)))
-    if weekday == 0 or weekday == 6 then
+    if weekday == 0 or weekday == 6 or is_holiday(d) then
         flag = (flag == "focus" and "focus_weekend" or flag == "normal" and "normal_weekend" or flag)
     end
 
@@ -132,7 +173,7 @@ local function factory(args)
                                 id = "calendar",
                                 long_weekdays = true,
                                 start_sunday = false,
-                                week_numbers = true,
+                                week_numbers = false,
                                 widget = wibox.widget.calendar.month
                             },
                             layout = wibox.layout.fixed.vertical
