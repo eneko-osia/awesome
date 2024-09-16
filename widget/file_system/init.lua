@@ -219,6 +219,13 @@ local function factory(args)
                     -- read data from command results
                     local device, size, used, available, percentage, mount = string.match(line, "([%p%w]+)%s+([%d%w]+)%s+([%d%w]+)%s+([%d%w]+)%s+([%d]+)%%%s+([%p%w]+)")
                     if is_in_mounts(mount) then
+                        if info[i] then
+                            -- remove file system since it is not the same
+                            if device ~= info[i].device then
+                                remove_file_system_info(i)
+                            end
+                        end
+
                         if not info[i] then
                             -- add new file system info since there isn't any
                             info[i] =
@@ -237,31 +244,24 @@ local function factory(args)
 
                         local fs_info = info[i]
 
-                        -- continue since it is the same file system
-                        if device == fs_info.device then
+                        -- update file system stats
+                        fs_info.available = tonumber(available)
+                        fs_info.percentage = tonumber(percentage)
+                        fs_info.size = tonumber(size)
+                        fs_info.used = tonumber(used)
 
-                            -- update file system stats
-                            fs_info.available = tonumber(available)
-                            fs_info.percentage = tonumber(percentage)
-                            fs_info.size = tonumber(size)
-                            fs_info.used = tonumber(used)
-
-                            -- update popup
-                            if popup.visible then
-                                update_popup(fs_info)
-                            end
-
-                            -- update widget
-                            if mount == mount_default then
-                                update_widget(fs_info)
-                            end
-
-                            -- continue
-                            i = i + 1
-                        else
-                            -- remove file systems that are not in the system anymore
-                            remove_file_system_info(i)
+                        -- update popup
+                        if popup.visible then
+                            update_popup(fs_info)
                         end
+
+                        -- update widget
+                        if mount == mount_default then
+                            update_widget(fs_info)
+                        end
+
+                        -- continue
+                        i = i + 1
                     end
                 end
 

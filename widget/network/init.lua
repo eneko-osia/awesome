@@ -577,7 +577,7 @@ local function factory(args)
                 for interface in stdout:gmatch("[^\r\n]+") do
                     if interface ~= "lo" then
                         if info.interfaces[i] then
-                            -- remove interfaces since it is not the same interface
+                            -- remove interfaces since it is not the same
                             if interface ~= info.interfaces[i].interface then
                                 remove_connection_info(i)
                             end
