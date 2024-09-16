@@ -20,48 +20,48 @@ local styles =
     {
         focus =
             {
-                bg_color = "#FFFFFF",
-                fg_color = '#000000',
+                bg_color = "#1E2320", -- beautiful.bg_focus
+                fg_color = "#F0DFAF", -- beautiful.fg_focus
                 markup = function(t) return string.format("<b>%s</b>", t) end,
                 shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(2)) end
             },
         focus_weekend =
             {
-                bg_color = "#FFFFFF",
-                fg_color = '#000000',
+                bg_color = "#1E2320", -- beautiful.bg_focus
+                fg_color = "#CC9393", -- beautiful.fg_urgent
                 markup = function(t) return string.format("<b>%s</b>", t) end,
                 shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(2)) end
             },
         header =
             {
-                bg_color = beautiful.bg_normal,
-                fg_color = beautiful.fg_normal,
+                bg_color = "#3F3F3F", -- beautiful.bg_normal
+                fg_color = "#DCDCCC", -- beautiful.fg_normal
                 markup = function(t) return string.format("%s", t) end
             },
         month =
             {
-                bg_color = beautiful.bg_normal,
-                fg_color = beautiful.fg_normal,
+                bg_color = "#3F3F3F", -- beautiful.bg_normal
+                fg_color = "#DCDCCC", -- beautiful.fg_normal
                 margins = beautiful_dpi(10)
             },
         normal =
             {
-                bg_color = beautiful.bg_normal,
-                fg_color = beautiful.fg_normal,
+                bg_color = "#3F3F3F", -- beautiful.bg_normal
+                fg_color = "#DCDCCC", -- beautiful.fg_normal
                 markup = function(t) return string.format("%s", t) end,
                 shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(2)) end
             },
         normal_weekend =
             {
-                bg_color = beautiful.bg_normal,
-                fg_color = beautiful.fg_normal,
+                bg_color = "#3F3F3F", -- beautiful.bg_normal
+                fg_color = "#CC9393", -- beautiful.fg_urgent
                 markup = function(t) return string.format("%s", t) end,
                 shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(2)) end
             },
         weekday =
             {
-                bg_color = beautiful.bg_normal,
-                fg_color = beautiful.fg_normal,
+                bg_color = "#3F3F3F", -- beautiful.bg_normal
+                fg_color = "#DCDCCC", -- beautiful.fg_normal
                 markup = function(t) return string.format("%s", t) end
             }
     }
