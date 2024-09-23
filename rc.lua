@@ -237,7 +237,7 @@ local launcher_menu = awful.widget.launcher(
 -- {{{ Startup programs
 function startup_programs()
     awful.spawn("discord")
-    awful.spawn("librewolf")
+    awful.spawn("firefox")
     awful.spawn("slack")
     awful.spawn("steam")
     awful.spawn("zoom")
@@ -1185,7 +1185,21 @@ awful.rules.rules =
         {
             rule =
                 {
-                    class = "[Ll]ibre[Ww]olf"
+                    class = "[Dd]iscord"
+                },
+            properties =
+                {
+                    floating = false,
+                    screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
+                    tag = tags.names[tags.TAG_CHAT],
+                    titlebars_enabled = false
+                }
+        },
+
+        {
+            rule =
+                {
+                    class = "[Ff]irefox"
                 },
             properties =
                 {
@@ -1199,27 +1213,13 @@ awful.rules.rules =
         {
             rule =
                 {
-                    class = "[Vv][Ss][Cc]odium"
+                    class = "[Ff]ree[Tt]ube"
                 },
             properties =
                 {
                     floating = false,
                     screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
-                    tag = tags.names[tags.TAG_DEV],
-                    titlebars_enabled = false
-                }
-        },
-
-        {
-            rule =
-                {
-                    class = "[Dd]iscord"
-                },
-            properties =
-                {
-                    floating = false,
-                    screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
-                    tag = tags.names[tags.TAG_CHAT],
+                    tag = tags.names[tags.TAG_WEB],
                     titlebars_enabled = false
                 }
         },
@@ -1275,6 +1275,20 @@ awful.rules.rules =
                 {
                     screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
                     tag = tags.names[tags.TAG_EXTRA]
+                }
+        },
+
+        {
+            rule =
+                {
+                    class = "[Vv][Ss][Cc]odium"
+                },
+            properties =
+                {
+                    floating = false,
+                    screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
+                    tag = tags.names[tags.TAG_DEV],
+                    titlebars_enabled = false
                 }
         },
 
