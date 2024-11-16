@@ -11,6 +11,7 @@ local function factory(args)
     args = args or {}
 
     local device_type = args.device_type or "sink"
+    local device_id = string.format("@DEFAULT_%s@", string.upper(device_type))
     local icons = args.icons or
         {
             high = nil,
@@ -79,12 +80,11 @@ local function factory(args)
 
     local function update()
         awful.spawn.easy_async_with_shell(
-            string.format("pacmd list-%ss | sed -n -e '/*/,$!d' -e '/index/p' -e '/volume:/p' -e '/muted:/p'", device_type),
+            string.format("pactl get-%s-volume %s ; pactl get-%s-mute %s", device_type, device_id, device_type, device_id),
             function(stdout, _, _, _)
                 info =
                     {
-                        index = tonumber(string.match(stdout, "index: (%S+)")) or nil,
-                        muted = string.match(stdout, "muted: yes") or false,
+                        muted = string.match(stdout, "Mute: yes") or false,
                         volume = tonumber(string.match(stdout, ":.-(%d+)%%")) or 0
                     }
                 update_widget()
@@ -93,47 +93,45 @@ local function factory(args)
     end
 
     function widget:down()
-        if info.index ~= nil then
-            awful.spawn.easy_async(
-                string.format("pactl set-%s-volume %d -1%%", device_type, info.index),
-                function(_, _, _, _)
-                    update()
-                end
-            )
-        end
+        awful.spawn.easy_async(
+            string.format("pactl set-%s-volume %s -1%%", device_type, device_id),
+            function(_, _, _, _)
+                update()
+            end
+        )
     end
 
     function widget:mute()
-        if info.index ~= nil then
-            awful.spawn.easy_async(
-                string.format("pactl set-%s-mute %d toggle", device_type, info.index),
-                function(_, _, _, _)
-                    update()
-                end
-            )
-        end
+        awful.spawn.easy_async(
+            string.format("pactl set-%s-mute %s toggle", device_type, device_id),
+            function(_, _, _, _)
+                update()
+            end
+        )
     end
 
     function widget:set(value)
-        if info.index ~= nil then
-            awful.spawn.easy_async(
-                string.format("pactl set-%s-volume %d %d%%", device_type, info.index, value),
-                function(_, _, _, _)
-                    update()
-                end
-            )
-        end
+        awful.spawn.easy_async(
+            string.format("pactl set-%s-volume %s %d%%", device_type, device_id, value),
+            function(_, _, _, _)
+                update()
+            end
+        )
     end
 
     function widget:up()
-        if info.index ~= nil then
-            awful.spawn.easy_async(
-                string.format("pactl set-%s-volume %d +1%%", device_type, info.index),
-                function(_, _, _, _)
-                    update()
-                end
-            )
-        end
+        local naughty = require("naughty")
+        naughty.notify(
+            {
+                text = string.format("pactl set-%s-volume %s +1%%", device_type, device_id)
+            }
+        )
+        awful.spawn.easy_async(
+            string.format("pactl set-%s-volume %s +1%%", device_type, device_id),
+            function(_, _, _, _)
+                update()
+            end
+        )
     end
 
     -- bindings
