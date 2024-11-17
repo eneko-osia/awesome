@@ -120,12 +120,6 @@ local function factory(args)
     end
 
     function widget:up()
-        local naughty = require("naughty")
-        naughty.notify(
-            {
-                text = string.format("pactl set-%s-volume %s +1%%", device_type, device_id)
-            }
-        )
         awful.spawn.easy_async(
             string.format("pactl set-%s-volume %s +1%%", device_type, device_id),
             function(_, _, _, _)
