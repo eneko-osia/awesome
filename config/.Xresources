@@ -1,0 +1,7 @@
+! cursor
+Xcursor.theme: default
+Xcursor.size: 16
+
+! xterm 
+xterm*foreground: white
+xterm*background: black
