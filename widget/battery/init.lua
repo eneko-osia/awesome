@@ -111,59 +111,59 @@ local function factory(args)
 
     local function update()
         -- check batteries in the system
-        awful.spawn.easy_async(
-            "ls /sys/class/power_supply",
-            function(stdout, _, _, _)
-                -- iterate all batteries
-                local i = 1
-                for name in stdout:gmatch("[^\r\n]+") do
-                    if string.match(name, "BAT%w+") then
-                        if info.batteries[i] then
-                            -- remove battery since it is not the same
-                            if name ~= info.batteries[i].name then
-                                -- remove_connection_info(i)
-                            end
-                        end
+        -- awful.spawn.easy_async(
+        --     "ls /sys/class/power_supply",
+        --     function(stdout, _, _, _)
+        --         -- iterate all batteries
+        --         local i = 1
+        --         for name in stdout:gmatch("[^\r\n]+") do
+        --             if string.match(name, "BAT%w+") then
+        --                 if info.batteries[i] then
+        --                     -- remove battery since it is not the same
+        --                     if name ~= info.batteries[i].name then
+        --                         -- remove_connection_info(i)
+        --                     end
+        --                 end
 
-                        if not info.batteries[i] then
-                            -- add new battery info since there isn't any
-                            info.batteries[i] =
-                                {
-                                    name = name
-                                }
-                            -- local bat_info = info.batteries[#info.batteries]
+        --                 if not info.batteries[i] then
+        --                     -- add new battery info since there isn't any
+        --                     info.batteries[i] =
+        --                         {
+        --                             name = name
+        --                         }
+        --                     -- local bat_info = info.batteries[#info.batteries]
 
-                            -- add popup row to layout
-                            -- popup_speed:get_widget():get_children_by_id("row_container")[1]:add(bat_info.popup.speed_row)
-                        end
+        --                     -- add popup row to layout
+        --                     -- popup_speed:get_widget():get_children_by_id("row_container")[1]:add(bat_info.popup.speed_row)
+        --                 end
 
-                        local bat_info = info.batteries[i]
+        --                 local bat_info = info.batteries[i]
 
-                        -- check battery state
-                        update_battery_state(bat_info)
+        --                 -- check battery state
+        --                 update_battery_state(bat_info)
 
-                        -- check interface connection info
-                        -- update_connection_info(bat_info)
+        --                 -- check interface connection info
+        --                 -- update_connection_info(bat_info)
 
-                        -- continue
-                        i = i + 1
-                    elseif string.match(power_supply, "A%w+") then
-                        if not info.ac then
-                            -- add ac info since there isn't any
-                            info.ac =
-                                {
-                                    name = name
-                                }
-                        end
-                    end
-                end
+        --                 -- continue
+        --                 i = i + 1
+        --             elseif string.match(power_supply, "A%w+") then
+        --                 if not info.ac then
+        --                     -- add ac info since there isn't any
+        --                     info.ac =
+        --                         {
+        --                             name = name
+        --                         }
+        --                 end
+        --             end
+        --         end
 
-                -- for j = #info.batteries, i, -1 do
-                --     -- remove batteries that are not in the system anymore
-                --     remove_connection_info(j)
-                -- end
-            end
-        )
+        --         -- for j = #info.batteries, i, -1 do
+        --         --     -- remove batteries that are not in the system anymore
+        --         --     remove_connection_info(j)
+        --         -- end
+        --     end
+        -- )
     end
 
     -- signals
@@ -188,14 +188,14 @@ local function factory(args)
     )
 
     -- timers
-    gears.timer(
-        {
-            autostart = true,
-            call_now = true,
-            callback = update,
-            timeout = timeout
-        }
-    )
+    -- gears.timer(
+    --     {
+    --         autostart = true,
+    --         call_now = true,
+    --         callback = update,
+    --         timeout = timeout
+    --     }
+    -- )
 
     return widget
 end
