@@ -182,24 +182,24 @@ local tags =
 
         [screens.SCREEN_ONE] =
             {
-                { name = "terminal",    layout = layouts.LAYOUT_FAIR_HORIZONTAL },
-                { name = "web",         layout = layouts.LAYOUT_TILE_LEFT       },
-                { name = "dev",         layout = layouts.LAYOUT_MAX             },
-                { name = "parsec",      layout = layouts.LAYOUT_MAX             },
-                { name = "chat",        layout = layouts.LAYOUT_TILE_LEFT       },
-                { name = "zoom",        layout = layouts.LAYOUT_TILE_LEFT       },
-                { name = "extra",       layout = layouts.LAYOUT_FLOATING        }
+                { name = "terminal",    layout = layouts.LAYOUT_TILE_LEFT   },
+                { name = "web",         layout = layouts.LAYOUT_TILE_LEFT   },
+                { name = "dev",         layout = layouts.LAYOUT_MAX         },
+                { name = "parsec",      layout = layouts.LAYOUT_MAX         },
+                { name = "chat",        layout = layouts.LAYOUT_TILE_LEFT   },
+                { name = "zoom",        layout = layouts.LAYOUT_TILE_LEFT   },
+                { name = "extra",       layout = layouts.LAYOUT_FLOATING    }
             },
 
         [screens.SCREEN_TWO] =
             {
-                { name = "terminal",    layout = layouts.LAYOUT_FAIR_HORIZONTAL },
-                { name = "web",         layout = layouts.LAYOUT_TILE_TOP        },
-                { name = "dev",         layout = layouts.LAYOUT_MAX             },
-                { name = "music",       layout = layouts.LAYOUT_TILE_TOP        },
-                { name = "chat",        layout = layouts.LAYOUT_TILE_TOP        },
-                { name = "zoom",        layout = layouts.LAYOUT_TILE_TOP        },
-                { name = "extra",       layout = layouts.LAYOUT_FLOATING        }
+                { name = "terminal",    layout = layouts.LAYOUT_TILE_LEFT   },
+                { name = "web",         layout = layouts.LAYOUT_TILE_LEFT   },
+                { name = "dev",         layout = layouts.LAYOUT_MAX         },
+                { name = "music",       layout = layouts.LAYOUT_TILE_LEFT   },
+                { name = "chat",        layout = layouts.LAYOUT_TILE_LEFT   },
+                { name = "zoom",        layout = layouts.LAYOUT_TILE_LEFT   },
+                { name = "extra",       layout = layouts.LAYOUT_FLOATING    }
             }
     }
 -- }}}
@@ -1218,8 +1218,8 @@ awful.rules.rules =
             properties =
                 {
                     floating = false,
-                    screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
-                    tag = tags.names[tags.TAG_WEB],
+                    screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
+                    tag = tags.names[tags.TAG_EXTRA],
                     titlebars_enabled = false
                 }
         },
@@ -1286,7 +1286,7 @@ awful.rules.rules =
             properties =
                 {
                     floating = false,
-                    screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
+                    screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
                     tag = tags.names[tags.TAG_DEV],
                     titlebars_enabled = false
                 }
