@@ -559,10 +559,10 @@ local function factory(args)
                     end
                     info.received = total_received
                     info.sent = total_sent
-
-                    -- update widget
-                    update_speed_widget()
                 end
+
+                -- update widget
+                update_speed_widget()
             end
         )
     end
