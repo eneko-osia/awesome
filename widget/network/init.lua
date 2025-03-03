@@ -28,7 +28,12 @@ local function factory(args)
             wifi_weak = nil,
             wifi_none = nil
         }
-    local info = { interfaces = {} }
+    local info = 
+        { 
+            interfaces = {},
+            received = 0,
+            sent = 0
+        }
     local popup_speed = awful.popup(
         {
             border_color = beautiful.bg_focus,
