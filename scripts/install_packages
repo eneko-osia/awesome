@@ -12,45 +12,50 @@ sudo pacman --needed -S \
     cmake               \
     dhcpcd              \
     discord             \
+    feh                 \
     firefox             \
+    gimp                \
     git                 \
     gnu-free-fonts      \
     gparted             \
-	htop                \
-	imagemagick         \
-	jellyfin-ffmpeg     \
-	jellyfin-server     \
-	jellyfin-web        \
-	lib32-mesa          \
-	lib32-vulkan-radeon \
-	linux-headers       \
-	lsb-release         \
-	man-db              \
-	man-pages           \
-	mesa                \
-	mlocate             \
-	mtools              \
+    htop                \
+    imagemagick         \
+    jellyfin-ffmpeg     \
+    jellyfin-server     \
+    jellyfin-web        \
+    lib32-mesa          \
+    lib32-vulkan-radeon \
+    libreoffice-still   \
+    linux-headers       \
+    lsb-release         \
+    man-db              \
+    man-pages           \
+    mesa                \
+    mlocate             \
+    mtools              \
     noto-fonts          \
     noto-fonts-emoji    \
-	openssh             \
-	p7zip               \
-	pavucontrol         \
+    openssh             \
+    p7zip               \
+    pavucontrol         \
+    qbittorrent         \
     reflector           \
-	steam               \
-	tk                  \
-	unzip               \
-	vim                 \
-	vulkan-radeon       \
-	wget                \
-	xarchiver           \
-	xcompmgr            \
-	xdg-user-dirs       \
-	xdg-utils           \
-	xf86-video-amdgpu   \
+    steam               \
+    tk                  \
+    unzip               \
+    vim                 \
+    vulkan-radeon       \
+    wget                \
+    vlc                 \
+    xarchiver           \
+    xcompmgr            \
+    xdg-user-dirs       \
+    xdg-utils           \
+    xf86-video-amdgpu   \
     xorg-xrandr         \
-	xscreensaver        \
-	xterm               \
-	zip
+    xscreensaver        \
+    xterm               \
+    zip
 
 # download and build paru
 git clone https://aur.archlinux.org/paru.git
@@ -62,15 +67,16 @@ rm -rf paru
 # install paru packages
 paru --needed -S                \
     amdgpu_top-bin              \
-	freetube-bin                \
+    freetube-bin                \
     heroic-games-launcher-bin   \
-	mkinitcpio-firmware         \
-	parsec-bin                  \
-	sgdboop-bin                 \
-	slack-desktop               \
-	spotify                     \
-	steamlink                   \
-	vscodium-bin                \
+    mkinitcpio-firmware         \
+    parsec-bin                  \
+    protonup-qt                 \
+    sgdboop-bin                 \
+    slack-desktop               \
+    spotify                     \
+    steamlink                   \
+    vscodium-bin                \
     xfe                         \
-	yed                         \
-	zoom
+    yed                         \
+    zoom
