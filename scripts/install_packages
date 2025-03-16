@@ -69,6 +69,7 @@ paru --needed -S                \
     amdgpu_top-bin              \
     freetube-bin                \
     heroic-games-launcher-bin   \
+    mcomix                      \
     mkinitcpio-firmware         \
     parsec-bin                  \
     protonup-qt                 \
