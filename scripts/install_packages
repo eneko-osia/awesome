@@ -2,14 +2,19 @@
 
 # install pacman packages
 sudo pacman --needed -S \
+    awesome             \
     base-devel          \
     bash-completion     \
     bluez               \
     bluez-utils         \
+    calibre             \
+    cmake               \
     dhcpcd              \
     discord             \
     firefox             \
     git                 \
+    gnu-free-fonts      \
+    gparted             \
 	htop                \
 	imagemagick         \
 	jellyfin-ffmpeg     \
@@ -24,6 +29,8 @@ sudo pacman --needed -S \
 	mesa                \
 	mlocate             \
 	mtools              \
+    noto-fonts          \
+    noto-fonts-emoji    \
 	openssh             \
 	p7zip               \
 	pavucontrol         \
@@ -38,6 +45,7 @@ sudo pacman --needed -S \
 	xdg-user-dirs       \
 	xdg-utils           \
 	xf86-video-amdgpu   \
+    xorg-xrandr         \
 	xscreensaver        \
 	xterm               \
 	zip
@@ -60,5 +68,11 @@ paru --needed -S        \
 	spotify             \
 	steamlink           \
 	vscodium-bin        \
+    xfe                 \
 	yed                 \
 	zoom
+
+# install awesome configuration
+git clone https://github.com/eneko-osia/awesome.git ~/.config/awesome
+cd ~/.config/awesome
+git submodule update --init --recursive
