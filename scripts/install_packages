@@ -72,8 +72,3 @@ paru --needed -S        \
     xfe                 \
 	yed                 \
 	zoom
-
-# install awesome configuration
-git clone https://github.com/eneko-osia/awesome.git ~/.config/awesome
-cd ~/.config/awesome
-git submodule update --init --recursive
