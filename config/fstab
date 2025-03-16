@@ -1,0 +1,18 @@
+# Static information about the filesystems.
+# See fstab(5) for details.
+
+# <file system> <dir> <type> <options> <dump> <pass>
+# /dev/nvme0n1p1
+UUID=B2F1-AFAC                              /boot       vfat    rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro   0 2
+
+# /dev/nvme0n1p2
+UUID=bf54af38-df8b-49ca-bd12-415a0760dc85   /           ext4    rw,relatime 0 1
+
+# /dev/sda1
+UUID=2f054415-31b5-4b7a-8202-9e38dc09e64b   /home       ext4    rw,relatime	0 2
+
+# /dev/sdb1
+UUID=a3dc8fc7-f30b-4974-8be6-6601e9c879f3   /mnt/data   ext4    rw,relatime	0 2
+
+# /dev/sdb2
+UUID=6fa4a7cf-996a-4202-8cb3-b5a17bd69dc3   /mnt/games  ext4    rw,relatime	0 2
