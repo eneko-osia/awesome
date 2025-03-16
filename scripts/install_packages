@@ -2,6 +2,7 @@
 
 # install pacman packages
 sudo pacman --needed -S \
+    archlinux-xdg-menu  \
     awesome             \
     base-devel          \
     bash-completion     \
