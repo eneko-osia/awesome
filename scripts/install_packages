@@ -35,6 +35,7 @@ sudo pacman --needed -S \
     mtools              \
     noto-fonts          \
     noto-fonts-emoji    \
+    ntfs-3g             \
     openssh             \
     p7zip               \
     pavucontrol         \
