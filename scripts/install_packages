@@ -6,13 +6,11 @@ sudo pacman --needed -S \
     awesome             \
     base-devel          \
     bash-completion     \
-    bluez               \
-    bluez-utils         \
     calibre             \
     cmake               \
-    dhcpcd              \
     discord             \
     feh                 \
+    ffmpeg              \
     firefox             \
     gimp                \
     git                 \
@@ -20,6 +18,8 @@ sudo pacman --needed -S \
     gparted             \
     htop                \
     imagemagick         \
+    iw                  \
+    iwd                 \
     jellyfin-ffmpeg     \
     jellyfin-server     \
     jellyfin-web        \
@@ -27,6 +27,7 @@ sudo pacman --needed -S \
     lib32-vulkan-radeon \
     libreoffice-still   \
     linux-headers       \
+    liquidctl           \
     lsb-release         \
     man-db              \
     man-pages           \
@@ -82,3 +83,6 @@ paru --needed -S                \
     xfe                         \
     yed                         \
     zoom
+
+# set default file browser
+xdg-mime default xfe.desktop inode/directory
