@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# install pacman packages
+sudo pacman --needed -S \
+    base-devel          \
+    bash-completion     \
+    bluez               \
+    bluez-utils         \
+    dhcpcd              \
+    discord             \
+    firefox             \
+    git                 \
+	htop                \
+	imagemagick         \
+	jellyfin-ffmpeg     \
+	jellyfin-server     \
+	jellyfin-web        \
+	lib32-mesa          \
+	lib32-vulkan-radeon \
+	linux-headers       \
+	lsb-release         \
+	man-db              \
+	man-pages           \
+	mesa                \
+	mlocate             \
+	mtools              \
+	openssh             \
+	p7zip               \
+	pavucontrol         \
+	steam               \
+	tk                  \
+	unzip               \
+	vim                 \
+	vulkan-radeon       \
+	wget                \
+	xarchiver           \
+	xcompmgr            \
+	xdg-user-dirs       \
+	xdg-utils           \
+	xf86-video-amdgpu   \
+	xscreensaver        \
+	xterm               \
+	zip
+
+# download and build paru
+git clone https://aur.archlinux.org/paru.git
+cd paru
+makepkg -si
+cd ..
+rm -rf paru
+
+# install paru packages
+paru --needed -S        \
+    amdgpu_top-bin      \
+	freetube-bin        \
+	mkinitcpio-firmware \
+	parsec-bin          \
+	sgdboop-bin         \
+	slack-desktop       \
+	spotify             \
+	steamlink           \
+	vscodium-bin        \
+	yed                 \
+	zoom
