@@ -35,6 +35,7 @@ sudo pacman --needed -S \
 	openssh             \
 	p7zip               \
 	pavucontrol         \
+    reflector           \
 	steam               \
 	tk                  \
 	unzip               \
@@ -59,16 +60,17 @@ cd ..
 rm -rf paru
 
 # install paru packages
-paru --needed -S        \
-    amdgpu_top-bin      \
-	freetube-bin        \
-	mkinitcpio-firmware \
-	parsec-bin          \
-	sgdboop-bin         \
-	slack-desktop       \
-	spotify             \
-	steamlink           \
-	vscodium-bin        \
-    xfe                 \
-	yed                 \
+paru --needed -S                \
+    amdgpu_top-bin              \
+	freetube-bin                \
+    heroic-games-launcher-bin   \
+	mkinitcpio-firmware         \
+	parsec-bin                  \
+	sgdboop-bin                 \
+	slack-desktop               \
+	spotify                     \
+	steamlink                   \
+	vscodium-bin                \
+    xfe                         \
+	yed                         \
 	zoom
