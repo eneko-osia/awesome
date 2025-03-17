@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# install pacman packages
+sudo pacman --needed -S \
+    calibre             \
+    discord             \
+    firefox             \
+    gimp                \
+    jellyfin-ffmpeg     \
+    jellyfin-server     \
+    jellyfin-web        \
+    libreoffice-still   \
+    qbittorrent         \
+    steam               \
+    vlc                 \
