@@ -32,8 +32,6 @@ sudo pacman --needed -S \
     openssh             \
     p7zip               \
     pavucontrol         \
-    pipewire-alsa       \
-    pipewire-jack       \
     pipewire-pulse      \
     reflector           \
     tk                  \
