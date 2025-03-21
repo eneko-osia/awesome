@@ -32,14 +32,12 @@ sudo pacman --needed -S \
     openssh             \
     p7zip               \
     pavucontrol         \
-    pipewire-pulse      \
     reflector           \
     tk                  \
     unzip               \
     vim                 \
     vulkan-radeon       \
     wget                \
-    wireplumber         \
     xarchiver           \
     xcompmgr            \
     xdg-user-dirs       \
