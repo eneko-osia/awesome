@@ -362,7 +362,7 @@ local function factory(args)
                     _,
                     function()
                         awful.spawn.easy_async(
-                            string.format("%s -e nmtui", terminal),
+                            string.format("%s -e iwctl", terminal),
                             function(stdout)
                             end
                         )
