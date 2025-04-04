@@ -5,11 +5,14 @@ sudo pacman --needed -S \
     calibre             \
     discord             \
     firefox             \
+    gamemode            \
     gimp                \
     jellyfin-ffmpeg     \
     jellyfin-server     \
     jellyfin-web        \
+    lib32-gamemode      \
     libreoffice-still   \
     qbittorrent         \
     steam               \
+    tigervnc            \
     vlc

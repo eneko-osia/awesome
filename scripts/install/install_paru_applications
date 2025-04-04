@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# install paru packages
+paru --needed -S                \
+    freetube-bin                \
+    heroic-games-launcher-bin   \
+    mcomix                      \
+    mkinitcpio-firmware         \
+    parsec-bin                  \
+    protonup-qt                 \
+    sgdboop-bin                 \
+    slack-desktop               \
+    spotify                     \
+    steamlink                   \
+    vscodium-bin                \
+    xfe                         \
+    yed                         \
+    zoom
+
+# set default file browser
+xdg-mime default xfe.desktop inode/directory

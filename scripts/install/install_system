@@ -20,6 +20,7 @@ sudo pacman --needed -S \
     lib32-vulkan-radeon \
     linux-headers       \
     liquidctl           \
+    lm_sensors          \
     lsb-release         \
     man-db              \
     man-pages           \
