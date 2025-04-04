@@ -682,6 +682,12 @@ function set_widgets(s)
                     spr,
                     spr4px,
                     spr,
+                    -- Music
+                    spotify_widget,
+                    -- Separator
+                    spr,
+                    spr4px,
+                    spr,
                     -- Volume
                     volume_widget,
                     -- Separator
