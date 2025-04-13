@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# install pacman packages
+sudo pacman --needed -S \
+    qemu                \
+    libvirt             \
+    iptables-nft        \
+    dnsmasq             \
+    virt-manager
+
+# start libvirtd service
+sudo systemctl enable --now libvirtd
+
+# add libvirt group to current user 
+sudo usermod -aG libvirt $USER
