@@ -3,6 +3,7 @@
 # install pacman packages
 sudo pacman --needed -S \
     qemu                \
+    libbsd              \
     libvirt             \
     iptables-nft        \
     dnsmasq             \
