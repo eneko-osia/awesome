@@ -1287,6 +1287,20 @@ awful.rules.rules =
         {
             rule =
                 {
+                    class = "[Tt]elegram"
+                },
+            properties =
+                {
+                    floating = false,
+                    screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
+                    tag = tags.names[tags.TAG_EXTRA],
+                    titlebars_enabled = false
+                }
+        },
+
+        {
+            rule =
+                {
                     class = "[Vv][Ss][Cc]odium"
                 },
             properties =
