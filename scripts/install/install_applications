@@ -14,5 +14,6 @@ sudo pacman --needed -S \
     libreoffice-still   \
     qbittorrent         \
     steam               \
+    telegram-desktop    \
     tigervnc            \
     vlc
