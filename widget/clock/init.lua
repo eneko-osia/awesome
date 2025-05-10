@@ -83,6 +83,9 @@ local function is_holiday(date)
 
     local holidays =
         {
+            { day = 2,  month = 5,  year = 2025 },
+            { day = 1,  month = 8,  year = 2025 },
+            { day = 15, month = 9,  year = 2025 },
             { day = 26, month = 12, year = 2024 },
             { day = 27, month = 12, year = 2024 },
             { day = 28, month = 12, year = 2024 },
