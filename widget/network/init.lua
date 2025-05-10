@@ -577,69 +577,80 @@ local function factory(args)
         awful.spawn.easy_async(
             "ls /sys/class/net",
             function(stdout, _, _, _)
-                -- iterate all network interfaces
-                local i = 1
+                -- get interfaces
+                local interfaces = {}
                 for interface in stdout:gmatch("[^\r\n]+") do
                     if interface ~= "lo" then
-                        if info.interfaces[i] then
-                            -- remove interfaces since it is not the same
-                            if interface ~= info.interfaces[i].interface then
-                                remove_connection_info(i)
-                            end
-                        end
-
-                        if not info.interfaces[i] then
-                            -- add new interface info since there isn't any
-                            info.interfaces[i] =
-                                {
-                                    interface = interface,
-                                    popup =
-                                        {
-                                            speed_row = create_speed_popup_row(interface)
-                                        },
-                                    received = 0,
-                                    sent = 0,
-                                    state = STATE_DOWN
-                                }
-                            local net_info = info.interfaces[i]
-
-                            -- add popup row to layout
-                            popup_speed:get_widget():get_children_by_id("row_container")[1]:add(net_info.popup.speed_row)
-
-                            -- request interface type
-                            awful.spawn.easy_async(
-                                string.format("cat /sys/class/net/%s/uevent", interface),
-                                function(stdout, _, _, _)
-                                    net_info.type = string.match(stdout, "DEVTYPE=(%w+)") or "ethernet"
-                                    if net_info.type == "wlan" then
-                                        -- create wifi popup
-                                        net_info.popup.wifi = create_wifi_popup()
-
-                                        -- create wifi widget
-                                        net_info.widget = create_wifi_widget(net_info)
-                                        local connection_container_widget = widget:get_children_by_id("connection_container")[1]:get_children()[1]
-                                        connection_container_widget:add(net_info.widget)
-                                    end
-                                end
-                            )
-                        end
-
-                        local net_info = info.interfaces[i]
-
-                        -- check interface state and stats
-                        update_connection_state_n_stats(net_info)
-
-                        -- check interface connection info
-                        update_connection_info(net_info)
-
-                        -- continue
-                        i = i + 1
+                        table.insert(interfaces, interface)
                     end
                 end
 
-                for j = #info.interfaces, i, -1 do
-                    -- remove interfaces that are not in the system anymore
-                    remove_connection_info(j)
+                -- check number of interfaces
+                local need_to_remove = false
+                if #interfaces ~= #info.interfaces then
+                    need_to_remove = true
+                else
+                    -- check all interfaces are the same
+                    for i, interface in ipairs(interfaces) do
+                        if interface ~= info.interfaces[i].interface then
+                            need_to_remove = true
+                            break
+                        end
+                    end
+                end
+
+                -- if interfaces do not match remove them all
+                if need_to_remove then
+                    for i = #info.interfaces, 1, -1 do
+                        remove_connection_info(i)
+                    end
+                end
+
+                -- iterate all network interfaces
+                for i, interface in ipairs(interfaces) do
+                     if not info.interfaces[i] then
+                        -- add new interface info since there isn't any
+                        info.interfaces[i] =
+                            {
+                                interface = interface,
+                                popup =
+                                    {
+                                        speed_row = create_speed_popup_row(interface)
+                                    },
+                                received = 0,
+                                sent = 0,
+                                state = STATE_DOWN
+                            }
+                        local net_info = info.interfaces[i]
+
+                        -- add popup row to layout
+                        popup_speed:get_widget():get_children_by_id("row_container")[1]:add(net_info.popup.speed_row)
+
+                        -- request interface type
+                        awful.spawn.easy_async(
+                            string.format("cat /sys/class/net/%s/uevent", interface),
+                            function(stdout, _, _, _)
+                                net_info.type = string.match(stdout, "DEVTYPE=(%w+)") or "ethernet"
+                                if net_info.type == "wlan" then
+                                    -- create wifi popup
+                                    net_info.popup.wifi = create_wifi_popup()
+
+                                    -- create wifi widget
+                                    net_info.widget = create_wifi_widget(net_info)
+                                    local connection_container_widget = widget:get_children_by_id("connection_container")[1]:get_children()[1]
+                                    connection_container_widget:add(net_info.widget)
+                                end
+                            end
+                        )
+                    end
+
+                    local net_info = info.interfaces[i]
+
+                    -- check interface state and stats
+                    update_connection_state_n_stats(net_info)
+
+                    -- check interface connection info
+                    update_connection_info(net_info)
                 end
             end
         )
