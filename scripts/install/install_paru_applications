@@ -6,6 +6,7 @@ paru --needed -S                \
     heroic-games-launcher-bin   \
     mcomix                      \
     mkinitcpio-firmware         \
+    nordvpn-bin                 \
     parsec-bin                  \
     protonup-qt                 \
     sgdboop-bin                 \
