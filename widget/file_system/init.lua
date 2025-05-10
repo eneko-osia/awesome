@@ -213,19 +213,42 @@ local function factory(args)
         awful.spawn.easy_async_with_shell(
             "df -k | tail -n +2",
             function(stdout, _, _, _)
+                -- get devices
+                local devices = {}
+                for line in stdout:gmatch("[^\r\n]+") do
+                    local device, size, used, available, percentage, mount = string.match(line, "([%p%w]+)%s+([%d%w]+)%s+([%d%w]+)%s+([%d%w]+)%s+([%d]+)%%%s+([%p%w]+)")
+                    if is_in_mounts(mount) then
+                        table.insert(devices, device)
+                    end
+                end
+
+                -- check number of devices
+                local need_to_remove = false
+                if #devices ~= #info then
+                    need_to_remove = true
+                else
+                    -- check all devices are the same
+                    for i, device in ipairs(devices) do
+                        if device ~= info[i].device then
+                            need_to_remove = true
+                            break
+                        end
+                    end
+                end
+
+                -- if devices do not match remove them all
+                if need_to_remove then
+                    for i = #info, 1, -1 do
+                        remove_file_system_info(i)
+                    end
+                end
+
                 -- iterate all file systems
                 local i = 1
                 for line in stdout:gmatch("[^\r\n]+") do
                     -- read data from command results
                     local device, size, used, available, percentage, mount = string.match(line, "([%p%w]+)%s+([%d%w]+)%s+([%d%w]+)%s+([%d%w]+)%s+([%d]+)%%%s+([%p%w]+)")
                     if is_in_mounts(mount) then
-                        if info[i] then
-                            -- remove file system since it is not the same
-                            if device ~= info[i].device then
-                                remove_file_system_info(i)
-                            end
-                        end
-
                         if not info[i] then
                             -- add new file system info since there isn't any
                             info[i] =
@@ -263,11 +286,6 @@ local function factory(args)
                         -- continue
                         i = i + 1
                     end
-                end
-
-                for j = #info, i, -1 do
-                    -- remove file system that are not in the system anymore
-                    remove_file_system_info(j)
                 end
             end
         )
