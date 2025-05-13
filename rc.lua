@@ -148,7 +148,7 @@ function set_tags(s, tags)
                     {
                         layout = layouts.suits[settings.layout],
                         screen = s,
-                        selected = ((s.index == screens.SCREEN_TWO) and (i == 2)) or ((s.index == screens.SCREEN_ONE) and (i == 1))
+                        selected = ((s.index == screens.SCREEN_ONE) and (i == 1)) or ((s.index == screens.SCREEN_TWO) and (i == 2))
                     }
             )
         end
@@ -577,7 +577,7 @@ function set_widgets(s)
 
     -- Wibox
     s.top_wibox = awful.wibar({ position = "top", screen = s, height = 22, bg = beautiful.panel, fg = beautiful.fg_normal })
-    if s == screen.primary then
+    if (s == screen.primary) or (1 == screen.count()) then
         s.top_wibox:setup(
             {
                 layout = wibox.layout.align.horizontal,
@@ -757,7 +757,7 @@ function set_widgets(s)
 
     -- Bottom box
     s.bottom_wibox = awful.wibar({ position = "bottom", screen = s, height = 22, bg = beautiful.panel, fg = beautiful.fg_normal })
-    if s == screen.primary then
+    if (s == screen.primary) or (1 == screen.count()) then
         s.bottom_wibox:setup(
             {
                 buttons = menu_bar_buttons,
@@ -1134,6 +1134,20 @@ clientkeys = gears.table.join(
         function (c) c.ontop = not c.ontop end,
         { description = "toggle on top", group = "program" }
     )
+
+    -- awful.key(
+    --     { MOD_KEY },
+    --     "e",
+    --     function (c)
+    --         naughty.notify(
+    --             {
+    --                 title = "Screens",
+    --                 text = "Screens: " .. screen.count()
+    --             }
+    --         )
+    --     end,
+    --     { description = "screens", group = "program" }
+    -- )
 )
 
 -- Set keys
@@ -1233,6 +1247,20 @@ awful.rules.rules =
         {
             rule =
                 {
+                    class = "[Mm]ullvad [Bb]rowser"
+                },
+            properties =
+                {
+                    floating = false,
+                    screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
+                    tag = tags.names[tags.TAG_WEB],
+                    titlebars_enabled = false
+                }
+        },
+
+        {
+            rule =
+                {
                     class = "[Pp]arsecd"
                 },
             properties =
@@ -1281,20 +1309,6 @@ awful.rules.rules =
                 {
                     screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
                     tag = tags.names[tags.TAG_EXTRA]
-                }
-        },
-
-        {
-            rule =
-                {
-                    class = "[Tt]elegram"
-                },
-            properties =
-                {
-                    floating = false,
-                    screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-                    tag = tags.names[tags.TAG_EXTRA],
-                    titlebars_enabled = false
                 }
         },
 
