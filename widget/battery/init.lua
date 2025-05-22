@@ -13,11 +13,21 @@ local function factory(args)
     local icons = args.icons or
         {
             ac = nil,
-            charging = nil,
-            empty = nil,
-            full = nil,
-            logo = nil,
-            low = nil
+            battery = 
+                {
+                    charging =
+                        {
+                            empty = nil,
+                            full = nil,
+                            good = nil,
+                            low = nil
+                        },
+                    empty = nil,
+                    full = nil,
+                    good = nil,
+                    low = nil
+                },
+            logo = nil
         }
     local info =
         {
@@ -180,14 +190,17 @@ local function factory(args)
                 icon_widget:set_image(icons.ac)
                 text_widget:set_markup(" " .. info.batteries_percentage .. "%" .. " ")
             else
-                if info.batteries_percentage > 50 then
-                    icon_widget:set_image(info.ac_connected and icons.charging or icons.full)
+                if info.batteries_percentage > 90 then
+                    icon_widget:set_image(info.ac_connected and icons.battery.charging.full or icons.battery.full)
+                    text_widget:set_markup(" " .. info.batteries_percentage .. "%" .. " ")
+                elseif info.batteries_percentage > 50 then
+                    icon_widget:set_image(info.ac_connected and icons.battery.charging.good or icons.battery.good)
                     text_widget:set_markup(" " .. info.batteries_percentage .. "%" .. " ")
                 elseif info.batteries_percentage > 15 then
-                    icon_widget:set_image(info.ac_connected and icons.charging or icons.low)
+                    icon_widget:set_image(info.ac_connected and icons.battery.charging.low or icons.battery.low)
                     text_widget:set_markup(string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_focus, info.batteries_percentage))
                 else
-                    icon_widget:set_image(info.ac_connected and icons.charging or icons.empty)
+                    icon_widget:set_image(info.ac_connected and icons.battery.charging.empty or icons.battery.empty)
                     text_widget:set_markup(string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_urgent, info.batteries_percentage))
                 end
             end

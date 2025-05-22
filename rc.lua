@@ -377,12 +377,22 @@ local battery_widget = widget_battery(
     {
         icons =
             {
-                ac = beautiful.widget.battery_ac,
-                charging = beautiful.widget.battery_ac,
-                empty = beautiful.widget.battery_empty,
-                full = beautiful.widget.battery_full,
-                logo = beautiful.widget.battery_ac,
-                low = beautiful.widget.battery_low
+                ac = beautiful.widget.ac,
+                battery = 
+                    {
+                        charging = 
+                            {
+                                empty = beautiful.widget.battery_charging_empty,
+                                full = beautiful.widget.battery_charging_full,
+                                good = beautiful.widget.battery_charging_good,
+                                low = beautiful.widget.battery_charging_low
+                            },
+                        empty = beautiful.widget.battery_empty,
+                        full = beautiful.widget.battery_full,
+                        good = beautiful.widget.battery_good,
+                        low = beautiful.widget.battery_low
+                    },
+                logo = beautiful.widget.ac
             },
         timeout = 2
     }
