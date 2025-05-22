@@ -378,6 +378,7 @@ local battery_widget = widget_battery(
         icons =
             {
                 ac = beautiful.widget.battery_ac,
+                charging = beautiful.widget.battery_ac,
                 empty = beautiful.widget.battery_empty,
                 full = beautiful.widget.battery_full,
                 logo = beautiful.widget.battery_ac,
