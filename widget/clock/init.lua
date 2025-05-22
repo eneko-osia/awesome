@@ -100,15 +100,10 @@ local function is_holiday(date)
                 return true
             end
         end
+        return false
     end
 
-    if _is_holiday(bank_holidays, date) then
-        return true
-    end
-    if _is_holiday(holidays, date) then
-        return true
-    end
-    return false
+    return _is_holiday(bank_holidays, date) or _is_holiday(holidays, date)
 end
 
 local function decorate_cell(widget, flag, date)
@@ -160,34 +155,34 @@ local function factory(args)
         {
             logo = nil
         }
-        local popup = awful.popup(
-            {
-                border_color = beautiful.bg_focus,
-                border_width = beautiful_dpi(2),
-                offset = { y = beautiful_dpi(2) },
-                ontop = true,
-                shape = gears.shape.rounded_rect,
-                visible = false,
-                widget =
+    local popup = awful.popup(
+        {
+            border_color = beautiful.bg_focus,
+            border_width = beautiful_dpi(2),
+            offset = { y = beautiful_dpi(2) },
+            ontop = true,
+            shape = gears.shape.rounded_rect,
+            visible = false,
+            widget =
+                {
                     {
                         {
-                            {
-                                date = os.date("*t"),
-                                fn_embed = decorate_cell,
-                                id = "calendar",
-                                long_weekdays = true,
-                                start_sunday = false,
-                                week_numbers = false,
-                                widget = wibox.widget.calendar.month
-                            },
-                            layout = wibox.layout.fixed.vertical
+                            date = os.date("*t"),
+                            fn_embed = decorate_cell,
+                            id = "calendar",
+                            long_weekdays = true,
+                            start_sunday = false,
+                            week_numbers = false,
+                            widget = wibox.widget.calendar.month
                         },
-                        bg = beautiful.bg_reset,
-                        shape = gears.shape.rectangle,
-                        widget = wibox.container.background
-                    }
-            }
-        )
+                        layout = wibox.layout.fixed.vertical
+                    },
+                    bg = beautiful.bg_reset,
+                    shape = gears.shape.rectangle,
+                    widget = wibox.container.background
+                }
+        }
+    )
     local widget = wibox.widget(
         {
             {
