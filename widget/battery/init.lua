@@ -13,7 +13,7 @@ local function factory(args)
     local icons = args.icons or
         {
             ac = nil,
-            battery = 
+            battery =
                 {
                     charging =
                         {
@@ -178,8 +178,15 @@ local function factory(args)
         end
 
         local rows_container_widget = bat_info.popup.row:get_children()[1]
-        _set_text(rows_container_widget, 2, string.format("%d%%", bat_info.percentage))
-        _set_value(rows_container_widget, 3, bat_info.percentage)
+        local percentage = math.floor(((bat_info.energy_now / bat_info.energy_full) * 100) + 0.5)
+        if percentage > 50 then
+            _set_text(rows_container_widget, 2, string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_normal, percentage))
+        elseif percentage > 15 then
+            _set_text(rows_container_widget, 2, string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_focus, percentage))
+        else
+            _set_text(rows_container_widget, 2, string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_urgent, percentage))
+        end
+        _set_value(rows_container_widget, 3, percentage)
     end
 
     local function update_widget()
@@ -230,9 +237,7 @@ local function factory(args)
         awful.spawn.easy_async(
             string.format("cat \
                 /sys/class/power_supply/%s/energy_full \
-                /sys/class/power_supply/%s/energy_now \
-                /sys/class/power_supply/%s/status",
-                bat_info.name,
+                /sys/class/power_supply/%s/energy_now",
                 bat_info.name,
                 bat_info.name),
             function(stdout, _, _, _)
@@ -243,14 +248,9 @@ local function factory(args)
                         bat_info.energy_full = tonumber(v)
                     elseif i == 1 then
                         bat_info.energy_now = tonumber(v)
-                    elseif i == 2 then
-                        bat_info.status = v
                     end
                     i = i + 1
                 end
-
-                -- calculate percentage
-                bat_info.percentage = math.floor((bat_info.energy_now / bat_info.energy_full) * 100)
 
                 -- decrease the number of power supplies updating
                 info.power_supplies_updating = info.power_supplies_updating - 1
@@ -323,7 +323,6 @@ local function factory(args)
                                             energy_full = 0,
                                             energy_now = 0,
                                             name = power_supply,
-                                            percentage = 0,
                                             popup =
                                                 {
                                                     row = create_popup_row(power_supply)
