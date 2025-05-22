@@ -26,15 +26,15 @@ local widget_vpn            = require("widget.vpn")
 -- }}}
 
 -- {{{ Variable definitions
-local MOD_KEY         = "Mod4"
-local SHIFT_KEY       = "Shift"
-local TERMINAL        = "xterm"
+local MOD_KEY               = "Mod4"
+local SHIFT_KEY             = "Shift"
+local TERMINAL              = "xterm"
 
-local MOUSE_DOWN_BUTTON     = 5
 local MOUSE_LEFT_BUTTON     = 1
 local MOUSE_MIDDLE_BUTTON   = 2
 local MOUSE_RIGHT_BUTTON    = 3
 local MOUSE_UP_BUTTON       = 4
+local MOUSE_DOWN_BUTTON     = 5
 -- }}}
 
 -- {{{ Error handling
@@ -380,9 +380,10 @@ local battery_widget = widget_battery(
                 ac = beautiful.widget.battery_ac,
                 empty = beautiful.widget.battery_empty,
                 full = beautiful.widget.battery_full,
-                logo = beautiful.widget.ssd,
+                logo = beautiful.widget.battery_ac,
                 low = beautiful.widget.battery_low
-            }
+            },
+        timeout = 2
     }
 )
 
@@ -633,9 +634,9 @@ function set_widgets(s)
                     -- File system widget
                     file_system_widget,
                     -- Separator
-                    -- spr,
+                    spr,
                     -- Battery widget
-                    -- battery_widget,
+                    battery_widget,
                     -- Separator
                     spr,
                     spr4px,
@@ -721,9 +722,9 @@ function set_widgets(s)
                     -- File system widget
                     file_system_widget,
                     -- Separator
-                    -- spr,
+                    spr,
                     -- Battery widget
-                    -- battery_widget,
+                    battery_widget,
                     -- Separator
                     spr,
                     spr4px,
@@ -1320,7 +1321,7 @@ awful.rules.rules =
             properties =
                 {
                     floating = false,
-                    screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
+                    screen = screens.SCREEN_ONE <= screen.count() and screens.SCREEN_ONE or awful.screen.preferred,
                     tag = tags.names[tags.TAG_DEV],
                     titlebars_enabled = false
                 }
