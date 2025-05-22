@@ -311,8 +311,9 @@ local function factory(args)
                         info.power_supplies_updating = #power_supplies
 
                         -- iterate all power supplies
-                        for i, power_supply in ipairs(power_supplies) do
-                            if string.match(power_supply, "A%w+") then
+                        local i = 1
+                        for _, power_supply in ipairs(power_supplies) do
+                            if string.match(power_supply, "ADP%w+") then
                                 -- check ac state
                                 update_ac_state(power_supply)
                             elseif string.match(power_supply, "BAT%w+") then
@@ -339,6 +340,9 @@ local function factory(args)
 
                                 -- check battery state
                                 update_battery_state(bat_info)
+
+                                -- continue
+                                i = i + 1
                             end
                         end
                     end
