@@ -176,18 +176,18 @@ local function factory(args)
         local icon_widget = widget:get_children_by_id("icon")[1]
         local text_widget = widget:get_children_by_id("text")[1]
         if (icon_widget ~= nil and text_widget ~= nil) then
-            if info.ac_connected == true then
-                icon_widget:set_image((#info.batteries == 0) and icons.ac or icons.charging)
+            if #info.batteries == 0 then
+                icon_widget:set_image(icons.ac)
                 text_widget:set_markup(" " .. info.batteries_percentage .. "%" .. " ")
             else
                 if info.batteries_percentage > 50 then
-                    icon_widget:set_image(icons.full)
+                    icon_widget:set_image(info.ac_connected and icons.charging or icons.full)
                     text_widget:set_markup(" " .. info.batteries_percentage .. "%" .. " ")
                 elseif info.batteries_percentage > 15 then
-                    icon_widget:set_image(icons.low)
+                    icon_widget:set_image(info.ac_connected and icons.charging or icons.low)
                     text_widget:set_markup(string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_focus, info.batteries_percentage))
                 else
-                    icon_widget:set_image(icons.empty)
+                    icon_widget:set_image(info.ac_connected and icons.charging or icons.empty)
                     text_widget:set_markup(string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_urgent, info.batteries_percentage))
                 end
             end
