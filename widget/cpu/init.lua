@@ -52,6 +52,7 @@ local function factory(args)
                         id = "icon",
                         widget = wibox.widget.imagebox(icons.logo)
                     },
+                    id = "icon_container",
                     layout = wibox.container.margin(_, _, _, _, _)
                 },
                 {
@@ -65,6 +66,7 @@ local function factory(args)
                             widget = wibox.widget.textbox
                         },
                         bg = beautiful.bg_focus,
+                        id = "text_container",
                         shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(2)) end,
                         widget = wibox.container.background,
                     },
@@ -142,6 +144,7 @@ local function factory(args)
             }
         )
     end
+
     local function update_popup(cpu_info)
         local function _set_text(container, index, value)
             local widget = container:get_children()[index]:get_children()[1]:get_children()[1]
@@ -153,17 +156,21 @@ local function factory(args)
             widget:set_value(value)
         end
 
-        if cpu_info.popup.row then
-            local row_container_widget = cpu_info.popup.row:get_children()[1]
-            local percentage = math.floor(((cpu_info.active / cpu_info.total) * 100) + 0.5)
-            _set_text(row_container_widget, 2, string.format("%d%%", percentage))
-            _set_value(row_container_widget, 3, percentage)
+        local rows_container_widget = cpu_info.popup.row:get_children()[1]
+        local percentage = math.floor(((cpu_info.active / cpu_info.total) * 100) + 0.5)
+        if percentage > 80 then
+            _set_text(rows_container_widget, 2, string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_urgent, percentage))
+        elseif percentage > 40 then
+            _set_text(rows_container_widget, 2, string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_focus, percentage))
+        else
+            _set_text(rows_container_widget, 2, string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_normal, percentage))
         end
+        _set_value(rows_container_widget, 3, percentage)
     end
 
     local function update_widget()
         local text_widget = widget:get_children_by_id("text")[1]
-        text_widget:set_markup(string.format(" %s%% ", math.ceil(math.abs((info[0].active / info[0].total) * 100))))
+        text_widget:set_markup(string.format(" %d%% ", math.floor(((info[0].active / info[0].total) * 100) + 0.5)))
     end
 
     local function update()
@@ -181,6 +188,8 @@ local function factory(args)
                                 name = name,
                                 popup = {}
                             }
+
+                        -- do not add popup for global cpu
                         if i ~= 0 then
                             local cpu_info = info[i]
 
@@ -194,7 +203,7 @@ local function factory(args)
 
                     local cpu_info = info[i]
 
-                    -- continue since it is the same file system
+                    -- continue since it is the same cpu
                     if name == cpu_info.name then
                         -- calculate stats values
                         local total = user + nice + system + idle + iowait + irq + softirq + steal
@@ -209,7 +218,7 @@ local function factory(args)
                         cpu_info.prev_total = total
 
                         -- update popup
-                        if popup.visible then
+                        if i ~= 0 and popup.visible then
                             update_popup(cpu_info)
                         end
 
@@ -262,8 +271,10 @@ local function factory(args)
         function(c)
             c:set_bg(beautiful.bg_normal)
 
-            for _, v in pairs(info) do
-                update_popup(v)
+            for i, v in pairs(info) do
+                if i ~= 0 then
+                    update_popup(v)
+                end
             end
             popup:move_next_to(mouse.current_widget_geometry)
             popup.visible = true
