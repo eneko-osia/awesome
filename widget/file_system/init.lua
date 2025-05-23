@@ -171,23 +171,31 @@ local function factory(args)
             widget:set_value(value)
         end
 
-        local row_container_widget = fs_info.popup.row:get_children()[1]
-        _set_text(row_container_widget, 2, string.format("%d%%", fs_info.percentage))
-        _set_value(row_container_widget, 3, fs_info.percentage)
-        _set_text(
-            row_container_widget,
-            4,
-            string.format(
-                "%3d / %3d GiB",
-                math.floor((fs_info.used / 1024.0 / 1024.0) + 0.5),
-                math.floor((fs_info.size / 1024 / 1024) + 0.5)
-            )
-        )
+        local rows_container_widget = fs_info.popup.row:get_children()[1]
+        local used = math.floor((fs_info.used / 1024.0 / 1024.0) + 0.5)
+        local size = math.floor((fs_info.size / 1024.0 / 1024.0) + 0.5)
+        if fs_info.percentage > 80 then
+            _set_text(rows_container_widget, 2, string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_urgent, fs_info.percentage))
+            _set_text(rows_container_widget, 4, string.format("<span foreground='%s'> %3d / %3d GiB </span>", beautiful.fg_urgent, used, size))
+        elseif fs_info.percentage > 60 then
+            _set_text(rows_container_widget, 2, string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_focus, fs_info.percentage))
+            _set_text(rows_container_widget, 4, string.format("<span foreground='%s'> %3d / %3d GiB </span>", beautiful.fg_focus, used, size))
+        else
+            _set_text(rows_container_widget, 2, string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_normal, fs_info.percentage))
+            _set_text(rows_container_widget, 4, string.format("<span foreground='%s'> %3d / %3d GiB </span>", beautiful.fg_normal, used, size))
+        end
+        _set_value(rows_container_widget, 3, fs_info.percentage)
     end
 
     local function update_widget(fs_info)
         local text_widget = widget:get_children_by_id("text")[1]
-        text_widget:set_markup(string.format(" %d%% ", fs_info.percentage))
+        if fs_info.percentage > 80 then
+            text_widget:set_markup(string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_urgent, fs_info.percentage))
+        elseif fs_info.percentage > 60 then
+            text_widget:set_markup(string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_focus, fs_info.percentage))
+        else
+            text_widget:set_markup(string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_normal, fs_info.percentage))
+        end
     end
 
     local function remove_file_system_info(index)
