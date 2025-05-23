@@ -170,14 +170,21 @@ local function factory(args)
 
     local function update_widget()
         local text_widget = widget:get_children_by_id("text")[1]
-        text_widget:set_markup(string.format(" %d%% ", math.floor(((info[0].active / info[0].total) * 100) + 0.5)))
+        local percentage = math.floor(((info[1].active / info[1].total) * 100) + 0.5)
+        if percentage > 80 then
+            text_widget:set_markup(string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_urgent, percentage))
+        elseif percentage > 40 then
+            text_widget:set_markup(string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_focus, percentage))
+        else
+            text_widget:set_markup(string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_normal, percentage))
+        end
     end
 
     local function update()
         awful.spawn.easy_async(
             string.format("grep '^cpu.' /proc/stat"),
             function(stdout, _, _, _)
-                local i = 0
+                local i = 1
                 for line in stdout:gmatch("[^\r\n]+") do
                     -- read data from command results
                     local name, user, nice, system, idle, iowait, irq, softirq, steal, guest, guest_nice = string.match(line, "(%w+)%s+(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)%s(%d+)")
@@ -190,7 +197,7 @@ local function factory(args)
                             }
 
                         -- do not add popup for global cpu
-                        if i ~= 0 then
+                        if i ~= 1 then
                             local cpu_info = info[i]
 
                             -- create popup row
@@ -203,28 +210,25 @@ local function factory(args)
 
                     local cpu_info = info[i]
 
-                    -- continue since it is the same cpu
-                    if name == cpu_info.name then
-                        -- calculate stats values
-                        local total = user + nice + system + idle + iowait + irq + softirq + steal
-                        local active = total - (idle + iowait)
-                        local prev_active = cpu_info and cpu_info.prev_active or 0
-                        local prev_total = cpu_info and cpu_info.prev_total or 0
+                    -- calculate stats values
+                    local total = user + nice + system + idle + iowait + irq + softirq + steal
+                    local active = total - (idle + iowait)
+                    local prev_active = cpu_info and cpu_info.prev_active or 0
+                    local prev_total = cpu_info and cpu_info.prev_total or 0
 
-                        -- update cpu stats
-                        cpu_info.active = active - prev_active
-                        cpu_info.total = total - prev_total
-                        cpu_info.prev_active = active
-                        cpu_info.prev_total = total
+                    -- update cpu stats
+                    cpu_info.active = active - prev_active
+                    cpu_info.total = total - prev_total
+                    cpu_info.prev_active = active
+                    cpu_info.prev_total = total
 
-                        -- update popup
-                        if i ~= 0 and popup.visible then
-                            update_popup(cpu_info)
-                        end
-
-                        -- continue
-                        i = i + 1
+                    -- update popup
+                    if i ~= 1 and popup.visible then
+                        update_popup(cpu_info)
                     end
+
+                    -- continue
+                    i = i + 1
                 end
 
                 -- update widget
@@ -272,7 +276,7 @@ local function factory(args)
             c:set_bg(beautiful.bg_normal)
 
             for i, v in pairs(info) do
-                if i ~= 0 then
+                if i ~= 1 then
                     update_popup(v)
                 end
             end
