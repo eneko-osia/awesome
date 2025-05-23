@@ -290,7 +290,9 @@ local function factory(args)
                     -- get power supplies
                     local power_supplies = {}
                     for power_supply in stdout:gmatch("[^\r\n]+") do
-                        table.insert(power_supplies, power_supply)
+                        if string.match(power_supply, "ADP%w+") or string.match(power_supply, "BAT%w+") then
+                            table.insert(power_supplies, power_supply)
+                        end
                     end
 
                     -- if not power supply set default AC power supply
@@ -303,7 +305,6 @@ local function factory(args)
 
                         -- update widget
                         update_widget()
-
                     else
                         -- set number of power supplies updating
                         info.power_supplies_updating = #power_supplies
