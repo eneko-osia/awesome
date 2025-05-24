@@ -53,6 +53,7 @@ local function factory(args)
                         id = "icon",
                         widget = wibox.widget.imagebox(icons.logo)
                     },
+                    id = "icon_container",
                     layout = wibox.container.margin(_, _, _, _, _)
                 },
                 {
@@ -66,6 +67,7 @@ local function factory(args)
                             widget = wibox.widget.textbox
                         },
                         bg = beautiful.bg_focus,
+                        id = "text_container",
                         shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(2)) end,
                         widget = wibox.container.background,
                     },

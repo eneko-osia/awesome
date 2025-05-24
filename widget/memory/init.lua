@@ -117,6 +117,7 @@ local function factory(args)
                         id = "icon",
                         widget = wibox.widget.imagebox(icons.logo)
                     },
+                    id = "icon_container",
                     layout = wibox.container.margin(_, _, _, _, _)
                 },
                 {
@@ -130,6 +131,7 @@ local function factory(args)
                             widget = wibox.widget.textbox
                         },
                         bg = beautiful.bg_focus,
+                        id = "text_container",
                         shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(2)) end,
                         widget = wibox.container.background,
                     },
@@ -177,7 +179,14 @@ local function factory(args)
 
     local function update_widget()
         local text_widget = widget:get_children_by_id("text")[1]
-        text_widget:set_markup(string.format(" %d%% ", math.floor(info.used / info.total * 100)))
+        local percentage = math.floor(((info.used / info.total) * 100) + 0.5)
+        if percentage > 80 then
+            text_widget:set_markup(string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_urgent, percentage))
+        elseif percentage > 60 then
+            text_widget:set_markup(string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_focus, percentage))
+        else
+            text_widget:set_markup(string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_normal, percentage))
+        end
     end
 
     local function update()
@@ -186,13 +195,13 @@ local function factory(args)
             function(stdout, _, _, _)
                 for line in stdout:gmatch("[^\r\n]+") do
                     for k, v in line:gmatch("([%a]+):[%s]+([%d]+).+") do
-                        if     k == "Buffers"      then info.buffers        = math.floor(v / 1024 + 0.5)
-                        elseif k == "Cached"       then info.cached         = math.floor(v / 1024 + 0.5)
-                        elseif k == "MemFree"      then info.free           = math.floor(v / 1024 + 0.5)
-                        elseif k == "MemTotal"     then info.total          = math.floor(v / 1024 + 0.5)
-                        elseif k == "SReclaimable" then info.sreclaimable   = math.floor(v / 1024 + 0.5)
-                        elseif k == "SwapFree"     then info.swap_free      = math.floor(v / 1024 + 0.5)
-                        elseif k == "SwapTotal"    then info.swap_total     = math.floor(v / 1024 + 0.5)
+                        if     k == "Buffers"      then info.buffers        = math.floor((v / 1024) + 0.5)
+                        elseif k == "Cached"       then info.cached         = math.floor((v / 1024) + 0.5)
+                        elseif k == "MemFree"      then info.free           = math.floor((v / 1024) + 0.5)
+                        elseif k == "MemTotal"     then info.total          = math.floor((v / 1024) + 0.5)
+                        elseif k == "SReclaimable" then info.sreclaimable   = math.floor((v / 1024) + 0.5)
+                        elseif k == "SwapFree"     then info.swap_free      = math.floor((v / 1024) + 0.5)
+                        elseif k == "SwapTotal"    then info.swap_total     = math.floor((v / 1024) + 0.5)
                         end
                     end
                 end
