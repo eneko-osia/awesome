@@ -9,7 +9,6 @@ local awful_hotkeys_popup   = require("awful.hotkeys_popup")
                               require("awful.hotkeys_popup.keys")
 local beautiful             = require("beautiful")
 local gears                 = require("gears")
-local lain                  = require("lain")
 local menu                  = require("menu")
 local menubar               = require("menubar")
 local naughty               = require("naughty")
@@ -21,6 +20,7 @@ local widget_file_system    = require("widget.file_system")
 local widget_memory         = require("widget.memory")
 local widget_network        = require("widget.network")
 local widget_spotify        = require("widget.spotify")
+local widget_terminal       = require("widget.terminal")
 local widget_volume         = require("widget.volume")
 local widget_vpn            = require("widget.vpn")
 -- }}}
@@ -245,16 +245,6 @@ end
 -- }}}
 
 -- {{{ Widgets definitions
--- Quake console
-quake = lain.util.quake(
-    {
-        app         = TERMINAL,
-        extra       = "-fg white -bg black",
-        followtag   = true,
-        height      = 0.5
-    }
-)
-
 -- Menu bar buttons
 local menu_bar_buttons = gears.table.join(
     awful.button(
@@ -500,6 +490,16 @@ local spotify_widget = widget_spotify(
                 play = beautiful.mpd_play,
                 prev = beautiful.mpd_prev
             }
+    }
+)
+
+-- terminal widget
+local terminal_widget = widget_terminal(
+    {
+        app         = TERMINAL,
+        extra       = "-fg white -bg black",
+        followtag   = true,
+        height      = 0.5
     }
 )
 
@@ -917,8 +917,8 @@ local globalkeys = gears.table.join(
     awful.key(
         { MOD_KEY },
         "`",
-        function () quake:toggle() end,
-        { description = "quake terminal", group = "launcher" }
+        function () terminal_widget:toggle() end,
+        { description = "terminal", group = "launcher" }
     ),
 
     awful.key(
