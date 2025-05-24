@@ -111,7 +111,7 @@ local function factory(args)
                             {
                                 align  = "left",
                                 forced_height = beautiful_dpi(20),
-                                forced_width = beautiful_dpi(128),
+                                forced_width = beautiful_dpi(64),
                                 text = string.format(" %s", title),
                                 valign = "center",
                                 widget = wibox.widget.textbox
