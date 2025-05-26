@@ -368,9 +368,9 @@ local battery_widget = widget_battery(
         icons =
             {
                 ac = beautiful.widget.ac,
-                battery = 
+                battery =
                     {
-                        charging = 
+                        charging =
                             {
                                 empty = beautiful.widget.battery_charging_empty,
                                 full = beautiful.widget.battery_charging_full,
@@ -468,12 +468,14 @@ local network_widget = widget_network(
                 eth = beautiful.widget.eth,
                 netdl = beautiful.widget.netdl,
                 netup = beautiful.widget.netul,
-                wifi = beautiful.widget.wifi,
-                wifi_excellent = beautiful.widget.wifi_excellent,
-                wifi_very_good = beautiful.widget.wifi_very_good,
-                wifi_good = beautiful.widget.wifi_good,
-                wifi_weak = beautiful.widget.wifi_weak,
-                wifi_none = beautiful.widget.wifi_none
+                wifi =
+                    {
+                        excellent = beautiful.widget.wifi_excellent,
+                        very_good = beautiful.widget.wifi_very_good,
+                        good = beautiful.widget.wifi_good,
+                        weak = beautiful.widget.wifi_weak,
+                        none = beautiful.widget.wifi_none
+                    }
             },
         timeout = 2
     }

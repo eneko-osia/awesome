@@ -21,16 +21,19 @@ local function factory(args)
             eth = nil,
             netdl = nil,
             netup = nil,
-            wifi = nil,
-            wifi_excellent = nil,
-            wifi_very_good = nil,
-            wifi_good = nil,
-            wifi_weak = nil,
-            wifi_none = nil
+            wifi = 
+                {
+                    excellent = nil,
+                    very_good = nil,
+                    good = nil,
+                    weak = nil,
+                    none = nil
+                }
         }
     local info = 
         { 
             interfaces = {},
+            interfaces_updating = 0,
             received = 0,
             sent = 0
         }
@@ -95,6 +98,7 @@ local function factory(args)
                                 widget = wibox.widget.textbox
                             },
                             bg = beautiful.bg_focus,
+                            id = "text_netdl_container",
                             shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(2)) end,
                             widget = wibox.container.background,
                         },
@@ -111,6 +115,7 @@ local function factory(args)
                                 widget = wibox.widget.textbox
                             },
                             bg = beautiful.bg_focus,
+                            id = "text_netup_container",
                             shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(2)) end,
                             widget = wibox.container.background,
                         },
@@ -333,7 +338,7 @@ local function factory(args)
                 {
                     {
                         {
-                            widget = wibox.widget.imagebox(icons.wifi)
+                            widget = wibox.widget.imagebox(icons.wifi.none)
                         },
                         layout = wibox.container.margin(_, beautiful_dpi(4), beautiful_dpi(4), beautiful_dpi(3), beautiful_dpi(3))
                     },
@@ -421,15 +426,15 @@ local function factory(args)
         if net_info.state == STATE_UP then
             local icon_widget = icon_widget_container:get_children()[1]:get_children()[1]
             if net_info.signal >= -30 then
-                icon_widget:set_image(icons.wifi_excellent)
+                icon_widget:set_image(icons.wifi.excellent)
             elseif net_info.signal >= -67 then
-                icon_widget:set_image(icons.wifi_very_good)
+                icon_widget:set_image(icons.wifi.very_good)
             elseif net_info.signal >= -70 then
-                icon_widget:set_image(icons.wifi_good)
+                icon_widget:set_image(icons.wifi.good)
             elseif net_info.signal >= -80 then
-                icon_widget:set_image(icons.wifi_weak)
+                icon_widget:set_image(icons.wifi.weak)
             else
-                icon_widget:set_image(icons.wifi_none)
+                icon_widget:set_image(icons.wifi.none)
             end
             net_info.widget.visible = true
         else
@@ -517,11 +522,11 @@ local function factory(args)
                 local state = 0
 
                 -- read data from command results
-                local i = 0
+                local i = 1
                 for v in stdout:gmatch("[^\r\n]+") do
-                    if i == 0 then
+                    if i == 1 then
                         carrier = v
-                    elseif i == 1 then
+                    elseif i == 2 then
                         if carrier == 0 then
                             net_info.state = STATE_DOWN
                         else
@@ -533,9 +538,9 @@ local function factory(args)
                                 net_info.state = STATE_UNKNOWN
                             end
                         end
-                    elseif i == 2 then
-                        received = v
                     elseif i == 3 then
+                        received = v
+                    elseif i == 4 then
                         sent = v
                     end
                     i = i + 1
@@ -547,113 +552,126 @@ local function factory(args)
                 net_info.prev_received = received
                 net_info.prev_sent = sent
 
+                -- decrease the number of interfaces updating
+                info.interfaces_updating = info.interfaces_updating - 1
+
                 -- update popup
-                if net_info.popup.speed_row.visible then
+                if popup_speed.visible then
                     update_speed_popup(net_info)
                 end
 
-                -- calculate total received and sent
-                if net_info.state == STATE_UP then
-                    local total_received = 0
-                    local total_sent = 0
-                    for _, v in pairs(info.interfaces) do
-                        if v.state == STATE_UP then
-                            total_received = total_received + v.received
-                            total_sent = total_sent + v.sent
+                -- update widget if all interfaces update has been completed
+                if info.interfaces_updating == 0 then
+                    -- calculate total received and sent
+                    if net_info.state == STATE_UP then
+                        local total_received = 0
+                        local total_sent = 0
+                        for _, v in pairs(info.interfaces) do
+                            if v.state == STATE_UP then
+                                total_received = total_received + v.received
+                                total_sent = total_sent + v.sent
+                            end
                         end
+                        info.received = total_received
+                        info.sent = total_sent
                     end
-                    info.received = total_received
-                    info.sent = total_sent
-                end
 
-                -- update widget
-                update_speed_widget()
+                    -- update widget
+                    update_speed_widget()
+                end
             end
         )
     end
 
     local function update()
-        -- check network interfaces in the system
-        awful.spawn.easy_async(
-            "ls /sys/class/net",
-            function(stdout, _, _, _)
-                -- get interfaces
-                local interfaces = {}
-                for interface in stdout:gmatch("[^\r\n]+") do
-                    if interface ~= "lo" then
-                        table.insert(interfaces, interface)
-                    end
-                end
+        -- check that previous update has finished
+        if info.interfaces_updating == 0 then
 
-                -- check number of interfaces
-                local need_to_remove = false
-                if #interfaces ~= #info.interfaces then
-                    need_to_remove = true
-                else
-                    -- check all interfaces are the same
-                    for i, interface in ipairs(interfaces) do
-                        if interface ~= info.interfaces[i].interface then
-                            need_to_remove = true
-                            break
+            -- check network interfaces in the system
+            awful.spawn.easy_async(
+                "ls /sys/class/net",
+                function(stdout, _, _, _)
+                    -- get interfaces
+                    local interfaces = {}
+                    for interface in stdout:gmatch("[^\r\n]+") do
+                        if interface ~= "lo" then
+                            table.insert(interfaces, interface)
                         end
                     end
-                end
 
-                -- if interfaces do not match remove them all
-                if need_to_remove then
-                    for i = #info.interfaces, 1, -1 do
-                        remove_connection_info(i)
+                    -- check number of interfaces
+                    local need_to_remove = false
+                    if #interfaces ~= #info.interfaces then
+                        need_to_remove = true
+                    else
+                        -- check all interfaces are the same
+                        for i, interface in ipairs(interfaces) do
+                            if interface ~= info.interfaces[i].interface then
+                                need_to_remove = true
+                                break
+                            end
+                        end
                     end
-                end
 
-                -- iterate all network interfaces
-                for i, interface in ipairs(interfaces) do
-                     if not info.interfaces[i] then
-                        -- add new interface info since there isn't any
-                        info.interfaces[i] =
-                            {
-                                interface = interface,
-                                popup =
-                                    {
-                                        speed_row = create_speed_popup_row(interface)
-                                    },
-                                received = 0,
-                                sent = 0,
-                                state = STATE_DOWN
-                            }
+                    -- if interfaces do not match remove them all
+                    if need_to_remove then
+                        for i = #info.interfaces, 1, -1 do
+                            remove_connection_info(i)
+                        end
+                    end
+
+                    -- set number of interfaces updating
+                    info.interfaces_updating = #interfaces
+
+                    -- iterate all network interfaces
+                    for i, interface in ipairs(interfaces) do
+                        if not info.interfaces[i] then
+                            -- add new interface info since there isn't any
+                            info.interfaces[i] =
+                                {
+                                    interface = interface,
+                                    popup =
+                                        {
+                                            speed_row = create_speed_popup_row(interface)
+                                        },
+                                    received = 0,
+                                    sent = 0,
+                                    state = STATE_DOWN
+                                }
+                            local net_info = info.interfaces[i]
+
+                            -- add popup row to layout
+                            popup_speed:get_widget():get_children_by_id("row_container")[1]:add(net_info.popup.speed_row)
+
+                            -- request interface type
+                            awful.spawn.easy_async(
+                                string.format("cat /sys/class/net/%s/uevent", interface),
+                                function(stdout, _, _, _)
+                                    net_info.type = string.match(stdout, "DEVTYPE=(%w+)") or "ethernet"
+                                    if net_info.type == "wlan" then
+                                        -- create wifi popup
+                                        net_info.popup.wifi = create_wifi_popup()
+
+                                        -- create wifi widget
+                                        net_info.widget = create_wifi_widget(net_info)
+                                        local connection_container_widget = widget:get_children_by_id("connection_container")[1]:get_children()[1]
+                                        connection_container_widget:add(net_info.widget)
+                                    end
+                                end
+                            )
+                        end
+
                         local net_info = info.interfaces[i]
 
-                        -- add popup row to layout
-                        popup_speed:get_widget():get_children_by_id("row_container")[1]:add(net_info.popup.speed_row)
+                        -- check interface state and stats
+                        update_connection_state_n_stats(net_info)
 
-                        -- request interface type
-                        awful.spawn.easy_async(
-                            string.format("cat /sys/class/net/%s/uevent", interface),
-                            function(stdout, _, _, _)
-                                net_info.type = string.match(stdout, "DEVTYPE=(%w+)") or "ethernet"
-                                if net_info.type == "wlan" then
-                                    -- create wifi popup
-                                    net_info.popup.wifi = create_wifi_popup()
-
-                                    -- create wifi widget
-                                    net_info.widget = create_wifi_widget(net_info)
-                                    local connection_container_widget = widget:get_children_by_id("connection_container")[1]:get_children()[1]
-                                    connection_container_widget:add(net_info.widget)
-                                end
-                            end
-                        )
+                        -- check interface connection info
+                        update_connection_info(net_info)
                     end
-
-                    local net_info = info.interfaces[i]
-
-                    -- check interface state and stats
-                    update_connection_state_n_stats(net_info)
-
-                    -- check interface connection info
-                    update_connection_info(net_info)
                 end
-            end
-        )
+            )
+        end
     end
 
     -- signals
