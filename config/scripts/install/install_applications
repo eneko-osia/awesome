@@ -15,4 +15,5 @@ sudo pacman --needed -S \
     qbittorrent         \
     steam               \
     tigervnc            \
-    vlc
+    vlc                 \
+    yt-dlp
