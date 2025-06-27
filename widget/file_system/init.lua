@@ -142,6 +142,22 @@ local function factory(args)
                             {
                                 align  = "center",
                                 forced_height = beautiful_dpi(20),
+                                forced_width = beautiful_dpi(64),
+                                text = "N/A",
+                                valign = "center",
+                                widget = wibox.widget.textbox
+                            },
+                            bg = beautiful.bg_focus,
+                            shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(5)) end,
+                            widget = wibox.container.background
+                        },
+                        layout = wibox.container.margin(_, beautiful_dpi(3), _, _, _)
+                    },
+                    {
+                        {
+                            {
+                                align  = "center",
+                                forced_height = beautiful_dpi(20),
                                 forced_width = beautiful_dpi(128),
                                 text = "N/A",
                                 valign = "center",
@@ -174,17 +190,22 @@ local function factory(args)
         end
 
         local rows_container_widget = fs_info.popup.row:get_children()[1]
-        local used = math.floor((fs_info.used / 1024.0 / 1024.0) + 0.5)
+        local available = math.floor((fs_info.available / 1024.0 / 1024.0) + 0.5)
         local size = math.floor((fs_info.size / 1024.0 / 1024.0) + 0.5)
+        local used = math.floor((fs_info.used / 1024.0 / 1024.0) + 0.5)
         if fs_info.percentage > 80 then
             _set_text(rows_container_widget, 2, string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_urgent, fs_info.percentage))
-            _set_text(rows_container_widget, 4, string.format("<span foreground='%s'> %3d / %3d GiB </span>", beautiful.fg_urgent, used, size))
+            _set_text(rows_container_widget, 4, string.format("<span foreground='%s'> %3d GiB </span>", beautiful.fg_urgent, available))
+            _set_text(rows_container_widget, 5, string.format("<span foreground='%s'> %3d / %3d GiB </span>", beautiful.fg_urgent, used, size))
+            
         elseif fs_info.percentage > 60 then
             _set_text(rows_container_widget, 2, string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_focus, fs_info.percentage))
-            _set_text(rows_container_widget, 4, string.format("<span foreground='%s'> %3d / %3d GiB </span>", beautiful.fg_focus, used, size))
+            _set_text(rows_container_widget, 4, string.format("<span foreground='%s'> %3d GiB </span>", beautiful.fg_focus, available))
+            _set_text(rows_container_widget, 5, string.format("<span foreground='%s'> %3d / %3d GiB </span>", beautiful.fg_focus, used, size))
         else
             _set_text(rows_container_widget, 2, string.format("<span foreground='%s'> %d%% </span>", beautiful.fg_normal, fs_info.percentage))
-            _set_text(rows_container_widget, 4, string.format("<span foreground='%s'> %3d / %3d GiB </span>", beautiful.fg_normal, used, size))
+            _set_text(rows_container_widget, 4, string.format("<span foreground='%s'> %3d GiB </span>", beautiful.fg_normal, available))
+            _set_text(rows_container_widget, 5, string.format("<span foreground='%s'> %3d / %3d GiB </span>", beautiful.fg_normal, used, size))
         end
         _set_value(rows_container_widget, 3, fs_info.percentage)
     end
