@@ -694,18 +694,16 @@ local function factory(args)
                 -- update widget if all interfaces update has been completed
                 if info.interfaces_updating == 0 then
                     -- calculate total received and sent
-                    if net_info.state == STATE_UP then
-                        local total_received = 0
-                        local total_sent = 0
-                        for _, v in pairs(info.interfaces) do
-                            if v.state == STATE_UP then
-                                total_received = total_received + v.received
-                                total_sent = total_sent + v.sent
-                            end
+                    local total_received = 0
+                    local total_sent = 0
+                    for _, v in pairs(info.interfaces) do
+                        if v.state == STATE_UP then
+                            total_received = total_received + v.received
+                            total_sent = total_sent + v.sent
                         end
-                        info.received = total_received
-                        info.sent = total_sent
                     end
+                    info.received = total_received
+                    info.sent = total_sent
 
                     -- update widget
                     update_speed_widget()
