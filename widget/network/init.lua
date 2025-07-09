@@ -21,7 +21,7 @@ local function factory(args)
             eth = nil,
             netdl = nil,
             netup = nil,
-            wifi = 
+            wifi =
                 {
                     excellent = nil,
                     very_good = nil,
@@ -30,8 +30,8 @@ local function factory(args)
                     none = nil
                 }
         }
-    local info = 
-        { 
+    local info =
+        {
             interfaces = {},
             interfaces_updating = 0,
             received = 0,
@@ -164,6 +164,82 @@ local function factory(args)
         return string.format(" %.1f B/s ", bytes)
     end
 
+    local function create_info_popup_row(title)
+        return wibox.widget(
+            {
+                {
+                    {
+                        {
+                            {
+                                align  = "left",
+                                forced_height = beautiful_dpi(20),
+                                forced_width = beautiful_dpi(128),
+                                text = string.format(" %s", title),
+                                valign = "center",
+                                widget = wibox.widget.textbox
+                            },
+                            bg = beautiful.bg_focus,
+                            shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(5)) end,
+                            widget = wibox.container.background
+                        },
+                        layout = wibox.container.margin(_, _, _, _, _)
+                    },
+                    {
+                        {
+                            {
+                                align  = "center",
+                                forced_height = beautiful_dpi(20),
+                                forced_width = beautiful_dpi(256),
+                                text = string.format(" N/A"),
+                                valign = "center",
+                                widget = wibox.widget.textbox
+                            },
+                            bg = beautiful.bg_focus,
+                            shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(5)) end,
+                            widget = wibox.container.background
+                        },
+                        layout = wibox.container.margin(_, beautiful_dpi(3), _, _, _)
+                    },
+                    layout = wibox.layout.fixed.horizontal
+                },
+                bg = beautiful.bg_reset,
+                shape = gears.shape.rectangle,
+                widget = wibox.container.background
+            }
+        )
+    end
+
+    local function create_ethernet_popup()
+        return awful.popup(
+            {
+                border_color = beautiful.bg_focus,
+                border_width = beautiful_dpi(2),
+                offset = { y = beautiful_dpi(2) },
+                ontop = true,
+                shape = gears.shape.rounded_rect,
+                visible = false,
+                widget =
+                    {
+                        {
+                            {
+                                {
+                                    create_info_popup_row("ip"),
+                                    id = "row_container",
+                                    layout = wibox.layout.fixed.vertical,
+                                    spacing = beautiful_dpi(5)
+                                },
+                                layout = wibox.container.margin(_, beautiful_dpi(5), beautiful_dpi(5), beautiful_dpi(5), beautiful_dpi(5))
+                            },
+                            layout = wibox.layout.fixed.horizontal
+                        },
+                        bg = beautiful.bg_reset,
+                        shape = gears.shape.rectangle,
+                        widget = wibox.container.background
+                    }
+            }
+        )
+    end
+
     local function create_speed_popup_row(title)
         return wibox.widget(
             {
@@ -225,51 +301,6 @@ local function factory(args)
         )
     end
 
-    local function create_wifi_popup_row(title)
-        return wibox.widget(
-            {
-                {
-                    {
-                        {
-                            {
-                                align  = "left",
-                                forced_height = beautiful_dpi(20),
-                                forced_width = beautiful_dpi(128),
-                                text = string.format(" %s", title),
-                                valign = "center",
-                                widget = wibox.widget.textbox
-                            },
-                            bg = beautiful.bg_focus,
-                            shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(5)) end,
-                            widget = wibox.container.background
-                        },
-                        layout = wibox.container.margin(_, _, _, _, _)
-                    },
-                    {
-                        {
-                            {
-                                align  = "center",
-                                forced_height = beautiful_dpi(20),
-                                forced_width = beautiful_dpi(256),
-                                text = string.format(" N/A"),
-                                valign = "center",
-                                widget = wibox.widget.textbox
-                            },
-                            bg = beautiful.bg_focus,
-                            shape = function(cr, width, height) gears.shape.rounded_rect(cr, beautiful_dpi(width), beautiful_dpi(height), beautiful_dpi(5)) end,
-                            widget = wibox.container.background
-                        },
-                        layout = wibox.container.margin(_, beautiful_dpi(3), _, _, _)
-                    },
-                    layout = wibox.layout.fixed.horizontal
-                },
-                bg = beautiful.bg_reset,
-                shape = gears.shape.rectangle,
-                widget = wibox.container.background
-            }
-        )
-    end
-
     local function create_wifi_popup()
         return awful.popup(
             {
@@ -284,11 +315,11 @@ local function factory(args)
                         {
                             {
                                 {
-                                    create_wifi_popup_row("interface"),
-                                    create_wifi_popup_row("ssid"),
-                                    create_wifi_popup_row("ip"),
-                                    create_wifi_popup_row("received bitrate"),
-                                    create_wifi_popup_row("sent bitrate"),
+                                    create_info_popup_row("interface"),
+                                    create_info_popup_row("ssid"),
+                                    create_info_popup_row("ip"),
+                                    create_info_popup_row("received bitrate"),
+                                    create_info_popup_row("sent bitrate"),
                                     id = "row_container",
                                     layout = wibox.layout.fixed.vertical,
                                     spacing = beautiful_dpi(5)
@@ -303,6 +334,17 @@ local function factory(args)
                     }
             }
         )
+    end
+
+    local function update_ethernet_popup(net_info)
+        local function _set_text(container, index, value)
+            local widget = container:get_children()[index]:get_children()[1]:get_children()[2]:get_children()[1]:get_children()[1]
+            widget:set_markup(value)
+        end
+
+        local popup_widget = net_info.popup.info:get_widget()
+        local rows_container_widget = popup_widget:get_children_by_id("row_container")[1]
+        _set_text(rows_container_widget, 1, net_info.ip)
     end
 
     local function update_speed_popup(net_info)
@@ -323,13 +365,80 @@ local function factory(args)
             widget:set_markup(value)
         end
 
-        local popup_widget = net_info.popup.wifi:get_widget()
+        local popup_widget = net_info.popup.info:get_widget()
         local rows_container_widget = popup_widget:get_children_by_id("row_container")[1]
         _set_text(rows_container_widget, 1, string.format(" %s", net_info.interface))
         _set_text(rows_container_widget, 2, net_info.ssid)
         _set_text(rows_container_widget, 3, net_info.ip)
         _set_text(rows_container_widget, 4, net_info.received_bitrate)
         _set_text(rows_container_widget, 5, net_info.sent_bitrate)
+    end
+
+    local function create_ethernet_widget(net_info)
+        local widget = wibox.widget(
+            {
+                {
+                    {
+                        {
+                            widget = wibox.widget.imagebox(icons.eth)
+                        },
+                        layout = wibox.container.margin(_, beautiful_dpi(4), beautiful_dpi(4), beautiful_dpi(3), beautiful_dpi(3))
+                    },
+                    bg = beautiful.bg_reset,
+                    id = "icon_container",
+                    shape = gears.shape.rectangle,
+                    widget = wibox.container.background
+                },
+                {
+                    {
+                        widget = wibox.widget.imagebox(beautiful.spr)
+                    },
+                    layout = wibox.container.margin(_, _, _, _, _)
+                },
+                layout = wibox.layout.fixed.horizontal
+            }
+        )
+
+        -- bindings
+        local icon_widget_container = widget:get_children_by_id("icon_container")[1]
+        icon_widget_container:buttons(
+            gears.table.join(
+                awful.button(
+                    {},
+                    1,
+                    _,
+                    function()
+                        awful.spawn.easy_async(
+                            string.format("%s -e iwctl", terminal),
+                            function(stdout)
+                            end
+                        )
+                    end
+                )
+            )
+        )
+
+        -- signals
+        icon_widget_container:connect_signal(
+            "mouse::enter",
+            function(c)
+                c:set_bg(beautiful.bg_normal)
+
+                update_ethernet_popup(net_info)
+                net_info.popup.info:move_next_to(mouse.current_widget_geometry)
+                net_info.popup.info.visible = true
+            end
+        )
+
+        icon_widget_container:connect_signal(
+            "mouse::leave",
+            function(c)
+                net_info.popup.info.visible = false
+                c:set_bg(beautiful.bg_reset)
+            end
+        )
+
+        return widget
     end
 
     local function create_wifi_widget(net_info)
@@ -397,21 +506,31 @@ local function factory(args)
                 c:set_bg(beautiful.bg_normal)
 
                 update_wifi_popup(net_info)
-                net_info.popup.wifi:move_next_to(mouse.current_widget_geometry)
-                net_info.popup.wifi.visible = true
+                net_info.popup.info:move_next_to(mouse.current_widget_geometry)
+                net_info.popup.info.visible = true
             end
         )
 
         icon_widget_container:connect_signal(
             "mouse::leave",
             function(c)
-                net_info.popup.wifi.visible = false
+                net_info.popup.info.visible = false
                 c:set_bg(beautiful.bg_reset)
             end
         )
 
         return widget
     end
+
+    local function update_ethernet_widget(net_info)
+        local icon_widget_container = net_info.widget:get_children_by_id("icon_container")[1]
+        if net_info.state == STATE_UP then
+            net_info.widget.visible = true
+        else
+            net_info.widget.visible = false
+        end
+    end
+
 
     local function update_speed_widget()
         local netdl_text_widget = widget:get_children_by_id("text_netdl")[1]
@@ -465,8 +584,12 @@ local function factory(args)
                     net_info.ip = string.match(stdout, "inet (%d+%.%d+%.%d+%.%d+)") or "N/A"
 
                     -- update popup
-                    if net_info.popup.wifi.visible then
-                        update_wifi_popup(net_info)
+                    if net_info.popup.info.visible then
+                        if net_info.type == "wlan" then
+                            update_wifi_popup(net_info)
+                        elseif net_info.type == "ethernet" then
+                            update_ethernet_popup(net_info)
+                        end
                     end
                 end
             )
@@ -484,7 +607,7 @@ local function factory(args)
                         end
 
                         -- update popup
-                        if net_info.popup.wifi.visible then
+                        if net_info.popup.info.visible then
                             update_wifi_popup(net_info)
                         end
 
@@ -492,12 +615,15 @@ local function factory(args)
                         update_wifi_widget(net_info)
                     end
                 )
+            elseif net_info.type == "ethernet" then
+                update_ethernet_widget(net_info)
             end
         else
-            if net_info.type == "wlan" then
-                -- update widget
-                if net_info.widget then
+            if net_info.widget then
+                if net_info.type == "wlan" then
                     update_wifi_widget(net_info)
+                elseif net_info.type == "ethernet" then
+                    update_ethernet_widget(net_info)
                 end
             end
         end
@@ -650,10 +776,18 @@ local function factory(args)
                                     net_info.type = string.match(stdout, "DEVTYPE=(%w+)") or "ethernet"
                                     if net_info.type == "wlan" then
                                         -- create wifi popup
-                                        net_info.popup.wifi = create_wifi_popup()
+                                        net_info.popup.info = create_wifi_popup()
 
                                         -- create wifi widget
                                         net_info.widget = create_wifi_widget(net_info)
+                                        local connection_container_widget = widget:get_children_by_id("connection_container")[1]:get_children()[1]
+                                        connection_container_widget:add(net_info.widget)
+                                    elseif net_info.type == "ethernet" then
+                                        -- create ethernet popup
+                                        net_info.popup.info = create_ethernet_popup()
+
+                                        -- create ethernet widget
+                                        net_info.widget = create_ethernet_widget(net_info)
                                         local connection_container_widget = widget:get_children_by_id("connection_container")[1]:get_children()[1]
                                         connection_container_widget:add(net_info.widget)
                                     end
