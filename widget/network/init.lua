@@ -224,6 +224,7 @@ local function factory(args)
                             {
                                 {
                                     create_info_popup_row("ip"),
+                                    create_info_popup_row("mac"),
                                     id = "row_container",
                                     layout = wibox.layout.fixed.vertical,
                                     spacing = beautiful_dpi(5)
@@ -318,6 +319,7 @@ local function factory(args)
                                     create_info_popup_row("interface"),
                                     create_info_popup_row("ssid"),
                                     create_info_popup_row("ip"),
+                                    create_info_popup_row("mac"),
                                     create_info_popup_row("received bitrate"),
                                     create_info_popup_row("sent bitrate"),
                                     id = "row_container",
@@ -345,6 +347,7 @@ local function factory(args)
         local popup_widget = net_info.popup.info:get_widget()
         local rows_container_widget = popup_widget:get_children_by_id("row_container")[1]
         _set_text(rows_container_widget, 1, net_info.ip)
+        _set_text(rows_container_widget, 2, net_info.mac)
     end
 
     local function update_speed_popup(net_info)
@@ -370,8 +373,9 @@ local function factory(args)
         _set_text(rows_container_widget, 1, string.format(" %s", net_info.interface))
         _set_text(rows_container_widget, 2, net_info.ssid)
         _set_text(rows_container_widget, 3, net_info.ip)
-        _set_text(rows_container_widget, 4, net_info.received_bitrate)
-        _set_text(rows_container_widget, 5, net_info.sent_bitrate)
+        _set_text(rows_container_widget, 4, net_info.mac)
+        _set_text(rows_container_widget, 5, net_info.received_bitrate)
+        _set_text(rows_container_widget, 6, net_info.sent_bitrate)
     end
 
     local function create_ethernet_widget(net_info)
@@ -582,6 +586,7 @@ local function factory(args)
                 function(stdout, _, _, _)
                     -- get ip info
                     net_info.ip = string.match(stdout, "inet (%d+%.%d+%.%d+%.%d+)") or "N/A"
+                    net_info.mac = string.match(stdout, "link/ether (%w+%:%w+%:%w+%:%w+%:%w+%:%w+)") or "N/A"
 
                     -- update popup
                     if net_info.popup.info.visible then
