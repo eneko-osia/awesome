@@ -13,6 +13,7 @@ paru --needed -S                \
     slack-desktop               \
     spotify                     \
     steamlink                   \
+    tiny-media-manager          \
     vscodium-bin                \
     xfe                         \
     yed                         \

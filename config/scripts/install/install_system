@@ -27,7 +27,9 @@ sudo pacman --needed -S \
     mesa                \
     mlocate             \
     mtools              \
+    nfs-utils           \
     noto-fonts          \
+    noto-fonts-cjk      \
     noto-fonts-emoji    \
     ntfs-3g             \
     openssh             \
