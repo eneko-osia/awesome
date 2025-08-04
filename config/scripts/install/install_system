@@ -7,6 +7,7 @@ sudo pacman --needed -S \
     base-devel          \
     bash-completion     \
     cmake               \
+    dosfstools          \
     feh                 \
     ffmpeg              \
     git                 \
