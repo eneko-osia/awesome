@@ -2,16 +2,16 @@
 
 # install paru packages
 paru --needed -S                \
+    bulky                       \
+    feishin-bin                 \
     freetube-bin                \
     heroic-games-launcher-bin   \
     mcomix                      \
     mkinitcpio-firmware         \
-    nordvpn-bin                 \
     parsec-bin                  \
     protonup-qt                 \
     sgdboop-bin                 \
     slack-desktop               \
-    spotify                     \
     steamlink                   \
     tiny-media-manager          \
     vscodium-bin                \

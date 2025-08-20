@@ -4,9 +4,7 @@
 sudo pacman --needed -S \
     discord             \
     firefox             \
-    gamemode            \
     gimp                \
-    lib32-gamemode      \
     libreoffice-still   \
     qbittorrent         \
     steam               \
