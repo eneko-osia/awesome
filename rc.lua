@@ -18,8 +18,8 @@ local widget_clock          = require("widget.clock")
 local widget_cpu            = require("widget.cpu")
 local widget_file_system    = require("widget.file_system")
 local widget_memory         = require("widget.memory")
+local widget_music          = require("widget.music")
 local widget_network        = require("widget.network")
-local widget_spotify        = require("widget.spotify")
 local widget_terminal       = require("widget.terminal")
 local widget_volume         = require("widget.volume")
 local widget_vpn            = require("widget.vpn")
@@ -460,6 +460,22 @@ local microphone_widget = widget_volume(
     }
 )
 
+-- Music widget
+local music_widget = widget_music(
+    {
+        icons =
+            {
+                logo = beautiful.mpd_feishin,
+                next = beautiful.mpd_next,
+                pause = beautiful.mpd_pause,
+                play = beautiful.mpd_play,
+                prev = beautiful.mpd_prev
+            },
+        music_player = "Feishin",
+        music_player_launcher = "feishin"
+    }
+)
+
 -- Network widget
 local network_widget = widget_network(
     {
@@ -478,20 +494,6 @@ local network_widget = widget_network(
                     }
             },
         timeout = 2
-    }
-)
-
--- Spotify widget
-local spotify_widget = widget_spotify(
-    {
-        icons =
-            {
-                logo = beautiful.mpd_spotify,
-                next = beautiful.mpd_next,
-                pause = beautiful.mpd_pause,
-                play = beautiful.mpd_play,
-                prev = beautiful.mpd_prev
-            }
     }
 )
 
@@ -609,7 +611,7 @@ function set_widgets(s)
                     spr4px,
                     spr,
                     -- Music
-                    spotify_widget,
+                    music_widget,
                     -- Separator
                     spr,
                     spr4px,
@@ -697,7 +699,7 @@ function set_widgets(s)
                     spr4px,
                     spr,
                     -- Music
-                    spotify_widget,
+                    music_widget,
                     -- Separator
                     spr,
                     spr4px,
@@ -967,6 +969,29 @@ local globalkeys = gears.table.join(
         { description = "next layout", group = "layout" }
     ),
 
+    -- Music
+
+    awful.key(
+        { MOD_KEY },
+        "s",
+        function() music_widget:play_pause() end,
+        { description = "play / pause music", group = "music" }
+    ),
+
+    awful.key(
+        { MOD_KEY },
+        "a",
+        function() music_widget:previous() end,
+        { description = "previous song", group = "music" }
+    ),
+
+    awful.key(
+        { MOD_KEY },
+        "d",
+        function() music_widget:next() end,
+        { description = "next song", group = "music" }
+    ),
+
     -- Programs
 
     awful.key(
@@ -997,29 +1022,6 @@ local globalkeys = gears.table.join(
         "k",
         function () awful.screen.focus_relative(-1) end,
         { description = "next screen", group = "screen" }
-    ),
-
-    -- Spotify
-
-    awful.key(
-        { MOD_KEY },
-        "s",
-        function() spotify_widget:play_pause() end,
-        { description = "play / pause music", group = "spotify" }
-    ),
-
-    awful.key(
-        { MOD_KEY },
-        "a",
-        function() spotify_widget:previous() end,
-        { description = "previous song", group = "spotify" }
-    ),
-
-    awful.key(
-        { MOD_KEY },
-        "d",
-        function() spotify_widget:next() end,
-        { description = "next song", group = "spotify" }
     ),
 
     -- Tags
@@ -1233,6 +1235,20 @@ awful.rules.rules =
         {
             rule =
                 {
+                    class = "[Ff]eishin"
+                },
+            properties =
+                {
+                    floating = false,
+                    screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
+                    tag = tags.names[tags.TAG_MUSIC],
+                    titlebars_enabled = false
+                }
+        },
+
+        {
+            rule =
+                {
                     class = "[Ff]irefox"
                 },
             properties =
@@ -1296,20 +1312,6 @@ awful.rules.rules =
                     floating = false,
                     screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
                     tag = tags.names[tags.TAG_CHAT],
-                    titlebars_enabled = false
-                }
-        },
-
-        {
-            rule =
-                {
-                    class = "[Ss]potify"
-                },
-            properties =
-                {
-                    floating = false,
-                    screen = screens.SCREEN_TWO <= screen.count() and screens.SCREEN_TWO or awful.screen.preferred,
-                    tag = tags.names[tags.TAG_MUSIC],
                     titlebars_enabled = false
                 }
         },
