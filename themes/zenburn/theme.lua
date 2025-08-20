@@ -76,7 +76,7 @@ theme.tasklist_maximized_vertical   = ""
 -- }}}
 
 -- {{{ Music
-theme.mpd_spotify                   = themes_path .. "zenburn/panel/apps/spotify.png"
+theme.mpd_feishin                   = themes_path .. "zenburn/panel/apps/feishin.png"
 theme.mpd_prev                      = themes_path .. "zenburn/panel/widgets/mpd_prev.svg"
 theme.mpd_next                      = themes_path .. "zenburn/panel/widgets/mpd_next.svg"
 theme.mpd_stop                      = themes_path .. "zenburn/panel/widgets/mpd_stop.svg"
