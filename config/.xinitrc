@@ -6,7 +6,7 @@
 
 # set liquid cooler rgb colors
 liquidctl --match Corsair set logo color alert 00ff00 ffff00 ff0000
-liquidctl --match Corsair set fan speed  20 50  30 70  40 100
+liquidctl --match Corsair set fan speed  40 50 50 60 60 70 70 80 80 100
 
 # set display mode
 xrandr --output HDMI-A-1 --mode 1920x1080 --rate 60 --pos 0x0 --set TearFree on --output HDMI-A-0 --mode 2560x1440 --rate 164 --pos 1920x-360 --primary --set TearFree on
