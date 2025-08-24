@@ -10,4 +10,5 @@ sudo pacman --needed -S \
     steam               \
     tigervnc            \
     vlc                 \
+    vlc-plugin-ffmpeg   \
     yt-dlp
