@@ -1,4 +1,0 @@
-#!/bin/bash
-
-xrandr --output DisplayPort-1 --off --output DisplayPort-0 --off --output HDMI-A-1 --mode 1920x1080 --rate 120 --pos 0x0 --primary
-awesome-client 'awesome.restart()'

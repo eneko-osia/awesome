@@ -1,5 +1,0 @@
-#!/bin/bash
-
-# docker run -d -p 8080:80 --name openproject -e OPENPROJECT_HOST__NAME=localhost:8080 -e OPENPROJECT_SECRET_KEY_BASE=secret -e OPENPROJECT_HTTPS=false -v /home/eneko/dev/rocksteady/roses/openproject/pgdata:/var/openproject/pgdata -v /home/eneko/dev/rocksteady/roses/openproject/assets:/var/openproject/assets openproject/openproject:15
-# docker exec -t openproject /usr/bin/curl "https://gist.githubusercontent.com/markasoftware/f5b2e55a2c2e3abb1f9eefcdf0bfff45/raw/148c5067e30eae04f96e3233144b4404f70ade47/enterprise_token.rb" -o /app/app/models/enterprise_token.rb && docker restart openproject
-docker start openproject
