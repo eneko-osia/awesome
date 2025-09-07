@@ -1,0 +1,7 @@
+[Match]
+Name=enp3s0
+
+[Network]
+DHCP=yes
+LinkLocalAddressing=ipv4
+IPv6AcceptRA=no
