@@ -9,6 +9,7 @@ local awful_hotkeys_popup   = require("awful.hotkeys_popup")
                               require("awful.hotkeys_popup.keys")
 local beautiful             = require("beautiful")
 local gears                 = require("gears")
+local lain                  = require("lain")
 local menu                  = require("menu")
 local menubar               = require("menubar")
 local naughty               = require("naughty")
@@ -22,7 +23,7 @@ local widget_music          = require("widget.music")
 local widget_network        = require("widget.network")
 local widget_terminal       = require("widget.terminal")
 local widget_volume         = require("widget.volume")
-local widget_vpn            = require("widget.vpn")
+-- local widget_vpn            = require("widget.vpn")
 -- }}}
 
 -- {{{ Variable definitions
@@ -109,6 +110,11 @@ local layouts =
         LAYOUT_MAX =                    10,
         LAYOUT_MAX_FULLSCREEN =         11,
         LAYOUT_MAGNIFIER =              12,
+        LAYOUT_CENTERWORK =             13,
+        LAYOUT_CASCADE =                14,
+        LAYOUT_CASCADE_TILE =           15,
+        LAYOUT_CENTERWORK_HORIZONTAL =  16,
+        LAYOUT_TERMFAIR_CENTER =        17,
 
         suits =
             {
@@ -123,7 +129,12 @@ local layouts =
                 awful.layout.suit.spiral.dwindle,
                 awful.layout.suit.max,
                 awful.layout.suit.max.fullscreen,
-                awful.layout.suit.magnifier
+                awful.layout.suit.magnifier,
+                lain.layout.centerwork,
+                lain.layout.cascade,
+                lain.layout.cascade.tile,
+                lain.layout.centerwork.horizontal,
+                lain.layout.termfair.center
             }
     }
 
@@ -238,6 +249,7 @@ local launcher_menu = awful.widget.launcher(
 function startup_programs()
     awful.spawn("discord")
     awful.spawn("firefox")
+    awful.spawn("opencloud")
     awful.spawn("slack")
     awful.spawn("steam")
     awful.spawn("zoom")
@@ -422,9 +434,10 @@ local file_system_widget = widget_file_system(
             {
                 "/",
                 "/home",
-                "/mnt/data",
                 "/mnt/games",
-                "/mnt/usb"
+                "/mnt/usb",
+                "/mnt/tnas/data",
+                "/mnt/tnas/system"
             },
         timeout = 30
     }
@@ -523,16 +536,16 @@ local volume_widget = widget_volume(
 )
 
 -- Vpn widget
-local vpn_widget = widget_vpn(
-    {
-        icons =
-            {
-                connected = beautiful.widget.vpn_connected,
-                diconnected = beautiful.widget.vpn_disconnected
-            },
-        timeout = 2
-    }
-)
+-- local vpn_widget = widget_vpn(
+--     {
+--         icons =
+--             {
+--                 connected = beautiful.widget.vpn_connected,
+--                 diconnected = beautiful.widget.vpn_disconnected
+--             },
+--         timeout = 2
+--     }
+-- )
 
 function set_widgets(s)
     -- Prompt box
@@ -661,7 +674,7 @@ function set_widgets(s)
                     -- Separator
                     spr,
                     -- Vpn
-                    vpn_widget,
+                    -- vpn_widget,
                     -- Separator
                     spr,
                     spr4px,
@@ -749,7 +762,7 @@ function set_widgets(s)
                     -- Separator
                     spr,
                     -- Vpn
-                    vpn_widget,
+                    -- vpn_widget,
                     -- Separator
                     spr,
                     spr4px,
