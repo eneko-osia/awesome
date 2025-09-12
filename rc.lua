@@ -249,7 +249,6 @@ local launcher_menu = awful.widget.launcher(
 function startup_programs()
     awful.spawn("discord")
     awful.spawn("firefox")
-    awful.spawn("opencloud")
     awful.spawn("slack")
     awful.spawn("steam")
     awful.spawn("zoom")
