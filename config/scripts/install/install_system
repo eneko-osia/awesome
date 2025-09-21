@@ -6,6 +6,9 @@ sudo pacman --needed -S \
     awesome             \
     base-devel          \
     bash-completion     \
+    blueman             \
+    bluez               \
+    bluez-utils         \
     cmake               \
     dosfstools          \
     feh                 \
