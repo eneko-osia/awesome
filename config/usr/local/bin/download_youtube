@@ -1,0 +1,3 @@
+#!/bin/bash
+
+yt-dlp -f "bv*[vcodec^=avc1]+ba[acodec^=mp4a]/b" -ciw -o "%(playlist_index)02d-%(title)s.%(ext)s" --merge-output-format mkv "$1"
