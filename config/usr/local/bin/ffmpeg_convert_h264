@@ -1,0 +1,22 @@
+#!/bin/bash
+
+cd "$1" || exit
+for f in *.mkv; do
+    echo "=== Processing: $f ==="
+
+    ffmpeg -i "$f" \
+        -map 0:v:0 -map 0:a:1 \
+        -c:v libx264 -preset slow -crf 18 -metadata:s:v:0 title="" \
+        -c:a aac -b:a 160k -metadata:s:a:0 title="" \
+        -sn \
+        "converted_$f"
+
+    if [ $? -eq 0 ]; then
+        echo "Replacing original file with converted version..."
+        mv -f "converted_$f" "$f"
+        echo "✔ Done: $f"
+    else
+        echo "❌ ERROR converting $f"
+        rm -f "converted_$f"
+    fi
+done
