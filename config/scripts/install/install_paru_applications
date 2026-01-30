@@ -8,6 +8,8 @@ paru --needed -S                \
     heroic-games-launcher-bin   \
     mcomix                      \
     mkinitcpio-firmware         \
+    mullvad-browser-bin         \
+    mullvad-vpn-bin             \
     parsec-bin                  \
     protonup-qt                 \
     sgdboop-bin                 \

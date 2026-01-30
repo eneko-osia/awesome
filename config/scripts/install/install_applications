@@ -4,11 +4,10 @@
 sudo pacman --needed -S \
     discord             \
     easytag             \
-    firefox             \
     gimp                \
     libreoffice-still   \
     steam               \
     tigervnc            \
     vlc                 \
-    vlc-plugin-ffmpeg   \
+    vlc-plugins-all     \
     yt-dlp
