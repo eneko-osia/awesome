@@ -248,10 +248,9 @@ local launcher_menu = awful.widget.launcher(
 -- {{{ Startup programs
 function startup_programs()
     awful.spawn("discord")
-    awful.spawn("firefox")
-    awful.spawn("slack")
+    awful.spawn("mullvad-browser")
+    awful.spawn("mullvad-vpn")
     awful.spawn("steam")
-    awful.spawn("zoom")
 end
 -- }}}
 
