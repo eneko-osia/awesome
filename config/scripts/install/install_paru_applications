@@ -6,6 +6,7 @@ paru --needed -S                \
     feishin-bin                 \
     freetube-bin                \
     heroic-games-launcher-bin   \
+    jitsi-meet-desktop-bin      \
     mcomix                      \
     mkinitcpio-firmware         \
     mullvad-browser-bin         \
