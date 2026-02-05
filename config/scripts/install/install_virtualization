@@ -2,11 +2,11 @@
 
 # install pacman packages
 sudo pacman --needed -S \
-    qemu                \
+    dnsmasq             \
+    iptables-nft        \
     libbsd              \
     libvirt             \
-    iptables-nft        \
-    dnsmasq             \
+    qemu                \
     virt-manager
 
 # start libvirtd service
