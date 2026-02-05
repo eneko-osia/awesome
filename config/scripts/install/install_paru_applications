@@ -18,6 +18,7 @@ paru --needed -S                \
     steamlink                   \
     tiny-media-manager          \
     vscodium-bin                \
+    wireguird                   \
     xfe                         \
     yed                         \
     zoom
