@@ -6,6 +6,7 @@ sudo pacman --needed -S \
     awesome             \
     base-devel          \
     bash-completion     \
+    bind                \
     blueman             \
     bluez               \
     bluez-utils         \
