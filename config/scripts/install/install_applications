@@ -7,6 +7,7 @@ sudo pacman --needed -S \
     firefox             \
     gimp                \
     libreoffice-still   \
+    nicotine+           \
     steam               \
     tigervnc            \
     vlc                 \
